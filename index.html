@@ -285,7 +285,28 @@ canvas{
   border:none;
   color:#eaf1ff;
 }
+details{
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:10px;
+  padding:8px 10px;
+  margin-bottom:8px;
+  background:rgba(255,255,255,.03);
+}
 
+summary{
+  cursor:pointer;
+  font-weight:700;
+  font-size:14px;
+  list-style:none;
+}
+
+summary::-webkit-details-marker{
+  display:none;
+}
+
+details[open] summary{
+  color:#cfe2ff;
+}
 </style>
 </head>
 
@@ -1005,79 +1026,90 @@ document.addEventListener("DOMContentLoaded", () => {
     <h2>ℹ️ Méthode d’alignement</h2>
 
     <div class="infoScroll">
-      <h3>Principe général</h3>
-<p>
-Cette application utilise la méthode du <b>comparateur inversé (TIR – Total Indicator Reading)</b>,
-une méthode standard industrielle utilisée pour l’alignement des arbres de machines tournantes.
-</p>
+   <details open>
+  <summary><b>Principe général – Comparateur inversé (TIR)</b></summary>
+  <p>
+    Cette application utilise la méthode du <b>comparateur inversé</b>,
+    une méthode industrielle standard pour l’alignement des arbres.
+  </p>
+  <p class="mono">
+    TIR = Lecture MAX − Lecture MIN
+  </p>
+  <p>
+    Le TIR mesure un <b>défaut</b>, jamais une correction.
+  </p>
+</details>
 
-<h3>1) TIR – Total Indicator Reading</h3>
-<p>
-Le TIR correspond à la <b>différence entre la lecture maximale et minimale</b> observée à l’indicateur à cadran.
-</p>
-<p class="mono">
-TIR = Lecture MAX − Lecture MIN
-</p>
-<p>
-Le TIR n’est <b>pas une correction</b>, mais une <b>mesure de défaut</b>.
-</p>
+<details>
+  <summary><b>Voilage (runout)</b></summary>
+  <p>
+    Le voilage correspond au faux-rond d’un arbre ou d’un accouplement.
+  </p>
+  <p>
+    Un voilage excessif invalide toutes les mesures d’alignement.
+  </p>
+</details>
 
-<h3>2) Voilage (runout)</h3>
-<p>
-Le voilage mesure le faux-rond d’un arbre ou d’un accouplement.
-Un voilage excessif fausse toutes les mesures d’alignement.
-</p>
-<p>
-Si le voilage dépasse la tolérance, il doit être corrigé avant de poursuivre.
-</p>
+<details>
+  <summary><b>Pied boiteux (soft foot)</b></summary>
+  <p>
+    Un pied boiteux est présent lorsque les pattes ne reposent pas
+    uniformément sur la base.
+  </p>
+  <p class="mono">
+    Pied boiteux = Lecture MAX − Lecture MIN
+  </p>
+  <p>
+    En pratique, on corrige environ <b>80 %</b> de la valeur mesurée
+    avec des cales, puis on revérifie.
+  </p>
+</details>
 
-<h3>3) Pied boiteux (soft foot)</h3>
-<p>
-Un pied boiteux est présent lorsque toutes les pattes du moteur ne reposent pas
-uniformément sur la base.
-</p>
+<details>
+  <summary><b>Angularité verticale</b></summary>
+  <p>
+    Inclinaison entre les axes (vue de profil).
+  </p>
+  <p class="mono">
+    Correction ∝ TIR ÷ distance
+  </p>
+</details>
 
-<p class="mono">
-Pied boiteux = Lecture MAX − Lecture MIN
-</p>
+<details>
+  <summary><b>Parallélisme vertical</b></summary>
+  <p>
+    Décalage vertical uniforme entre les axes.
+  </p>
+</details>
 
-<p>
-La patte ayant la plus grande variation est considérée comme la <b>patte fautive</b>.
-</p>
+<details>
+  <summary><b>Angularité horizontale</b></summary>
+  <p>
+    Inclinaison gauche / droite visible en vue de dessus.
+  </p>
+</details>
 
-<p>
-En pratique, on recommande de corriger environ <b>80 % de la valeur mesurée</b>
-en utilisant des cales (shims), puis de revérifier.
-</p>
+<details>
+  <summary><b>Parallélisme horizontal</b></summary>
+  <p>
+    Décalage horizontal uniforme entre les axes.
+  </p>
+</details>
 
-<h3>4) Angularité</h3>
-<p>
-L’angularité correspond à une inclinaison entre les axes des deux machines.
-Elle est mesurée par une différence de lecture entre deux positions opposées
-(12h–6h ou 3h–9h).
-</p>
-
-<p class="mono">
-Correction ∝ TIR ÷ distance
-</p>
-
-<p>
-Dans cette application, l’effet de l’angularité est <b>exagéré visuellement</b>
-afin de faciliter la compréhension.
-</p>
-
-<h3>5) Parallélisme</h3>
-<p>
-Le parallélisme correspond à un décalage uniforme entre les axes.
-La correction se fait par un déplacement égal à la lecture observée.
-</p>
-
-<h3>Important</h3>
-<p>
-Cette application est un <b>outil pédagogique</b>.
-Les déplacements affichés sont volontairement amplifiés visuellement,
-mais les valeurs numériques respectent les formules industrielles.
-</p>
+<details>
+  <summary><b>⚠️ Ordre obligatoire des corrections</b></summary>
+  <ol>
+    <li>Voilage</li>
+    <li>Pied boiteux</li>
+    <li>Angularité verticale</li>
+    <li>Parallélisme vertical</li>
+    <li>Angularité horizontale</li>
+    <li>Parallélisme horizontal</li>
+  </ol>
+  <p>
+    Changer cet ordre rend les résultats <b>mathématiquement faux</b>.
+  </p>
+</details>
     </div>
 
     <button onclick="closeInfo()">Fermer</button>
