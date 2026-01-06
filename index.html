@@ -12,128 +12,56 @@
   --bg:#0b1436;
   --card:#121c4a;
   --text:#eaf1ff;
-  --muted:rgba(234,241,255,.75);
+  --muted:rgba(234,241,255,.72);
   --ok:#4caf50;
   --bad:#ff5252;
   --accent:#00a2ff;
-  --warn:#ffb300;
+  --warn:#ffcc00;
 }
 *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 html,body{ margin:0; background:var(--bg); color:var(--text); font-family:Arial,system-ui,sans-serif; }
 
 header{
   padding:14px 14px 10px;
-  text-align:center;
   font-size:18px;
   font-weight:800;
-}
-.sub{
   text-align:center;
-  opacity:.85;
-  margin:-6px 0 10px;
-  font-size:12px;
 }
 
-.wrap{
-  padding:0 12px 18px;
-  max-width:980px;
-  margin:0 auto;
-}
-
-.grid{
-  display:grid;
-  gap:12px;
-}
-@media (min-width: 860px){
-  .grid{ grid-template-columns: 1.05fr 0.95fr; align-items:start; }
-}
+.wrap{ padding:0 12px 18px; max-width:820px; margin:0 auto; }
 
 .card{
   background:var(--card);
   border-radius:14px;
   padding:14px;
+  margin:10px 0;
 }
 
-h2{
-  margin:0 0 8px;
-  font-size:16px;
-}
-p{
-  margin:6px 0 10px;
-  font-size:13px;
-  color:var(--muted);
-  line-height:1.35;
-}
-
-.step{
-  border:1px solid rgba(255,255,255,.08);
-  border-radius:14px;
-  padding:12px;
-  margin-top:10px;
-  background:rgba(255,255,255,.03);
-}
-.stepHead{
-  display:flex;
-  align-items:baseline;
-  justify-content:space-between;
-  gap:10px;
-}
-.stepTitle{
-  font-weight:800;
-  font-size:14px;
-}
-.badge{
-  font-size:12px;
-  font-weight:800;
-  padding:4px 8px;
-  border-radius:999px;
-  background:rgba(255,255,255,.10);
-  color:var(--muted);
-}
-.badge.ok{ background:rgba(76,175,80,.15); color:#bff3c1; }
-.badge.bad{ background:rgba(255,82,82,.15); color:#ffc2c2; }
-.badge.warn{ background:rgba(255,179,0,.16); color:#ffe6b0; }
+h2{ margin:0 0 10px; font-size:16px; }
+p{ margin:6px 0 10px; font-size:13px; color:var(--muted); line-height:1.35; }
 
 .row{
   display:grid;
   grid-template-columns: 1fr 1fr;
-  gap:8px;
-}
-.row3{
-  display:grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap:8px;
-}
-
-label{
-  display:block;
-  font-size:12px;
-  color:var(--muted);
-  margin-bottom:4px;
-}
-
-input, select{
-  width:100%;
-  padding:10px 10px;
-  font-size:16px;
-  border-radius:12px;
-  border:none;
-  outline:none;
-}
-
-.smallNote{
-  margin-top:10px;
-  font-size:12px;
-  color:var(--muted);
-  line-height:1.35;
-}
-
-.btnRow{
-  display:flex;
   gap:10px;
-  flex-wrap:wrap;
-  margin-top:10px;
 }
+@media (max-width:520px){
+  .row{ grid-template-columns:1fr; }
+}
+
+label{ font-size:12px; color:var(--muted); display:block; }
+input[type="number"]{
+  width:100%;
+  padding:10px;
+  font-size:16px;
+  border:none;
+  border-radius:12px;
+  margin-top:6px;
+}
+input[type="range"]{ width:100%; }
+.small{ font-size:12px; color:var(--muted); margin-top:8px; }
+
+.btnRow{ display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
 button{
   flex:1;
   min-width:140px;
@@ -145,768 +73,661 @@ button{
   color:#fff;
   font-weight:800;
 }
-button.secondary{
-  background:rgba(255,255,255,.12);
+
+.badTxt{ color:var(--bad); font-weight:800; }
+.okTxt{ color:var(--ok); font-weight:800; }
+.warnTxt{ color:var(--warn); font-weight:800; }
+
+.status{
+  margin-top:8px;
+  font-size:13px;
+  line-height:1.35;
 }
 
-.hr{
-  height:1px;
-  background:rgba(255,255,255,.08);
-  margin:12px 0;
-}
-
-/* ====== CANVAS AREA ====== */
-.canvasGrid{
-  display:grid;
-  gap:12px;
-}
-@media (min-width: 860px){
-  .canvasGrid{
-    grid-template-columns: 1fr 1fr;
-  }
-}
-.canvasCard{
-  background:#000;
+.canvasBox{
+  background:#05080f;
   border-radius:14px;
   overflow:hidden;
-  border:1px solid rgba(255,255,255,.10);
-}
-.canvasHeader{
-  padding:10px 12px;
-  font-size:13px;
-  font-weight:800;
-  background:rgba(0,0,0,.35);
-  color:#eaf1ff;
-  border-bottom:1px solid rgba(255,255,255,.08);
-}
-canvas{
-  width:100%;
-  height:240px;
-  display:block;
-  background:#000;
-}
-@media (min-width: 860px){
-  canvas{ height:280px; }
 }
 
-.legend{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-top:10px;
-  font-size:12px;
-  color:var(--muted);
+canvas{
+  width:100%;
+  height:260px;
+  display:block;
+  background:#05080f;
+  touch-action:none;
 }
-.dot{
-  width:10px;height:10px;border-radius:999px;display:inline-block;margin-right:6px;
-}
-.dot.motor{ background:#00a2ff; }
-.dot.pump{ background:#ff9800; }
+#sideView{ height:220px; }
 
 .kpi{
   display:grid;
   grid-template-columns: 1fr 1fr;
-  gap:8px;
+  gap:10px;
   margin-top:10px;
 }
-.kpi .box{
-  padding:10px;
+.kpi .pill{
+  background:rgba(255,255,255,0.08);
   border-radius:12px;
-  background:rgba(255,255,255,.06);
-  border:1px solid rgba(255,255,255,.08);
+  padding:10px;
+  font-size:13px;
+  line-height:1.35;
 }
 .kpi b{ color:#cfe2ff; }
-.kpi .v{ font-size:14px; font-weight:800; margin-top:4px; }
 
-.mono{
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size:12px;
+hr.sep{
+  border:none;
+  height:1px;
+  background:rgba(255,255,255,0.12);
+  margin:12px 0;
 }
 </style>
 </head>
 
 <body>
-<header>Alignement – Comparateur inversé (mils)</header>
-<div class="sub">iPhone-first • 2 vues (dessus + profil) • corrections visibles (exagérées) • pas de blocage d’étapes</div>
+<header>Alignement – Comparateur inversé (mils) • iPhone-first</header>
 
 <div class="wrap">
-  <div class="grid">
 
-    <!-- ===== LEFT: STEPS / INPUTS ===== -->
-    <div class="card" id="panelInputs">
-      <h2>Entrées & étapes</h2>
-      <p>
-        Signe standard : <b>+</b> = <b>monte / va à droite</b>, <b>−</b> = <b>descend / va à gauche</b>.
-        Les déplacements sont <b>exagérés visuellement</b> pour être perceptibles.
-      </p>
-
-      <div class="step" id="step1">
-        <div class="stepHead">
-          <div class="stepTitle">1) Voilage (runout)</div>
-          <div class="badge" id="b1">Info</div>
-        </div>
-        <p>Entrer le voilage max (mils). (Ce n’est pas bloquant; on indique seulement l’état.)</p>
-        <div class="row">
-          <div>
-            <label>Voilage (mils)</label>
-            <input id="runout" type="number" inputmode="decimal" step="0.1" value="0.8">
-          </div>
-          <div>
-            <label>Tolérance voilage (mils)</label>
-            <input id="runoutTol" type="number" inputmode="decimal" step="0.1" value="2.0">
-          </div>
-        </div>
+  <!-- 0) Paramètres visuels -->
+  <div class="card">
+    <h2>🎛️ Paramètres (pédagogiques)</h2>
+    <div class="row">
+      <div>
+        <label>Exagération visuelle (×) — pour voir les mils à l’œil</label>
+        <input id="gain" type="range" min="20" max="200" value="80">
+        <div class="small">Plus grand = déplacements plus visibles sur le dessin.</div>
       </div>
-
-      <div class="step" id="step2">
-        <div class="stepHead">
-          <div class="stepTitle">2) Pied boiteux (soft foot)</div>
-          <div class="badge" id="b2">Info</div>
-        </div>
-        <p>Entrer les 4 lectures (mils) par patte (différence max-min). Le logiciel retient la pire patte.</p>
-
-        <div class="row">
-          <div>
-            <label>Patte AV-G (mils)</label>
-            <input id="sfFL" type="number" inputmode="decimal" step="0.1" value="2.0">
-          </div>
-          <div>
-            <label>Patte AV-D (mils)</label>
-            <input id="sfFR" type="number" inputmode="decimal" step="0.1" value="1.0">
-          </div>
-        </div>
-        <div class="row" style="margin-top:8px;">
-          <div>
-            <label>Patte AR-G (mils)</label>
-            <input id="sfRL" type="number" inputmode="decimal" step="0.1" value="0.5">
-          </div>
-          <div>
-            <label>Patte AR-D (mils)</label>
-            <input id="sfRR" type="number" inputmode="decimal" step="0.1" value="3.5">
-          </div>
-        </div>
-
-        <div class="row" style="margin-top:8px;">
-          <div>
-            <label>Tolérance pied boiteux (mils)</label>
-            <input id="sfTol" type="number" inputmode="decimal" step="0.1" value="3.0">
-          </div>
-          <div>
-            <label>Patte affectée</label>
-            <select id="sfFoot">
-              <option value="auto" selected>Auto (pire patte)</option>
-              <option value="FL">AV-G</option>
-              <option value="FR">AV-D</option>
-              <option value="RL">AR-G</option>
-              <option value="RR">AR-D</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="smallNote">
-          Astuce : en vrai, on corrige par cales (shims). Ici, la vue de profil montre une patte plus basse pour comprendre l’effet.
-        </div>
-      </div>
-
-      <div class="step" id="step3">
-        <div class="stepHead">
-          <div class="stepTitle">3) Angularité verticale</div>
-          <div class="badge" id="b3">Info</div>
-        </div>
-        <p>Entrer l’angularité verticale (mils). (+) = nez du moteur “monte” côté pompe (visuel).</p>
-        <div class="row">
-          <div>
-            <label>Angularité V (mils)</label>
-            <input id="angV" type="number" inputmode="decimal" step="0.1" value="0.0">
-          </div>
-          <div>
-            <label>Tolérance (mils)</label>
-            <input id="angVTol" type="number" inputmode="decimal" step="0.1" value="1.0">
-          </div>
-        </div>
-      </div>
-
-      <div class="step" id="step4">
-        <div class="stepHead">
-          <div class="stepTitle">4) Parallélisme vertical</div>
-          <div class="badge" id="b4">Info</div>
-        </div>
-        <p>Entrer le parallélisme vertical (mils). (+) = moteur “monte” globalement.</p>
-        <div class="row">
-          <div>
-            <label>Parallélisme V (mils)</label>
-            <input id="parV" type="number" inputmode="decimal" step="0.1" value="0.0">
-          </div>
-          <div>
-            <label>Tolérance (mils)</label>
-            <input id="parVTol" type="number" inputmode="decimal" step="0.1" value="1.0">
-          </div>
-        </div>
-      </div>
-
-      <div class="step" id="step5">
-        <div class="stepHead">
-          <div class="stepTitle">5) Angularité horizontale</div>
-          <div class="badge" id="b5">Info</div>
-        </div>
-        <p>Entrer l’angularité horizontale (mils). (+) = nez du moteur “va à droite”.</p>
-        <div class="row">
-          <div>
-            <label>Angularité H (mils)</label>
-            <input id="angH" type="number" inputmode="decimal" step="0.1" value="0.0">
-          </div>
-          <div>
-            <label>Tolérance (mils)</label>
-            <input id="angHTol" type="number" inputmode="decimal" step="0.1" value="1.0">
-          </div>
-        </div>
-      </div>
-
-      <div class="step" id="step6">
-        <div class="stepHead">
-          <div class="stepTitle">6) Parallélisme horizontal</div>
-          <div class="badge" id="b6">Info</div>
-        </div>
-        <p>Entrer le parallélisme horizontal (mils). (+) = moteur “se décale” à droite.</p>
-        <div class="row">
-          <div>
-            <label>Parallélisme H (mils)</label>
-            <input id="parH" type="number" inputmode="decimal" step="0.1" value="0.0">
-          </div>
-          <div>
-            <label>Tolérance (mils)</label>
-            <input id="parHTol" type="number" inputmode="decimal" step="0.1" value="1.0">
-          </div>
-        </div>
-      </div>
-
-      <div class="hr"></div>
-
-      <h2>Affichage (pédagogique)</h2>
-      <p>Le gain visuel amplifie les mils en pixels pour voir les corrections.</p>
-      <div class="row">
-        <div>
-          <label>Gain visuel (px par mil)</label>
-          <input id="gain" type="number" inputmode="decimal" step="1" value="25">
-        </div>
-        <div>
-          <label>Réinitialiser</label>
-          <button class="secondary" id="btnReset" type="button">Reset valeurs</button>
-        </div>
-      </div>
-
-      <div class="kpi">
-        <div class="box">
-          <b>Résumé vertical</b>
-          <div class="v mono" id="kpiV">—</div>
-        </div>
-        <div class="box">
-          <b>Résumé horizontal</b>
-          <div class="v mono" id="kpiH">—</div>
-        </div>
-      </div>
-
-      <div class="legend">
-        <div><span class="dot motor"></span>Moteur (mobile)</div>
-        <div><span class="dot pump"></span>Pompe (fixe)</div>
-      </div>
-
-      <div class="smallNote">
-        Les tolérances ici sont des valeurs pédagogiques par défaut. On pourra les ajuster à ta méthode (et plus tard: calculs complets “comparateur inversé”).
+      <div>
+        <label>Tolérance pied boiteux (mils)</label>
+        <input id="softTol" type="number" inputmode="decimal" value="3">
+        <div class="small">Référence pédagogique (ex.: 2 à 3 mils selon pratiques).</div>
       </div>
     </div>
 
-    <!-- ===== RIGHT: CANVAS VIEWS ===== -->
-    <div class="card">
-      <h2>Vues synchronisées</h2>
-      <p>Les deux vues changent en temps réel à chaque modification.</p>
-
-      <div class="canvasGrid">
-        <div class="canvasCard">
-          <div class="canvasHeader">Vue de dessus (horizontal)</div>
-          <canvas id="topView"></canvas>
-        </div>
-        <div class="canvasCard">
-          <div class="canvasHeader">Vue de profil (vertical)</div>
-          <canvas id="sideView"></canvas>
-        </div>
-      </div>
+    <div class="btnRow">
+      <button id="resetBtn" type="button">Reset (tout remettre à 0)</button>
     </div>
-
   </div>
+
+  <!-- 1) Pied boiteux -->
+  <div class="card">
+    <h2>1️⃣ Pied boiteux (4 pattes) — entrées directes</h2>
+    <p>
+      Entre la valeur (mils) mesurée à chaque patte du <b>moteur</b> (ex.: variation max-min au comparateur).
+      L’outil affiche <b>rouge</b> si hors tolérance, mais <b>n’empêche pas</b> de continuer.
+    </p>
+
+    <div class="row">
+      <div><label>Patte AV-G (mils)</label><input id="sf_fl" type="number" inputmode="decimal" value="0"></div>
+      <div><label>Patte AV-D (mils)</label><input id="sf_fr" type="number" inputmode="decimal" value="0"></div>
+      <div><label>Patte AR-G (mils)</label><input id="sf_rl" type="number" inputmode="decimal" value="0"></div>
+      <div><label>Patte AR-D (mils)</label><input id="sf_rr" type="number" inputmode="decimal" value="0"></div>
+    </div>
+
+    <div class="status" id="softStatus"></div>
+  </div>
+
+  <!-- 2) Corrections live -->
+  <div class="card">
+    <h2>2️⃣ Corrections (live) — moteur mobile / pompe fixe</h2>
+    <p>
+      Tu ajustes ces valeurs comme si tu appliquais des corrections. Le dessin exagère pour être visible.
+      <b>Offset</b> = parallélisme. <b>Angularité</b> = différence AV/AR (shim ou déplacement latéral AV/AR).
+    </p>
+
+    <div class="row">
+      <div>
+        <label>Parallélisme vertical (Offset Y) — mils</label>
+        <input id="offY" type="range" min="-20" max="20" value="0">
+        <div class="small"><span id="offYv">0</span> mils</div>
+      </div>
+      <div>
+        <label>Parallélisme horizontal (Offset X) — mils</label>
+        <input id="offX" type="range" min="-20" max="20" value="0">
+        <div class="small"><span id="offXv">0</span> mils</div>
+      </div>
+
+      <div>
+        <label>Angularité verticale (shim AV vs AR) — Δmils</label>
+        <input id="angV" type="range" min="-20" max="20" value="0">
+        <div class="small"><span id="angVv">0</span> mils (AV ↕ / AR ↕)</div>
+      </div>
+      <div>
+        <label>Angularité horizontale (AV vs AR) — Δmils</label>
+        <input id="angH" type="range" min="-20" max="20" value="0">
+        <div class="small"><span id="angHv">0</span> mils (AV ↔ / AR ↔)</div>
+      </div>
+    </div>
+
+    <div class="kpi">
+      <div class="pill">
+        <b>Interprétation (rappel)</b><br>
+        Offset = même valeur AV/AR.<br>
+        Angularité = AV ≠ AR.
+      </div>
+      <div class="pill">
+        <b>Astuce</b><br>
+        Mets gain élevé (ex. 80–120) pour bien voir les variations.
+      </div>
+    </div>
+
+    <div class="status" id="alignStatus"></div>
+  </div>
+
+  <!-- 3) Dessins -->
+  <div class="card">
+    <h2>🧭 Vue du dessus (plan)</h2>
+    <p>Grille plus voyante + arbres + accouplement. Pompe fixe (orange), moteur mobile (bleu).</p>
+    <div class="canvasBox"><canvas id="topView"></canvas></div>
+
+    <hr class="sep">
+
+    <h2>📐 Vue de profil</h2>
+    <p>Montre surtout l’effet du vertical (offset + angularité verticale).</p>
+    <div class="canvasBox"><canvas id="sideView"></canvas></div>
+  </div>
+
 </div>
 
 <script>
 (() => {
   "use strict";
 
-  /* ===================== ÉTAT (mils) ===================== */
-  const align = {
-    runout: 0.8,
-    runoutTol: 2.0,
+  /* ========= DOM ========= */
+  const gainEl   = document.getElementById("gain");
+  const softTolEl= document.getElementById("softTol");
 
-    sf: { FL:2.0, FR:1.0, RL:0.5, RR:3.5 },
-    sfTol: 3.0,
-    sfFoot: "auto", // auto|FL|FR|RL|RR
-
-    angV: 0.0,
-    angVTol: 1.0,
-
-    parV: 0.0,
-    parVTol: 1.0,
-
-    angH: 0.0,
-    angHTol: 1.0,
-
-    parH: 0.0,
-    parHTol: 1.0,
-
-    gain: 25
+  const sf = {
+    fl: document.getElementById("sf_fl"),
+    fr: document.getElementById("sf_fr"),
+    rl: document.getElementById("sf_rl"),
+    rr: document.getElementById("sf_rr"),
   };
 
-  const clamp = (v,a,b)=>Math.max(a, Math.min(b, v));
-  const isNum = (x)=>Number.isFinite(x);
+  const offXEl = document.getElementById("offX");
+  const offYEl = document.getElementById("offY");
+  const angVEl = document.getElementById("angV");
+  const angHEl = document.getElementById("angH");
 
-  /* ===================== DOM ===================== */
-  const el = (id)=>document.getElementById(id);
+  const offXv = document.getElementById("offXv");
+  const offYv = document.getElementById("offYv");
+  const angVv = document.getElementById("angVv");
+  const angHv = document.getElementById("angHv");
 
-  const runout    = el("runout");
-  const runoutTol = el("runoutTol");
+  const softStatus = document.getElementById("softStatus");
+  const alignStatus = document.getElementById("alignStatus");
 
-  const sfFL = el("sfFL");
-  const sfFR = el("sfFR");
-  const sfRL = el("sfRL");
-  const sfRR = el("sfRR");
-  const sfTol = el("sfTol");
-  const sfFoot = el("sfFoot");
+  const resetBtn = document.getElementById("resetBtn");
 
-  const angV = el("angV");
-  const angVTol = el("angVTol");
-
-  const parV = el("parV");
-  const parVTol = el("parVTol");
-
-  const angH = el("angH");
-  const angHTol = el("angHTol");
-
-  const parH = el("parH");
-  const parHTol = el("parHTol");
-
-  const gain = el("gain");
-  const btnReset = el("btnReset");
-
-  const kpiV = el("kpiV");
-  const kpiH = el("kpiH");
-
-  const b1 = el("b1");
-  const b2 = el("b2");
-  const b3 = el("b3");
-  const b4 = el("b4");
-  const b5 = el("b5");
-  const b6 = el("b6");
-
-  const topCanvas = el("topView");
-  const topCtx = topCanvas.getContext("2d");
-
-  const sideCanvas = el("sideView");
+  const topCanvas  = document.getElementById("topView");
+  const sideCanvas = document.getElementById("sideView");
+  const topCtx  = topCanvas.getContext("2d");
   const sideCtx = sideCanvas.getContext("2d");
 
-  /* ===================== LECTURE / MAJ ===================== */
-  function readFloat(inputEl, fallback){
-    const v = parseFloat(inputEl.value);
-    return isNum(v) ? v : fallback;
+  const dprNow = () => Math.min(3, window.devicePixelRatio || 1);
+  const clamp = (v,a,b)=>Math.max(a, Math.min(b, v));
+
+  function toNum(el){
+    const v = parseFloat(el.value);
+    return Number.isFinite(v) ? v : 0;
   }
 
-  function syncFromInputs(){
-    align.runout = readFloat(runout, align.runout);
-    align.runoutTol = Math.max(0, readFloat(runoutTol, align.runoutTol));
+  /* ========= Modèle =========
+     On dessine un ensemble pompe (fixe) + moteur (mobile).
+     Les "mils" deviennent des pixels via gain.
+  */
+  const model = {
+    // offsets
+    offX: 0, // mils
+    offY: 0, // mils
+    angV: 0, // mils (diff AV/AR sur Y)
+    angH: 0, // mils (diff AV/AR sur X)
+    gain: 80, // px per mil (exagération)
+  };
 
-    align.sf.FL = Math.abs(readFloat(sfFL, align.sf.FL));
-    align.sf.FR = Math.abs(readFloat(sfFR, align.sf.FR));
-    align.sf.RL = Math.abs(readFloat(sfRL, align.sf.RL));
-    align.sf.RR = Math.abs(readFloat(sfRR, align.sf.RR));
-
-    align.sfTol = Math.max(0, readFloat(sfTol, align.sfTol));
-    align.sfFoot = sfFoot.value || "auto";
-
-    align.angV = readFloat(angV, align.angV);
-    align.angVTol = Math.max(0, readFloat(angVTol, align.angVTol));
-
-    align.parV = readFloat(parV, align.parV);
-    align.parVTol = Math.max(0, readFloat(parVTol, align.parVTol));
-
-    align.angH = readFloat(angH, align.angH);
-    align.angHTol = Math.max(0, readFloat(angHTol, align.angHTol));
-
-    align.parH = readFloat(parH, align.parH);
-    align.parHTol = Math.max(0, readFloat(parHTol, align.parHTol));
-
-    align.gain = clamp(readFloat(gain, align.gain), 1, 120);
-  }
-
-  /* ===================== STATUTS (non bloquant) ===================== */
-  function setBadge(badgeEl, kind, txt){
-    badgeEl.classList.remove("ok","bad","warn");
-    badgeEl.classList.add(kind);
-    badgeEl.textContent = txt;
-  }
-
-  function computeWorstSoftFoot(){
-    const entries = Object.entries(align.sf); // [ [FL,val], ... ]
-    entries.sort((a,b)=>b[1]-a[1]);
-    return { foot: entries[0][0], val: entries[0][1] };
-  }
-
-  function getActiveSoftFoot(){
-    if(align.sfFoot && align.sfFoot !== "auto"){
-      return { foot: align.sfFoot, val: align.sf[align.sfFoot] ?? 0 };
-    }
-    return computeWorstSoftFoot();
-  }
-
-  function updateBadges(){
-    // 1) runout
-    const okRunout = Math.abs(align.runout) <= align.runoutTol;
-    setBadge(b1, okRunout ? "ok" : "bad", okRunout ? "OK" : "À corriger");
-
-    // 2) soft foot (pire patte ou patte choisie)
-    const sf = getActiveSoftFoot();
-    const okSF = sf.val <= align.sfTol;
-    setBadge(b2, okSF ? "ok" : "bad", okSF ? "OK" : "À corriger");
-
-    // 3) ang V
-    const okAngV = Math.abs(align.angV) <= align.angVTol;
-    setBadge(b3, okAngV ? "ok" : "bad", okAngV ? "OK" : "À corriger");
-
-    // 4) par V
-    const okParV = Math.abs(align.parV) <= align.parVTol;
-    setBadge(b4, okParV ? "ok" : "bad", okParV ? "OK" : "À corriger");
-
-    // 5) ang H
-    const okAngH = Math.abs(align.angH) <= align.angHTol;
-    setBadge(b5, okAngH ? "ok" : "bad", okAngH ? "OK" : "À corriger");
-
-    // 6) par H
-    const okParH = Math.abs(align.parH) <= align.parHTol;
-    setBadge(b6, okParH ? "ok" : "bad", okParH ? "OK" : "À corriger");
-
-    // KPI text
-    const sf2 = getActiveSoftFoot();
-    kpiV.textContent =
-      `SF ${sf2.foot}=${sf2.val.toFixed(1)} mil | angV=${align.angV.toFixed(1)} | parV=${align.parV.toFixed(1)} | gain=${align.gain.toFixed(0)}`;
-
-    kpiH.textContent =
-      `angH=${align.angH.toFixed(1)} | parH=${align.parH.toFixed(1)} | (+)=droite`;
-  }
-
-  /* ===================== CANVAS UTILS ===================== */
-  function dprNow(){ return Math.min(3, window.devicePixelRatio || 1); }
-
-  function resizeCanvas(c, ctx){
+  /* ========= Canvas resize ========= */
+  function resizeCanvas(canvas, ctx){
     const dpr = dprNow();
-    const w = c.clientWidth || 300;
-    const h = c.clientHeight || 240;
-    c.width  = Math.round(w * dpr);
-    c.height = Math.round(h * dpr);
+    const cssW = canvas.clientWidth || 1;
+    const cssH = canvas.clientHeight || 1;
+    canvas.width  = Math.round(cssW * dpr);
+    canvas.height = Math.round(cssH * dpr);
     ctx.setTransform(dpr,0,0,dpr,0,0);
-    return { W: w, H: h };
   }
 
-  function clear(ctx, W, H){
-    ctx.clearRect(0,0,W,H);
-    ctx.fillStyle="#000";
-    ctx.fillRect(0,0,W,H);
+  function resizeAll(){
+    resizeCanvas(topCanvas, topCtx);
+    resizeCanvas(sideCanvas, sideCtx);
+    drawAll();
   }
 
+  /* ========= Grille (plus voyante) ========= */
   function drawGrid(ctx, W, H){
-    ctx.strokeStyle="rgba(255,255,255,.06)";
-    ctx.lineWidth=1;
-    const step = 24;
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle = "#05080f";
+    ctx.fillRect(0,0,W,H);
+
+    // Grille principale
+    const step = 20; // px
+    ctx.lineWidth = 1;
+
+    // lignes fines
+    ctx.strokeStyle = "rgba(255,255,255,0.12)";
     for(let x=0; x<=W; x+=step){
-      ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(x,0); ctx.lineTo(x,H);
+      ctx.stroke();
     }
     for(let y=0; y<=H; y+=step){
-      ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(0,y); ctx.lineTo(W,y);
+      ctx.stroke();
+    }
+
+    // lignes fortes (toutes les 5)
+    ctx.strokeStyle = "rgba(0,162,255,0.28)";
+    ctx.lineWidth = 1.4;
+    for(let x=0; x<=W; x+=step*5){
+      ctx.beginPath();
+      ctx.moveTo(x,0); ctx.lineTo(x,H);
+      ctx.stroke();
+    }
+    for(let y=0; y<=H; y+=step*5){
+      ctx.beginPath();
+      ctx.moveTo(0,y); ctx.lineTo(W,y);
+      ctx.stroke();
+    }
+
+    // axes centre
+    ctx.strokeStyle = "rgba(255,255,255,0.35)";
+    ctx.lineWidth = 1.8;
+    ctx.beginPath(); ctx.moveTo(W/2,0); ctx.lineTo(W/2,H); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0,H/2); ctx.lineTo(W,H/2); ctx.stroke();
+  }
+
+  /* ========= Dessin des machines (style schéma) ========= */
+  function drawMachineTop(ctx, x, y, w, h, color, label){
+    // corps
+    ctx.fillStyle = color;
+    ctx.globalAlpha = 0.92;
+    ctx.fillRect(x, y, w, h);
+    ctx.globalAlpha = 1;
+
+    // contour
+    ctx.strokeStyle = "rgba(255,255,255,0.25)";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(x, y, w, h);
+
+    // pattes (4)
+    const footW = 18;
+    const footH = 10;
+    const pad = 10;
+
+    ctx.fillStyle = "rgba(255,255,255,0.22)";
+    // avant (g/d)
+    ctx.fillRect(x+pad,     y+h, footW, footH);
+    ctx.fillRect(x+w-pad-footW, y+h, footW, footH);
+    // arrière (g/d)
+    ctx.fillRect(x+pad,     y-footH, footW, footH);
+    ctx.fillRect(x+w-pad-footW, y-footH, footW, footH);
+
+    // label
+    ctx.fillStyle = "#eaf1ff";
+    ctx.font = "12px Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "bottom";
+    ctx.fillText(label, x+w/2, y-12);
+  }
+
+  function drawMachineSide(ctx, x, y, w, h, color, label){
+    ctx.fillStyle = color;
+    ctx.globalAlpha = 0.92;
+    ctx.fillRect(x, y, w, h);
+    ctx.globalAlpha = 1;
+
+    ctx.strokeStyle = "rgba(255,255,255,0.25)";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(x, y, w, h);
+
+    // base
+    ctx.fillStyle = "rgba(255,255,255,0.14)";
+    ctx.fillRect(x, y+h, w, 8);
+
+    ctx.fillStyle = "#eaf1ff";
+    ctx.font = "12px Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "bottom";
+    ctx.fillText(label, x+w/2, y-10);
+  }
+
+  /* ========= Arbres + accouplement ========= */
+  function drawShaftAndCouplingTop(ctx, pumpCX, pumpCY, motorCX, motorCY, coupX){
+    // ligne d’axe pompe
+    ctx.strokeStyle = "rgba(255,152,0,0.90)";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(pumpCX-120, pumpCY);
+    ctx.lineTo(coupX, pumpCY);
+    ctx.stroke();
+
+    // ligne d’axe moteur
+    ctx.strokeStyle = "rgba(0,162,255,0.95)";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(motorCX+120, motorCY);
+    ctx.lineTo(coupX, motorCY);
+    ctx.stroke();
+
+    // accouplement (2 demi)
+    const r = 14;
+    ctx.fillStyle = "rgba(255,152,0,0.95)";
+    ctx.beginPath(); ctx.arc(coupX-10, pumpCY, r, 0, Math.PI*2); ctx.fill();
+
+    ctx.fillStyle = "rgba(0,162,255,0.95)";
+    ctx.beginPath(); ctx.arc(coupX+10, motorCY, r, 0, Math.PI*2); ctx.fill();
+
+    // jeu au centre
+    ctx.strokeStyle = "rgba(255,255,255,0.65)";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(coupX, Math.min(pumpCY, motorCY)-18);
+    ctx.lineTo(coupX, Math.max(pumpCY, motorCY)+18);
+    ctx.stroke();
+
+    // annotation décalage
+    const dy = motorCY - pumpCY;
+    const dx = (motorCX - pumpCX);
+
+    ctx.fillStyle = "rgba(255,255,255,0.90)";
+    ctx.font = "12px Arial";
+    ctx.textAlign = "left";
+    ctx.textBaseline = "top";
+    ctx.fillText(`ΔY (visuel) = ${dy.toFixed(0)} px`, 12, 12);
+    ctx.fillText(`ΔX (visuel) = ${dx.toFixed(0)} px`, 12, 28);
+  }
+
+  function drawShaftAndCouplingSide(ctx, pumpCY, motorCY, coupX){
+    // axe pompe
+    ctx.strokeStyle = "rgba(255,152,0,0.90)";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(coupX-170, pumpCY);
+    ctx.lineTo(coupX, pumpCY);
+    ctx.stroke();
+
+    // axe moteur
+    ctx.strokeStyle = "rgba(0,162,255,0.95)";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(coupX+170, motorCY);
+    ctx.lineTo(coupX, motorCY);
+    ctx.stroke();
+
+    // accouplement (2 demi)
+    const r = 12;
+    ctx.fillStyle = "rgba(255,152,0,0.95)";
+    ctx.beginPath(); ctx.arc(coupX-10, pumpCY, r, 0, Math.PI*2); ctx.fill();
+
+    ctx.fillStyle = "rgba(0,162,255,0.95)";
+    ctx.beginPath(); ctx.arc(coupX+10, motorCY, r, 0, Math.PI*2); ctx.fill();
+
+    // marqueur écart vertical
+    ctx.strokeStyle = "rgba(255,255,255,0.65)";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(coupX, pumpCY);
+    ctx.lineTo(coupX, motorCY);
+    ctx.stroke();
+
+    ctx.fillStyle = "rgba(255,255,255,0.90)";
+    ctx.font = "12px Arial";
+    ctx.textAlign = "left";
+    ctx.textBaseline = "top";
+    ctx.fillText(`ΔY profil (px) = ${(motorCY - pumpCY).toFixed(0)}`, 12, 12);
+  }
+
+  /* ========= Logique pied boiteux ========= */
+  function evalSoftFoot(){
+    const tol = Math.max(0, toNum(softTolEl));
+    const v = {
+      fl: Math.abs(toNum(sf.fl)),
+      fr: Math.abs(toNum(sf.fr)),
+      rl: Math.abs(toNum(sf.rl)),
+      rr: Math.abs(toNum(sf.rr)),
+    };
+
+    const maxV = Math.max(v.fl, v.fr, v.rl, v.rr);
+
+    if(maxV <= tol){
+      softStatus.innerHTML =
+        `<span class="okTxt">✔ Pied boiteux OK</span> — max = <b>${maxV.toFixed(2)}</b> mils (tol. ${tol.toFixed(2)})`;
+      return { ok:true, max:maxV, tol };
+    }else{
+      // liste des pattes hors tol
+      const out = [];
+      if(v.fl > tol) out.push("AV-G");
+      if(v.fr > tol) out.push("AV-D");
+      if(v.rl > tol) out.push("AR-G");
+      if(v.rr > tol) out.push("AR-D");
+
+      softStatus.innerHTML =
+        `<span class="badTxt">❌ Pied boiteux À corriger</span> — max = <b>${maxV.toFixed(2)}</b> mils (tol. ${tol.toFixed(2)})<br>
+         <span class="small">Hors tolérance : <b>${out.join(", ")}</b> (pédagogique: shim/correction avant alignement)</span>`;
+      return { ok:false, max:maxV, tol };
     }
   }
 
-  function drawCoupling(ctx, x, y, r){
-    ctx.strokeStyle="rgba(255,255,255,.25)";
-    ctx.lineWidth=2;
-    ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.stroke();
-    ctx.beginPath(); ctx.arc(x,y,r*0.55,0,Math.PI*2); ctx.stroke();
+  /* ========= Interprétation alignement (simple et utile) ========= */
+  function evalAlignment(){
+    // Ici on ne fait PAS la math de comparateurs (on viendra après).
+    // On affiche simplement l’état des 4 réglages (offset/ang) et un avertissement pédagogique.
+    const offX = model.offX, offY = model.offY, angV = model.angV, angH = model.angH;
+
+    const abs = (x)=>Math.abs(x);
+    const warn = [];
+
+    // seuils pédagogiques (tu pourras changer)
+    const T_OFF = 2;  // mils
+    const T_ANG = 2;  // mils
+
+    if(abs(offY) > T_OFF) warn.push(`Parallélisme vertical élevé (${offY.toFixed(1)} mils)`);
+    if(abs(offX) > T_OFF) warn.push(`Parallélisme horizontal élevé (${offX.toFixed(1)} mils)`);
+    if(abs(angV) > T_ANG) warn.push(`Angularité verticale élevée (${angV.toFixed(1)} mils)`);
+    if(abs(angH) > T_ANG) warn.push(`Angularité horizontale élevée (${angH.toFixed(1)} mils)`);
+
+    if(warn.length === 0){
+      alignStatus.innerHTML = `<span class="okTxt">✔ Alignement visuel : bon</span> <span class="small">(pédagogique — on ajoutera la logique comparateur ensuite)</span>`;
+    }else{
+      alignStatus.innerHTML =
+        `<span class="badTxt">⚠ Ajustements requis</span><br>
+         <span class="small">• ${warn.join("<br>• ")}</span>`;
+    }
   }
 
-  function drawFoot(ctx, x, y, w, h){
-    ctx.fillRect(x, y, w, h);
-  }
+  /* ========= Mapping mils -> pixels ========= */
+  function milsToPx(m){ return m * model.gain; }
 
-  /* ===================== RENDU – VUE DESSUS (HORIZONTAL) ===================== */
-  function drawTopView(){
-    const { W, H } = resizeCanvas(topCanvas, topCtx);
-    clear(topCtx, W, H);
+  /* ========= Dessin TOP ========= */
+  function drawTop(){
+    const W = topCanvas.clientWidth;
+    const H = topCanvas.clientHeight;
+
     drawGrid(topCtx, W, H);
 
-    // plan
-    const midY = H * 0.55;
-    const baseX = 40;
-    const unitLen = Math.min(150, (W - 120) * 0.45); // longueur machine
-    const gap = Math.min(90, (W - 120) * 0.18);
+    // zone / repères
+    const centerY = H/2;
+    const pumpX = W*0.65;
+    const motorX = W*0.20;
 
-    // pompe (fixe)
-    const pumpX = baseX + unitLen + gap;
-    const pumpY = midY;
-    const pumpW = unitLen;
-    const pumpH = 42;
+    const machineW = 150;
+    const machineH = 70;
 
-    // moteur (mobile) — base position (à gauche)
-    const motorX0 = baseX;
-    const motorY0 = midY;
-    const motorW = unitLen;
-    const motorH = 42;
+    // Pompe fixe : au centre
+    const pumpY = centerY - machineH/2;
 
-    // transform moteur selon parH + angH
-    const g = align.gain;
+    // Moteur mobile : on applique offset + angularité H (effet AV/AR)
+    // Pour la vue TOP : on simule que l’AV et l’AR n’ont pas la même position (angularité)
+    // On dessine le moteur comme un bloc, mais on calcule la ligne d’axe moteur avec un tilt simplifié.
+    const offXpx = milsToPx(model.offX);
+    const offYpx = milsToPx(model.offY);
+    const angHpx = milsToPx(model.angH);
 
-    // parH: translation latérale (droite=+)
-    const dx = align.parH * g;
+    // Position du bloc moteur (moyenne)
+    const motorY = centerY - machineH/2 + offYpx;
+    const motorBlockX = motorX + offXpx;
 
-    // angH: rotation autour centre (petit angle pédagogique)
-    const ang = (align.angH * 0.0025); // radians par mil (tweak pédagogique)
+    // Centres d’axes au niveau couplage
+    const coupX = W/2;
 
-    // dessin pompe
-    topCtx.fillStyle="#ff9800";
-    topCtx.fillRect(pumpX, pumpY - pumpH/2, pumpW, pumpH);
+    // Axe pompe (fixe)
+    const pumpAxisY = centerY; // fixe
 
-    // pattes pompe (4)
-    topCtx.fillStyle="#d98200";
-    const fw=16, fh=8;
-    drawFoot(topCtx, pumpX+10,         pumpY - pumpH/2 - fh - 2, fw, fh);
-    drawFoot(topCtx, pumpX+pumpW-26,   pumpY - pumpH/2 - fh - 2, fw, fh);
-    drawFoot(topCtx, pumpX+10,         pumpY + pumpH/2 + 2,      fw, fh);
-    drawFoot(topCtx, pumpX+pumpW-26,   pumpY + pumpH/2 + 2,      fw, fh);
+    // Axe moteur (variable) :
+    // - OffY déplace l’axe
+    // - AngH donne une différence AV/AR en X (pédagogique: inclinaison latérale)
+    // Dans TOP, on applique angH comme une "pente" proche du couplage.
+    // Simplification: on décale l’axe moteur au couplage d’une fraction de angH.
+    const motorAxisY = centerY + offYpx; // (top: angularité verticale se verra plutôt en profil)
+    const motorAxisXCenter = motorBlockX + machineW/2;
 
-    topCtx.fillStyle="#eaf1ff";
-    topCtx.font="12px Arial";
-    topCtx.textAlign="center";
-    topCtx.fillText("Pompe (fixe)", pumpX + pumpW/2, pumpY - pumpH/2 - 16);
+    // Dessin machines
+    drawMachineTop(topCtx, pumpX, pumpY, machineW, machineH, "#ff9800", "Pompe (fixe)");
+    drawMachineTop(topCtx, motorBlockX, motorY, machineW, machineH, "#00a2ff", "Moteur (mobile)");
 
-    // dessin moteur avec rotation + translation (autour son centre)
-    const cx = motorX0 + motorW/2;
-    const cy = motorY0;
+    // Arbres + accouplement (TOP)
+    drawShaftAndCouplingTop(
+      topCtx,
+      pumpX + machineW/2, pumpAxisY,
+      motorAxisXCenter + (angHpx*0.15), motorAxisY,
+      coupX
+    );
 
-    topCtx.save();
-    topCtx.translate(cx + dx, cy);
-    topCtx.rotate(ang);
-    topCtx.translate(-cx, -cy);
-
-    // corps moteur
-    topCtx.fillStyle="#00a2ff";
-    topCtx.fillRect(motorX0, motorY0 - motorH/2, motorW, motorH);
-
-    // pattes moteur (4)
-    topCtx.fillStyle="#0086d6";
-    drawFoot(topCtx, motorX0+10,        motorY0 - motorH/2 - fh - 2, fw, fh);
-    drawFoot(topCtx, motorX0+motorW-26, motorY0 - motorH/2 - fh - 2, fw, fh);
-    drawFoot(topCtx, motorX0+10,        motorY0 + motorH/2 + 2,      fw, fh);
-    drawFoot(topCtx, motorX0+motorW-26, motorY0 + motorH/2 + 2,      fw, fh);
-
-    topCtx.fillStyle="#eaf1ff";
-    topCtx.font="12px Arial";
-    topCtx.textAlign="center";
-    topCtx.fillText("Moteur (mobile)", motorX0 + motorW/2, motorY0 - motorH/2 - 16);
-
-    // arbre moteur (ligne)
-    topCtx.strokeStyle="rgba(255,255,255,.55)";
-    topCtx.lineWidth=3;
+    // Marqueur de déplacement moteur (point)
+    topCtx.fillStyle = "rgba(255,255,255,0.9)";
     topCtx.beginPath();
-    topCtx.moveTo(motorX0+motorW, motorY0);
-    topCtx.lineTo(pumpX, pumpY);
-    topCtx.stroke();
+    topCtx.arc(motorAxisXCenter, motorAxisY, 4, 0, Math.PI*2);
+    topCtx.fill();
 
-    // accouplement au milieu du gap
-    const coupX = motorX0 + motorW + gap/2;
-    const coupY = motorY0;
-    drawCoupling(topCtx, coupX, coupY, 12);
-
-    topCtx.restore();
-
-    // note bas
-    topCtx.fillStyle="rgba(255,255,255,.75)";
-    topCtx.font="12px Arial";
-    topCtx.textAlign="left";
-    topCtx.fillText(`parH=${align.parH.toFixed(1)} mil, angH=${align.angH.toFixed(1)} mil (visuel exagéré)`, 12, H - 12);
+    // Légende mini
+    topCtx.fillStyle = "rgba(255,255,255,0.85)";
+    topCtx.font = "12px Arial";
+    topCtx.textAlign = "right";
+    topCtx.textBaseline = "top";
+    topCtx.fillText("Vue dessus (plan)", W-10, 10);
   }
 
-  /* ===================== RENDU – VUE PROFIL (VERTICAL) ===================== */
-  function drawSideView(){
-    const { W, H } = resizeCanvas(sideCanvas, sideCtx);
-    clear(sideCtx, W, H);
+  /* ========= Dessin SIDE ========= */
+  function drawSide(){
+    const W = sideCanvas.clientWidth;
+    const H = sideCanvas.clientHeight;
+
     drawGrid(sideCtx, W, H);
 
-    const midY = H * 0.60;
-    const baseX = 40;
-    const unitLen = Math.min(150, (W - 120) * 0.45);
-    const gap = Math.min(90, (W - 120) * 0.18);
+    const centerY = H/2;
 
-    // pompe fixe
-    const pumpX = baseX + unitLen + gap;
-    const pumpW = unitLen;
-    const pumpH = 42;
+    const machineW = 160;
+    const machineH = 60;
 
-    // moteur mobile
-    const motorX0 = baseX;
-    const motorW = unitLen;
-    const motorH = 42;
+    const pumpX = W*0.12;
+    const motorX = W*0.62;
 
-    const g = align.gain;
+    // Pompe fixe
+    const pumpY = centerY - machineH/2;
 
-    // parV: translation verticale (haut = +, donc Y diminue)
-    const dy = -align.parV * g;
+    // Moteur mobile : OFFY + ANGV (shim AV/AR)
+    const offYpx = milsToPx(model.offY);
+    const angVpx = milsToPx(model.angV);
 
-    // angV: rotation (profil)
-    const ang = -(align.angV * 0.0025); // rad par mil (tweak)
+    // Pour la vue profil, on fait une représentation claire :
+    // - le bloc moteur bouge en moyenne (offY)
+    // - le nez au couplage reflète une partie de l’angularité (angV)
+    const motorY = centerY - machineH/2 + offYpx;
 
-    // soft foot: patte affectée est “plus basse” (descend) => +val => patte baisse
-    const sf = getActiveSoftFoot();
-    const sfDrop = sf.val * g * 0.35; // drop visuel modéré
-    const footSel = sf.foot;
+    // Centres d’axes au couplage
+    const coupX = W/2;
 
-    // pompe (fixe)
-    const pumpY = midY;
-    sideCtx.fillStyle="#ff9800";
-    sideCtx.fillRect(pumpX, pumpY - pumpH/2, pumpW, pumpH);
+    const pumpAxisY = centerY;
+    const motorAxisY = centerY + offYpx + (angVpx * 0.18);
 
-    // pattes pompe (profil = 2 pattes visibles)
-    sideCtx.fillStyle="#d98200";
-    const fw=20, fh=10;
-    // avant
-    drawFoot(sideCtx, pumpX+16, pumpY + pumpH/2 + 2, fw, fh);
-    // arrière
-    drawFoot(sideCtx, pumpX+pumpW-36, pumpY + pumpH/2 + 2, fw, fh);
+    // Machines
+    drawMachineSide(sideCtx, pumpX, pumpY, machineW, machineH, "#ff9800", "Pompe (fixe)");
+    drawMachineSide(sideCtx, motorX, motorY, machineW, machineH, "#00a2ff", "Moteur (mobile)");
 
-    sideCtx.fillStyle="#eaf1ff";
-    sideCtx.font="12px Arial";
-    sideCtx.textAlign="center";
-    sideCtx.fillText("Pompe (fixe)", pumpX + pumpW/2, pumpY - pumpH/2 - 16);
+    // Arbres + accouplement (profil)
+    drawShaftAndCouplingSide(sideCtx, pumpAxisY, motorAxisY, coupX);
 
-    // moteur transformé
-    const motorY0 = midY + dy;
-    const cx = motorX0 + motorW/2;
-    const cy = motorY0;
+    // Indication angularité verticale (pédagogique)
+    sideCtx.fillStyle = "rgba(255,255,255,0.90)";
+    sideCtx.font = "12px Arial";
+    sideCtx.textAlign = "left";
+    sideCtx.textBaseline = "bottom";
+    sideCtx.fillText(`OffsetY=${model.offY.toFixed(1)} mils | AngV=${model.angV.toFixed(1)} mils`, 12, H-10);
 
-    sideCtx.save();
-    sideCtx.translate(cx, cy);
-    sideCtx.rotate(ang);
-    sideCtx.translate(-cx, -cy);
-
-    // corps moteur
-    sideCtx.fillStyle="#00a2ff";
-    sideCtx.fillRect(motorX0, motorY0 - motorH/2, motorW, motorH);
-
-    // pattes moteur (profil=2 pattes visibles) + soft foot drop (si patte AV ou AR)
-    sideCtx.fillStyle="#0086d6";
-    // avant (FL/FR)
-    const frontDrop = (footSel === "FL" || footSel === "FR") ? sfDrop : 0;
-    // arrière (RL/RR)
-    const rearDrop  = (footSel === "RL" || footSel === "RR") ? sfDrop : 0;
-
-    drawFoot(sideCtx, motorX0+16,         motorY0 + motorH/2 + 2 + frontDrop, fw, fh);
-    drawFoot(sideCtx, motorX0+motorW-36,  motorY0 + motorH/2 + 2 + rearDrop,  fw, fh);
-
-    // arbre / ligne centre
-    sideCtx.strokeStyle="rgba(255,255,255,.55)";
-    sideCtx.lineWidth=3;
-    sideCtx.beginPath();
-    sideCtx.moveTo(motorX0+motorW, motorY0);
-    sideCtx.lineTo(pumpX, pumpY);
-    sideCtx.stroke();
-
-    // accouplement
-    const coupX = motorX0 + motorW + gap/2;
-    const coupY = motorY0;
-    drawCoupling(sideCtx, coupX, coupY, 12);
-
-    // label moteur
-    sideCtx.fillStyle="#eaf1ff";
-    sideCtx.font="12px Arial";
-    sideCtx.textAlign="center";
-    sideCtx.fillText("Moteur (mobile)", motorX0 + motorW/2, motorY0 - motorH/2 - 16);
-
-    sideCtx.restore();
-
-    // annotation soft foot
-    sideCtx.fillStyle="rgba(255,255,255,.80)";
-    sideCtx.font="12px Arial";
-    sideCtx.textAlign="left";
-    sideCtx.fillText(`SF: patte ${sf.foot} = ${sf.val.toFixed(1)} mil (affiché exagéré)`, 12, H - 28);
-    sideCtx.fillText(`parV=${align.parV.toFixed(1)} mil, angV=${align.angV.toFixed(1)} mil`, 12, H - 12);
+    sideCtx.fillStyle = "rgba(255,255,255,0.85)";
+    sideCtx.font = "12px Arial";
+    sideCtx.textAlign = "right";
+    sideCtx.textBaseline = "top";
+    sideCtx.fillText("Vue profil", W-10, 10);
   }
 
-  /* ===================== RENDER GLOBAL ===================== */
-  function render(){
-    syncFromInputs();
-    updateBadges();
-    drawTopView();
-    drawSideView();
+  function drawAll(){
+    // sync numbers
+    model.gain = clamp(parseFloat(gainEl.value)||80, 20, 200);
+
+    model.offX = parseFloat(offXEl.value) || 0;
+    model.offY = parseFloat(offYEl.value) || 0;
+    model.angV = parseFloat(angVEl.value) || 0;
+    model.angH = parseFloat(angHEl.value) || 0;
+
+    offXv.textContent = model.offX.toFixed(0);
+    offYv.textContent = model.offY.toFixed(0);
+    angVv.textContent = model.angV.toFixed(0);
+    angHv.textContent = model.angH.toFixed(0);
+
+    // statuses
+    evalSoftFoot();
+    evalAlignment();
+
+    // draw
+    drawTop();
+    drawSide();
   }
 
-  /* ===================== RESET (valeurs) ===================== */
-  function resetValues(){
-    runout.value = "0.8";
-    runoutTol.value = "2.0";
-
-    sfFL.value = "2.0";
-    sfFR.value = "1.0";
-    sfRL.value = "0.5";
-    sfRR.value = "3.5";
-    sfTol.value = "3.0";
-    sfFoot.value = "auto";
-
-    angV.value = "0.0";
-    angVTol.value = "1.0";
-
-    parV.value = "0.0";
-    parVTol.value = "1.0";
-
-    angH.value = "0.0";
-    angHTol.value = "1.0";
-
-    parH.value = "0.0";
-    parHTol.value = "1.0";
-
-    gain.value = "25";
-
-    render();
-  }
-
-  /* ===================== EVENTS ===================== */
+  /* ========= Events ========= */
   const allInputs = [
-    runout, runoutTol,
-    sfFL, sfFR, sfRL, sfRR, sfTol, sfFoot,
-    angV, angVTol,
-    parV, parVTol,
-    angH, angHTol,
-    parH, parHTol,
-    gain
+    gainEl, softTolEl,
+    sf.fl,sf.fr,sf.rl,sf.rr,
+    offXEl, offYEl, angVEl, angHEl
   ];
 
-  allInputs.forEach(x => {
-    x.addEventListener("input", render, { passive:true });
-    x.addEventListener("change", render, { passive:true });
+  allInputs.forEach(el => el.addEventListener("input", drawAll));
+
+  resetBtn.addEventListener("click", () => {
+    gainEl.value = "80";
+    softTolEl.value = "3";
+
+    sf.fl.value = "0";
+    sf.fr.value = "0";
+    sf.rl.value = "0";
+    sf.rr.value = "0";
+
+    offXEl.value = "0";
+    offYEl.value = "0";
+    angVEl.value = "0";
+    angHEl.value = "0";
+
+    drawAll();
   });
 
-  btnReset.addEventListener("click", resetValues);
-
-  window.addEventListener("resize", render);
+  window.addEventListener("resize", resizeAll);
   if(window.visualViewport){
-    window.visualViewport.addEventListener("resize", render);
+    window.visualViewport.addEventListener("resize", resizeAll);
   }
 
-  /* ===================== INIT ===================== */
-  render();
-
+  /* ========= Init ========= */
+  resizeAll();
 })();
 </script>
+
 </body>
 </html>
