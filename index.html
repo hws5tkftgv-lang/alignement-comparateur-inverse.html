@@ -79,6 +79,16 @@ button{
   opacity:0.4;
   pointer-events:none;
 }
+
+#alignView{
+  width:100%;
+  height:220px;
+  background:#000;
+  border-radius:14px;
+  display:block;
+}
+
+
 </style>
 </head>
 
@@ -136,6 +146,12 @@ button{
   <div class="status" id="status6"></div>
 </div>
 
+<div class="step">
+  <h2>🔧 Vue moteur & pompe</h2>
+  <p>Vue pédagogique – moteur mobile / pompe fixe</p>
+  <canvas id="alignView"></canvas>
+</div>
+
 <script>
 const state = {
   step: 1
@@ -168,6 +184,54 @@ function validateSoftFoot(){
       "<span class='bad'>❌ Hors tolérance (&gt; 3 mils)</span>";
   }
 }
+
+const alignCanvas = document.getElementById("alignView");
+const alignCtx = alignCanvas.getContext("2d");
+
+function resizeAlignView(){
+  const dpr = Math.min(3, window.devicePixelRatio || 1);
+  const w = alignCanvas.clientWidth;
+  const h = alignCanvas.clientHeight;
+
+  alignCanvas.width  = Math.round(w * dpr);
+  alignCanvas.height = Math.round(h * dpr);
+  alignCtx.setTransform(dpr,0,0,dpr,0,0);
+}
+
+function drawMachine(x, y, w, h, color, label){
+  // corps
+  alignCtx.fillStyle = color;
+  alignCtx.fillRect(x, y, w, h);
+
+  // pattes (4)
+  const footW = 16;
+  const footH = 8;
+
+  alignCtx.fillRect(x+10,        y+h, footW, footH);
+  alignCtx.fillRect(x+w-26,      y+h, footW, footH);
+  alignCtx.fillRect(x+10,        y-8, footW, footH);
+  alignCtx.fillRect(x+w-26,      y-8, footW, footH);
+
+  // label
+  alignCtx.fillStyle = "#eaf1ff";
+  alignCtx.font = "12px Arial";
+  alignCtx.textAlign = "center";
+  alignCtx.fillText(label, x+w/2, y-14);
+}
+
+function drawAlignmentView(){
+  resizeAlignView();
+
+  const W = alignCanvas.width / (window.devicePixelRatio || 1);
+  const H = alignCanvas.height / (window.devicePixelRatio || 1);
+
+  alignCtx.clearRect(0,0,W,H);
+
+  // dimensions machines
+  const machineW = 110;
+  const machineH = 50;
+
+  const centerY
 </script>
 
 </body>
