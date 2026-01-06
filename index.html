@@ -230,8 +230,29 @@ function drawAlignmentView(){
   // dimensions machines
   const machineW = 110;
   const machineH = 50;
+  const centerY = H/2 - machineH/2;
 
-  const centerY
+  // moteur (mobile)
+  drawMachine(
+    30,
+    centerY,
+    machineW,
+    machineH,
+    "#00a2ff",
+    "Moteur (mobile)"
+  );
+
+  // pompe (fixe)
+  drawMachine(
+    W - machineW - 30,
+    centerY,
+    machineW,
+    machineH,
+    "#ff9800",
+    "Pompe (fixe)"
+  );
+}
+drawAlignmentView();
 </script>
 
 </body>
