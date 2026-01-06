@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Alignement">
 <title>Alignement – Comparateur inversé (mils)</title>
@@ -11,872 +11,902 @@
 :root{
   --bg:#0b1436;
   --card:#121c4a;
+  --text:#eaf1ff;
+  --muted:rgba(234,241,255,.75);
   --ok:#4caf50;
   --bad:#ff5252;
-  --warn:#ffb300;
   --accent:#00a2ff;
-  --muted:rgba(234,241,255,.75);
-  --line:rgba(255,255,255,.12);
+  --warn:#ffb300;
 }
-
 *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-html,body{ height:100%; }
-body{
-  margin:0;
-  font-family:Arial, system-ui, sans-serif;
-  background:var(--bg);
-  color:#eaf1ff;
-}
+html,body{ margin:0; background:var(--bg); color:var(--text); font-family:Arial,system-ui,sans-serif; }
 
 header{
   padding:14px 14px 10px;
+  text-align:center;
   font-size:18px;
   font-weight:800;
-  text-align:center;
 }
-
-.subhead{
+.sub{
   text-align:center;
+  opacity:.85;
+  margin:-6px 0 10px;
   font-size:12px;
-  color:var(--muted);
-  padding:0 14px 10px;
 }
 
-.step{
+.wrap{
+  padding:0 12px 18px;
+  max-width:980px;
+  margin:0 auto;
+}
+
+.grid{
+  display:grid;
+  gap:12px;
+}
+@media (min-width: 860px){
+  .grid{ grid-template-columns: 1.05fr 0.95fr; align-items:start; }
+}
+
+.card{
   background:var(--card);
-  margin:12px;
-  padding:14px;
   border-radius:14px;
-  border:1px solid rgba(255,255,255,.06);
+  padding:14px;
 }
 
-.step h2{
+h2{
   margin:0 0 8px;
   font-size:16px;
 }
-
-.step p{
-  margin:0 0 10px;
+p{
+  margin:6px 0 10px;
   font-size:13px;
-  opacity:0.92;
+  color:var(--muted);
   line-height:1.35;
 }
 
-.grid2{
-  display:grid;
-  grid-template-columns:1fr 1fr;
+.step{
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:14px;
+  padding:12px;
+  margin-top:10px;
+  background:rgba(255,255,255,.03);
+}
+.stepHead{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
   gap:10px;
+}
+.stepTitle{
+  font-weight:800;
+  font-size:14px;
+}
+.badge{
+  font-size:12px;
+  font-weight:800;
+  padding:4px 8px;
+  border-radius:999px;
+  background:rgba(255,255,255,.10);
+  color:var(--muted);
+}
+.badge.ok{ background:rgba(76,175,80,.15); color:#bff3c1; }
+.badge.bad{ background:rgba(255,82,82,.15); color:#ffc2c2; }
+.badge.warn{ background:rgba(255,179,0,.16); color:#ffe6b0; }
+
+.row{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:8px;
+}
+.row3{
+  display:grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap:8px;
 }
 
 label{
   display:block;
   font-size:12px;
   color:var(--muted);
-  margin-bottom:6px;
+  margin-bottom:4px;
 }
 
 input, select{
   width:100%;
-  padding:10px;
+  padding:10px 10px;
   font-size:16px;
   border-radius:12px;
   border:none;
   outline:none;
 }
 
-button{
-  width:100%;
+.smallNote{
   margin-top:10px;
+  font-size:12px;
+  color:var(--muted);
+  line-height:1.35;
+}
+
+.btnRow{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:10px;
+}
+button{
+  flex:1;
+  min-width:140px;
   padding:12px;
   font-size:16px;
   border:none;
   border-radius:12px;
   background:var(--accent);
-  color:white;
+  color:#fff;
   font-weight:800;
 }
-
 button.secondary{
-  background:rgba(255,255,255,.10);
+  background:rgba(255,255,255,.12);
 }
 
-.status{
-  margin-top:10px;
-  font-weight:800;
-  font-size:14px;
-  line-height:1.35;
-}
-
-.ok{ color:var(--ok); }
-.bad{ color:var(--bad); }
-.warn{ color:var(--warn); }
-
-.locked{
-  opacity:0.40;
-  pointer-events:none;
-}
-
-hr.sep{
-  border:none;
+.hr{
   height:1px;
-  background:var(--line);
-  margin:10px 0;
+  background:rgba(255,255,255,.08);
+  margin:12px 0;
 }
 
-.small{
-  margin-top:6px;
-  font-size:12px;
-  color:var(--muted);
-  line-height:1.35;
+/* ====== CANVAS AREA ====== */
+.canvasGrid{
+  display:grid;
+  gap:12px;
 }
-
-.kpi{
-  background:rgba(255,255,255,0.06);
-  border-radius:12px;
-  padding:10px;
-  font-size:13px;
-  line-height:1.35;
+@media (min-width: 860px){
+  .canvasGrid{
+    grid-template-columns: 1fr 1fr;
+  }
 }
-
-.kpi b{ color:#cfe2ff; }
-
-#alignView{
-  width:100%;
-  height:240px;
+.canvasCard{
   background:#000;
   border-radius:14px;
-  display:block;
-  touch-action:none;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.10);
 }
-
-.pillRow{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  margin-top:8px;
-}
-.pill{
-  padding:6px 10px;
-  border-radius:999px;
-  background:rgba(255,255,255,.10);
-  font-size:12px;
+.canvasHeader{
+  padding:10px 12px;
+  font-size:13px;
+  font-weight:800;
+  background:rgba(0,0,0,.35);
   color:#eaf1ff;
+  border-bottom:1px solid rgba(255,255,255,.08);
 }
-.pill.ok{ background:rgba(76,175,80,.18); }
-.pill.bad{ background:rgba(255,82,82,.18); }
-.pill.warn{ background:rgba(255,179,0,.18); }
+canvas{
+  width:100%;
+  height:240px;
+  display:block;
+  background:#000;
+}
+@media (min-width: 860px){
+  canvas{ height:280px; }
+}
 
-footer{
-  padding:14px;
-  text-align:center;
+.legend{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:10px;
   font-size:12px;
   color:var(--muted);
-  opacity:.9;
+}
+.dot{
+  width:10px;height:10px;border-radius:999px;display:inline-block;margin-right:6px;
+}
+.dot.motor{ background:#00a2ff; }
+.dot.pump{ background:#ff9800; }
+
+.kpi{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:8px;
+  margin-top:10px;
+}
+.kpi .box{
+  padding:10px;
+  border-radius:12px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.08);
+}
+.kpi b{ color:#cfe2ff; }
+.kpi .v{ font-size:14px; font-weight:800; margin-top:4px; }
+
+.mono{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size:12px;
 }
 </style>
 </head>
 
 <body>
+<header>Alignement – Comparateur inversé (mils)</header>
+<div class="sub">iPhone-first • 2 vues (dessus + profil) • corrections visibles (exagérées) • pas de blocage d’étapes</div>
 
-<header>Alignement – Comparateur inversé</header>
-<div class="subhead">iPhone-first • unités: <b>mils</b> • séquence métier: voilage → pied boiteux (4 pattes) → V ang → V par → H ang → H par</div>
+<div class="wrap">
+  <div class="grid">
 
-<!-- ÉTAPE 1 -->
-<div class="step" id="step1">
-  <h2>1️⃣ Vérification du voilage (runout)</h2>
-  <p>Confirmer que les arbres/coupleur sont acceptables AVANT l’alignement.</p>
+    <!-- ===== LEFT: STEPS / INPUTS ===== -->
+    <div class="card" id="panelInputs">
+      <h2>Entrées & étapes</h2>
+      <p>
+        Signe standard : <b>+</b> = <b>monte / va à droite</b>, <b>−</b> = <b>descend / va à gauche</b>.
+        Les déplacements sont <b>exagérés visuellement</b> pour être perceptibles.
+      </p>
 
-  <div class="grid2">
-    <div>
-      <label>Runout arbre moteur (mils)</label>
-      <input id="runoutMotor" type="number" inputmode="decimal" placeholder="ex: 1.5">
+      <div class="step" id="step1">
+        <div class="stepHead">
+          <div class="stepTitle">1) Voilage (runout)</div>
+          <div class="badge" id="b1">Info</div>
+        </div>
+        <p>Entrer le voilage max (mils). (Ce n’est pas bloquant; on indique seulement l’état.)</p>
+        <div class="row">
+          <div>
+            <label>Voilage (mils)</label>
+            <input id="runout" type="number" inputmode="decimal" step="0.1" value="0.8">
+          </div>
+          <div>
+            <label>Tolérance voilage (mils)</label>
+            <input id="runoutTol" type="number" inputmode="decimal" step="0.1" value="2.0">
+          </div>
+        </div>
+      </div>
+
+      <div class="step" id="step2">
+        <div class="stepHead">
+          <div class="stepTitle">2) Pied boiteux (soft foot)</div>
+          <div class="badge" id="b2">Info</div>
+        </div>
+        <p>Entrer les 4 lectures (mils) par patte (différence max-min). Le logiciel retient la pire patte.</p>
+
+        <div class="row">
+          <div>
+            <label>Patte AV-G (mils)</label>
+            <input id="sfFL" type="number" inputmode="decimal" step="0.1" value="2.0">
+          </div>
+          <div>
+            <label>Patte AV-D (mils)</label>
+            <input id="sfFR" type="number" inputmode="decimal" step="0.1" value="1.0">
+          </div>
+        </div>
+        <div class="row" style="margin-top:8px;">
+          <div>
+            <label>Patte AR-G (mils)</label>
+            <input id="sfRL" type="number" inputmode="decimal" step="0.1" value="0.5">
+          </div>
+          <div>
+            <label>Patte AR-D (mils)</label>
+            <input id="sfRR" type="number" inputmode="decimal" step="0.1" value="3.5">
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:8px;">
+          <div>
+            <label>Tolérance pied boiteux (mils)</label>
+            <input id="sfTol" type="number" inputmode="decimal" step="0.1" value="3.0">
+          </div>
+          <div>
+            <label>Patte affectée</label>
+            <select id="sfFoot">
+              <option value="auto" selected>Auto (pire patte)</option>
+              <option value="FL">AV-G</option>
+              <option value="FR">AV-D</option>
+              <option value="RL">AR-G</option>
+              <option value="RR">AR-D</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="smallNote">
+          Astuce : en vrai, on corrige par cales (shims). Ici, la vue de profil montre une patte plus basse pour comprendre l’effet.
+        </div>
+      </div>
+
+      <div class="step" id="step3">
+        <div class="stepHead">
+          <div class="stepTitle">3) Angularité verticale</div>
+          <div class="badge" id="b3">Info</div>
+        </div>
+        <p>Entrer l’angularité verticale (mils). (+) = nez du moteur “monte” côté pompe (visuel).</p>
+        <div class="row">
+          <div>
+            <label>Angularité V (mils)</label>
+            <input id="angV" type="number" inputmode="decimal" step="0.1" value="0.0">
+          </div>
+          <div>
+            <label>Tolérance (mils)</label>
+            <input id="angVTol" type="number" inputmode="decimal" step="0.1" value="1.0">
+          </div>
+        </div>
+      </div>
+
+      <div class="step" id="step4">
+        <div class="stepHead">
+          <div class="stepTitle">4) Parallélisme vertical</div>
+          <div class="badge" id="b4">Info</div>
+        </div>
+        <p>Entrer le parallélisme vertical (mils). (+) = moteur “monte” globalement.</p>
+        <div class="row">
+          <div>
+            <label>Parallélisme V (mils)</label>
+            <input id="parV" type="number" inputmode="decimal" step="0.1" value="0.0">
+          </div>
+          <div>
+            <label>Tolérance (mils)</label>
+            <input id="parVTol" type="number" inputmode="decimal" step="0.1" value="1.0">
+          </div>
+        </div>
+      </div>
+
+      <div class="step" id="step5">
+        <div class="stepHead">
+          <div class="stepTitle">5) Angularité horizontale</div>
+          <div class="badge" id="b5">Info</div>
+        </div>
+        <p>Entrer l’angularité horizontale (mils). (+) = nez du moteur “va à droite”.</p>
+        <div class="row">
+          <div>
+            <label>Angularité H (mils)</label>
+            <input id="angH" type="number" inputmode="decimal" step="0.1" value="0.0">
+          </div>
+          <div>
+            <label>Tolérance (mils)</label>
+            <input id="angHTol" type="number" inputmode="decimal" step="0.1" value="1.0">
+          </div>
+        </div>
+      </div>
+
+      <div class="step" id="step6">
+        <div class="stepHead">
+          <div class="stepTitle">6) Parallélisme horizontal</div>
+          <div class="badge" id="b6">Info</div>
+        </div>
+        <p>Entrer le parallélisme horizontal (mils). (+) = moteur “se décale” à droite.</p>
+        <div class="row">
+          <div>
+            <label>Parallélisme H (mils)</label>
+            <input id="parH" type="number" inputmode="decimal" step="0.1" value="0.0">
+          </div>
+          <div>
+            <label>Tolérance (mils)</label>
+            <input id="parHTol" type="number" inputmode="decimal" step="0.1" value="1.0">
+          </div>
+        </div>
+      </div>
+
+      <div class="hr"></div>
+
+      <h2>Affichage (pédagogique)</h2>
+      <p>Le gain visuel amplifie les mils en pixels pour voir les corrections.</p>
+      <div class="row">
+        <div>
+          <label>Gain visuel (px par mil)</label>
+          <input id="gain" type="number" inputmode="decimal" step="1" value="25">
+        </div>
+        <div>
+          <label>Réinitialiser</label>
+          <button class="secondary" id="btnReset" type="button">Reset valeurs</button>
+        </div>
+      </div>
+
+      <div class="kpi">
+        <div class="box">
+          <b>Résumé vertical</b>
+          <div class="v mono" id="kpiV">—</div>
+        </div>
+        <div class="box">
+          <b>Résumé horizontal</b>
+          <div class="v mono" id="kpiH">—</div>
+        </div>
+      </div>
+
+      <div class="legend">
+        <div><span class="dot motor"></span>Moteur (mobile)</div>
+        <div><span class="dot pump"></span>Pompe (fixe)</div>
+      </div>
+
+      <div class="smallNote">
+        Les tolérances ici sont des valeurs pédagogiques par défaut. On pourra les ajuster à ta méthode (et plus tard: calculs complets “comparateur inversé”).
+      </div>
     </div>
-    <div>
-      <label>Runout arbre pompe (mils)</label>
-      <input id="runoutPump" type="number" inputmode="decimal" placeholder="ex: 1.0">
+
+    <!-- ===== RIGHT: CANVAS VIEWS ===== -->
+    <div class="card">
+      <h2>Vues synchronisées</h2>
+      <p>Les deux vues changent en temps réel à chaque modification.</p>
+
+      <div class="canvasGrid">
+        <div class="canvasCard">
+          <div class="canvasHeader">Vue de dessus (horizontal)</div>
+          <canvas id="topView"></canvas>
+        </div>
+        <div class="canvasCard">
+          <div class="canvasHeader">Vue de profil (vertical)</div>
+          <canvas id="sideView"></canvas>
+        </div>
+      </div>
     </div>
+
   </div>
-
-  <div class="small">Tolérance pédagogique par défaut: ≤ <b>2.0 mils</b> (à ajuster selon ton cours).</div>
-
-  <button id="btnStep1">Valider voilage</button>
-  <div class="status" id="status1"></div>
 </div>
-
-<!-- ÉTAPE 2 -->
-<div class="step locked" id="step2">
-  <h2>2️⃣ Pied boiteux – mesures des 4 pattes (moteur mobile)</h2>
-  <p>Entrer les lectures au comparateur (variation/écart) pour <b>chaque patte</b>. L’outil calcule max/min et détermine si le pied boiteux est présent.</p>
-
-  <div class="grid2">
-    <div>
-      <label>Patte AV gauche (mils)</label>
-      <input id="sfFL" type="number" inputmode="decimal" placeholder="ex: 0.0">
-    </div>
-    <div>
-      <label>Patte AV droite (mils)</label>
-      <input id="sfFR" type="number" inputmode="decimal" placeholder="ex: 0.5">
-    </div>
-    <div>
-      <label>Patte AR gauche (mils)</label>
-      <input id="sfRL" type="number" inputmode="decimal" placeholder="ex: 2.0">
-    </div>
-    <div>
-      <label>Patte AR droite (mils)</label>
-      <input id="sfRR" type="number" inputmode="decimal" placeholder="ex: 0.0">
-    </div>
-  </div>
-
-  <div class="kpi" id="sfKPI">
-    <div><b>Δ (max-min)</b> : —</div>
-    <div><b>Patte max</b> : —</div>
-    <div><b>Patte min</b> : —</div>
-  </div>
-
-  <div class="small">Tolérance pédagogique (pied boiteux): Δ ≤ <b>3.0 mils</b>.</div>
-
-  <button id="btnStep2">Valider pied boiteux</button>
-  <div class="status" id="status2"></div>
-</div>
-
-<!-- ÉTAPE 3 -->
-<div class="step locked" id="step3">
-  <h2>3️⃣ Angularité verticale (12h–6h)</h2>
-  <p>Entrer les lectures <b>A</b> (mils) au comparateur inversé (12h et 6h). L’outil indique si c’est acceptable et prépare le calcul futur.</p>
-
-  <div class="grid2">
-    <div>
-      <label>Lecture 12h (mils)</label>
-      <input id="v12" type="number" inputmode="decimal" placeholder="ex: +1.0">
-    </div>
-    <div>
-      <label>Lecture 6h (mils)</label>
-      <input id="v6" type="number" inputmode="decimal" placeholder="ex: -1.0">
-    </div>
-  </div>
-
-  <div class="kpi" id="kpiAngV">
-    <div><b>ΔV</b> (12h−6h): —</div>
-  </div>
-
-  <div class="small">Tolérance pédagogique: |ΔV| ≤ <b>2.0 mils</b>.</div>
-
-  <button id="btnStep3">Valider angularité V</button>
-  <div class="status" id="status3"></div>
-</div>
-
-<!-- ÉTAPE 4 -->
-<div class="step locked" id="step4">
-  <h2>4️⃣ Parallélisme vertical</h2>
-  <p>Entrer les lectures <b>R</b> (mils) (ex: comparateur sur le plan vertical). L’outil indique si c’est acceptable.</p>
-
-  <div class="grid2">
-    <div>
-      <label>Lecture verticale (mils)</label>
-      <input id="parV" type="number" inputmode="decimal" placeholder="ex: 1.0">
-    </div>
-    <div>
-      <label>Tolérance par défaut (mils)</label>
-      <input id="tolParV" type="number" inputmode="decimal" value="2.0">
-    </div>
-  </div>
-
-  <button id="btnStep4">Valider parallélisme V</button>
-  <div class="status" id="status4"></div>
-</div>
-
-<!-- ÉTAPE 5 -->
-<div class="step locked" id="step5">
-  <h2>5️⃣ Angularité horizontale (3h–9h)</h2>
-  <p>Entrer les lectures au comparateur inversé (3h et 9h).</p>
-
-  <div class="grid2">
-    <div>
-      <label>Lecture 3h (mils)</label>
-      <input id="h3" type="number" inputmode="decimal" placeholder="ex: +0.5">
-    </div>
-    <div>
-      <label>Lecture 9h (mils)</label>
-      <input id="h9" type="number" inputmode="decimal" placeholder="ex: -0.5">
-    </div>
-  </div>
-
-  <div class="kpi" id="kpiAngH">
-    <div><b>ΔH</b> (3h−9h): —</div>
-  </div>
-
-  <div class="small">Tolérance pédagogique: |ΔH| ≤ <b>2.0 mils</b>.</div>
-
-  <button id="btnStep5">Valider angularité H</button>
-  <div class="status" id="status5"></div>
-</div>
-
-<!-- ÉTAPE 6 -->
-<div class="step locked" id="step6">
-  <h2>6️⃣ Parallélisme horizontal</h2>
-  <p>Entrer la lecture horizontale (mils).</p>
-
-  <div class="grid2">
-    <div>
-      <label>Lecture horizontale (mils)</label>
-      <input id="parH" type="number" inputmode="decimal" placeholder="ex: 0.8">
-    </div>
-    <div>
-      <label>Tolérance par défaut (mils)</label>
-      <input id="tolParH" type="number" inputmode="decimal" value="2.0">
-    </div>
-  </div>
-
-  <button id="btnStep6">Valider parallélisme H</button>
-  <div class="status" id="status6"></div>
-</div>
-
-<!-- Vue -->
-<div class="step" id="view">
-  <h2>🔧 Vue moteur & pompe (pédagogique)</h2>
-  <p>Moteur = mobile (bleu) • Pompe = fixe (orange). Indicateurs affichés selon les étapes.</p>
-
-  <canvas id="alignView"></canvas>
-
-  <div class="pillRow" id="pillRow">
-    <span class="pill warn">Suivi: étape 1</span>
-  </div>
-
-  <hr class="sep">
-
-  <button class="secondary" id="btnResetAll">Réinitialiser tout</button>
-  <div class="small">Astuce: sur iPhone, utilise <b>Partager → Sur l’écran d’accueil</b> pour avoir une icône.</div>
-</div>
-
-<footer>Version de base (clé en main). Prochaine étape: ajouter les distances (A,B,C) + calculs de corrections (shims & latéral) + “rapport” exportable.</footer>
 
 <script>
 (() => {
   "use strict";
 
-  /* ===================== UTIL ===================== */
-  const $ = (id)=>document.getElementById(id);
+  /* ===================== ÉTAT (mils) ===================== */
+  const align = {
+    runout: 0.8,
+    runoutTol: 2.0,
+
+    sf: { FL:2.0, FR:1.0, RL:0.5, RR:3.5 },
+    sfTol: 3.0,
+    sfFoot: "auto", // auto|FL|FR|RL|RR
+
+    angV: 0.0,
+    angVTol: 1.0,
+
+    parV: 0.0,
+    parVTol: 1.0,
+
+    angH: 0.0,
+    angHTol: 1.0,
+
+    parH: 0.0,
+    parHTol: 1.0,
+
+    gain: 25
+  };
+
+  const clamp = (v,a,b)=>Math.max(a, Math.min(b, v));
   const isNum = (x)=>Number.isFinite(x);
 
-  function parseNum(id){
-    const v = parseFloat($(id).value);
-    return Number.isFinite(v) ? v : null;
+  /* ===================== DOM ===================== */
+  const el = (id)=>document.getElementById(id);
+
+  const runout    = el("runout");
+  const runoutTol = el("runoutTol");
+
+  const sfFL = el("sfFL");
+  const sfFR = el("sfFR");
+  const sfRL = el("sfRL");
+  const sfRR = el("sfRR");
+  const sfTol = el("sfTol");
+  const sfFoot = el("sfFoot");
+
+  const angV = el("angV");
+  const angVTol = el("angVTol");
+
+  const parV = el("parV");
+  const parVTol = el("parVTol");
+
+  const angH = el("angH");
+  const angHTol = el("angHTol");
+
+  const parH = el("parH");
+  const parHTol = el("parHTol");
+
+  const gain = el("gain");
+  const btnReset = el("btnReset");
+
+  const kpiV = el("kpiV");
+  const kpiH = el("kpiH");
+
+  const b1 = el("b1");
+  const b2 = el("b2");
+  const b3 = el("b3");
+  const b4 = el("b4");
+  const b5 = el("b5");
+  const b6 = el("b6");
+
+  const topCanvas = el("topView");
+  const topCtx = topCanvas.getContext("2d");
+
+  const sideCanvas = el("sideView");
+  const sideCtx = sideCanvas.getContext("2d");
+
+  /* ===================== LECTURE / MAJ ===================== */
+  function readFloat(inputEl, fallback){
+    const v = parseFloat(inputEl.value);
+    return isNum(v) ? v : fallback;
   }
 
-  function setStatus(step, cls, html){
-    const el = $("status"+step);
-    el.className = "status " + (cls || "");
-    el.innerHTML = html;
+  function syncFromInputs(){
+    align.runout = readFloat(runout, align.runout);
+    align.runoutTol = Math.max(0, readFloat(runoutTol, align.runoutTol));
+
+    align.sf.FL = Math.abs(readFloat(sfFL, align.sf.FL));
+    align.sf.FR = Math.abs(readFloat(sfFR, align.sf.FR));
+    align.sf.RL = Math.abs(readFloat(sfRL, align.sf.RL));
+    align.sf.RR = Math.abs(readFloat(sfRR, align.sf.RR));
+
+    align.sfTol = Math.max(0, readFloat(sfTol, align.sfTol));
+    align.sfFoot = sfFoot.value || "auto";
+
+    align.angV = readFloat(angV, align.angV);
+    align.angVTol = Math.max(0, readFloat(angVTol, align.angVTol));
+
+    align.parV = readFloat(parV, align.parV);
+    align.parVTol = Math.max(0, readFloat(parVTol, align.parVTol));
+
+    align.angH = readFloat(angH, align.angH);
+    align.angHTol = Math.max(0, readFloat(angHTol, align.angHTol));
+
+    align.parH = readFloat(parH, align.parH);
+    align.parHTol = Math.max(0, readFloat(parHTol, align.parHTol));
+
+    align.gain = clamp(readFloat(gain, align.gain), 1, 120);
   }
 
-  function lock(step){
-    const el = $("step"+step);
-    if(el) el.classList.add("locked");
-  }
-  function unlock(step){
-    const el = $("step"+step);
-    if(el) el.classList.remove("locked");
+  /* ===================== STATUTS (non bloquant) ===================== */
+  function setBadge(badgeEl, kind, txt){
+    badgeEl.classList.remove("ok","bad","warn");
+    badgeEl.classList.add(kind);
+    badgeEl.textContent = txt;
   }
 
-  function setPills(){
-    const row = $("pillRow");
-    row.innerHTML = "";
-
-    const s = state.step;
-
-    const mk = (txt, cls)=>{
-      const span = document.createElement("span");
-      span.className = "pill " + (cls||"");
-      span.textContent = txt;
-      row.appendChild(span);
-    };
-
-    mk("Étape actuelle: " + s, "warn");
-
-    if(state.runoutOK) mk("Voilage OK", "ok");
-    else mk("Voilage non validé", "warn");
-
-    if(state.softFootOK) mk("Pied boiteux OK", "ok");
-    else mk("Pied boiteux à vérifier", state.step>2 ? "warn":"warn");
-
-    if(state.angVOK) mk("Ang V OK", "ok");
-    if(state.parVOK) mk("Par V OK", "ok");
-    if(state.angHOK) mk("Ang H OK", "ok");
-    if(state.parHOK) mk("Par H OK", "ok");
+  function computeWorstSoftFoot(){
+    const entries = Object.entries(align.sf); // [ [FL,val], ... ]
+    entries.sort((a,b)=>b[1]-a[1]);
+    return { foot: entries[0][0], val: entries[0][1] };
   }
 
-  /* ===================== STATE ===================== */
-  const state = {
-    step: 1,
-
-    runoutOK:false,
-    softFootOK:false,
-    angVOK:false,
-    parVOK:false,
-    angHOK:false,
-    parHOK:false,
-
-    // valeurs calculées pour affichage
-    sfDelta:null,
-    sfMaxKey:null,
-    sfMinKey:null,
-
-    angVDelta:null,
-    angHDelta:null,
-
-    parV:null,
-    parH:null
-  };
-
-  /* ===================== TOLÉRANCES PÉDAGO ===================== */
-  const TOL = {
-    runout: 2.0,     // mils
-    softFoot: 3.0,   // Δ max-min (mils)
-    angDelta: 2.0    // |Δ| (mils)
-  };
-
-  /* ===================== STEP 1 (VOILAGE) ===================== */
-  $("btnStep1").addEventListener("click", () => {
-    const m = parseNum("runoutMotor");
-    const p = parseNum("runoutPump");
-
-    if(m === null || p === null){
-      setStatus(1, "bad", "❌ Entre les deux valeurs de voilage (mils).");
-      return;
+  function getActiveSoftFoot(){
+    if(align.sfFoot && align.sfFoot !== "auto"){
+      return { foot: align.sfFoot, val: align.sf[align.sfFoot] ?? 0 };
     }
-    if(m < 0 || p < 0){
-      setStatus(1, "bad", "❌ Le voilage ne peut pas être négatif.");
-      return;
-    }
-
-    const ok = (m <= TOL.runout) && (p <= TOL.runout);
-
-    if(ok){
-      state.runoutOK = true;
-      state.step = Math.max(state.step, 2);
-      setStatus(1, "ok", `✔ Voilage acceptable (≤ ${TOL.runout.toFixed(1)} mils).`);
-      unlock(2);
-    }else{
-      state.runoutOK = false;
-      setStatus(1, "bad", `⛔ Voilage trop élevé. Cible: ≤ ${TOL.runout.toFixed(1)} mils.`);
-      // on garde step2 verrouillé
-      lock(2);
-      lock(3); lock(4); lock(5); lock(6);
-    }
-
-    drawAlignmentView();
-    setPills();
-  });
-
-  /* ===================== STEP 2 (PIED BOITEUX 4 PATTES) ===================== */
-  function softFootCompute(){
-    const vals = {
-      "AV G": parseNum("sfFL"),
-      "AV D": parseNum("sfFR"),
-      "AR G": parseNum("sfRL"),
-      "AR D": parseNum("sfRR")
-    };
-    for(const k of Object.keys(vals)){
-      if(vals[k] === null) return null;
-    }
-    // autorise négatif? en pratique, la lecture peut être signée selon méthode,
-    // mais pour "écart", on veut souvent la magnitude. Ici: on garde la valeur telle quelle,
-    // et on fait max/min sur la valeur numérique.
-    let maxKey=null, minKey=null;
-    let max=-Infinity, min=Infinity;
-
-    for(const [k,v] of Object.entries(vals)){
-      if(v > max){ max=v; maxKey=k; }
-      if(v < min){ min=v; minKey=k; }
-    }
-    const delta = max - min;
-
-    return { vals, max, min, delta, maxKey, minKey };
+    return computeWorstSoftFoot();
   }
 
-  function refreshSoftFootKPI(){
-    const r = softFootCompute();
-    const box = $("sfKPI");
-    if(!r){
-      box.innerHTML = `<div><b>Δ (max-min)</b> : —</div><div><b>Patte max</b> : —</div><div><b>Patte min</b> : —</div>`;
-      return;
-    }
-    box.innerHTML = `
-      <div><b>Δ (max-min)</b> : ${r.delta.toFixed(2)} mils</div>
-      <div><b>Patte max</b> : ${r.maxKey} (${r.max.toFixed(2)})</div>
-      <div><b>Patte min</b> : ${r.minKey} (${r.min.toFixed(2)})</div>
-    `;
+  function updateBadges(){
+    // 1) runout
+    const okRunout = Math.abs(align.runout) <= align.runoutTol;
+    setBadge(b1, okRunout ? "ok" : "bad", okRunout ? "OK" : "À corriger");
+
+    // 2) soft foot (pire patte ou patte choisie)
+    const sf = getActiveSoftFoot();
+    const okSF = sf.val <= align.sfTol;
+    setBadge(b2, okSF ? "ok" : "bad", okSF ? "OK" : "À corriger");
+
+    // 3) ang V
+    const okAngV = Math.abs(align.angV) <= align.angVTol;
+    setBadge(b3, okAngV ? "ok" : "bad", okAngV ? "OK" : "À corriger");
+
+    // 4) par V
+    const okParV = Math.abs(align.parV) <= align.parVTol;
+    setBadge(b4, okParV ? "ok" : "bad", okParV ? "OK" : "À corriger");
+
+    // 5) ang H
+    const okAngH = Math.abs(align.angH) <= align.angHTol;
+    setBadge(b5, okAngH ? "ok" : "bad", okAngH ? "OK" : "À corriger");
+
+    // 6) par H
+    const okParH = Math.abs(align.parH) <= align.parHTol;
+    setBadge(b6, okParH ? "ok" : "bad", okParH ? "OK" : "À corriger");
+
+    // KPI text
+    const sf2 = getActiveSoftFoot();
+    kpiV.textContent =
+      `SF ${sf2.foot}=${sf2.val.toFixed(1)} mil | angV=${align.angV.toFixed(1)} | parV=${align.parV.toFixed(1)} | gain=${align.gain.toFixed(0)}`;
+
+    kpiH.textContent =
+      `angH=${align.angH.toFixed(1)} | parH=${align.parH.toFixed(1)} | (+)=droite`;
   }
 
-  ["sfFL","sfFR","sfRL","sfRR"].forEach(id=>{
-    $(id).addEventListener("input", () => {
-      refreshSoftFootKPI();
-      drawAlignmentView();
-    });
-  });
-
-  $("btnStep2").addEventListener("click", () => {
-    const r = softFootCompute();
-    if(!r){
-      setStatus(2, "bad", "❌ Entre les 4 lectures de pattes (mils).");
-      return;
-    }
-
-    state.sfDelta = r.delta;
-    state.sfMaxKey = r.maxKey;
-    state.sfMinKey = r.minKey;
-
-    if(r.delta <= TOL.softFoot){
-      state.softFootOK = true;
-      state.step = Math.max(state.step, 3);
-      setStatus(2, "ok", `✔ Pied boiteux acceptable: Δ=${r.delta.toFixed(2)} mils (≤ ${TOL.softFoot.toFixed(1)}).`);
-      unlock(3);
-    }else{
-      state.softFootOK = false;
-      setStatus(2, "bad", `⛔ Pied boiteux présent: Δ=${r.delta.toFixed(2)} mils (> ${TOL.softFoot.toFixed(1)}). Corriger AVANT l’alignement.`);
-      // On bloque la suite tant que pas OK
-      lock(3); lock(4); lock(5); lock(6);
-    }
-
-    drawAlignmentView();
-    setPills();
-  });
-
-  /* ===================== STEP 3 (ANG V) ===================== */
-  function computeDelta(a, b){ return a - b; }
-
-  function refreshAngVKPI(){
-    const a = parseNum("v12");
-    const b = parseNum("v6");
-    const box = $("kpiAngV");
-    if(a === null || b === null){
-      box.innerHTML = `<div><b>ΔV</b> (12h−6h): —</div>`;
-      return;
-    }
-    const d = computeDelta(a,b);
-    box.innerHTML = `<div><b>ΔV</b> (12h−6h): ${d.toFixed(2)} mils</div>`;
-  }
-
-  ["v12","v6"].forEach(id=>{
-    $(id).addEventListener("input", () => {
-      refreshAngVKPI();
-      drawAlignmentView();
-    });
-  });
-
-  $("btnStep3").addEventListener("click", () => {
-    const a = parseNum("v12");
-    const b = parseNum("v6");
-    if(a === null || b === null){
-      setStatus(3, "bad", "❌ Entre les lectures 12h et 6h (mils).");
-      return;
-    }
-
-    const d = computeDelta(a,b);
-    state.angVDelta = d;
-
-    if(Math.abs(d) <= TOL.angDelta){
-      state.angVOK = true;
-      state.step = Math.max(state.step, 4);
-      setStatus(3, "ok", `✔ Angularité V acceptable: ΔV=${d.toFixed(2)} mils (|Δ| ≤ ${TOL.angDelta.toFixed(1)}).`);
-      unlock(4);
-    }else{
-      state.angVOK = false;
-      setStatus(3, "bad", `⛔ Angularité V hors tolérance: ΔV=${d.toFixed(2)} mils (cible |Δ| ≤ ${TOL.angDelta.toFixed(1)}).`);
-      lock(4); lock(5); lock(6);
-    }
-
-    drawAlignmentView();
-    setPills();
-  });
-
-  /* ===================== STEP 4 (PAR V) ===================== */
-  $("btnStep4").addEventListener("click", () => {
-    const v = parseNum("parV");
-    const tol = parseNum("tolParV");
-
-    if(v === null || tol === null){
-      setStatus(4, "bad", "❌ Entre la lecture et la tolérance (mils).");
-      return;
-    }
-    state.parV = v;
-
-    if(Math.abs(v) <= Math.abs(tol)){
-      state.parVOK = true;
-      state.step = Math.max(state.step, 5);
-      setStatus(4, "ok", `✔ Parallélisme V acceptable: ${v.toFixed(2)} mils (≤ ${Math.abs(tol).toFixed(2)}).`);
-      unlock(5);
-    }else{
-      state.parVOK = false;
-      setStatus(4, "bad", `⛔ Parallélisme V hors tolérance: ${v.toFixed(2)} mils (cible ≤ ${Math.abs(tol).toFixed(2)}).`);
-      lock(5); lock(6);
-    }
-
-    drawAlignmentView();
-    setPills();
-  });
-
-  /* ===================== STEP 5 (ANG H) ===================== */
-  function refreshAngHKPI(){
-    const a = parseNum("h3");
-    const b = parseNum("h9");
-    const box = $("kpiAngH");
-    if(a === null || b === null){
-      box.innerHTML = `<div><b>ΔH</b> (3h−9h): —</div>`;
-      return;
-    }
-    const d = computeDelta(a,b);
-    box.innerHTML = `<div><b>ΔH</b> (3h−9h): ${d.toFixed(2)} mils</div>`;
-  }
-
-  ["h3","h9"].forEach(id=>{
-    $(id).addEventListener("input", () => {
-      refreshAngHKPI();
-      drawAlignmentView();
-    });
-  });
-
-  $("btnStep5").addEventListener("click", () => {
-    const a = parseNum("h3");
-    const b = parseNum("h9");
-    if(a === null || b === null){
-      setStatus(5, "bad", "❌ Entre les lectures 3h et 9h (mils).");
-      return;
-    }
-
-    const d = computeDelta(a,b);
-    state.angHDelta = d;
-
-    if(Math.abs(d) <= TOL.angDelta){
-      state.angHOK = true;
-      state.step = Math.max(state.step, 6);
-      setStatus(5, "ok", `✔ Angularité H acceptable: ΔH=${d.toFixed(2)} mils (|Δ| ≤ ${TOL.angDelta.toFixed(1)}).`);
-      unlock(6);
-    }else{
-      state.angHOK = false;
-      setStatus(5, "bad", `⛔ Angularité H hors tolérance: ΔH=${d.toFixed(2)} mils (cible |Δ| ≤ ${TOL.angDelta.toFixed(1)}).`);
-      lock(6);
-    }
-
-    drawAlignmentView();
-    setPills();
-  });
-
-  /* ===================== STEP 6 (PAR H) ===================== */
-  $("btnStep6").addEventListener("click", () => {
-    const v = parseNum("parH");
-    const tol = parseNum("tolParH");
-
-    if(v === null || tol === null){
-      setStatus(6, "bad", "❌ Entre la lecture et la tolérance (mils).");
-      return;
-    }
-    state.parH = v;
-
-    if(Math.abs(v) <= Math.abs(tol)){
-      state.parHOK = true;
-      setStatus(6, "ok", `✔ Parallélisme H acceptable: ${v.toFixed(2)} mils (≤ ${Math.abs(tol).toFixed(2)}).`);
-    }else{
-      state.parHOK = false;
-      setStatus(6, "bad", `⛔ Parallélisme H hors tolérance: ${v.toFixed(2)} mils (cible ≤ ${Math.abs(tol).toFixed(2)}).`);
-    }
-
-    drawAlignmentView();
-    setPills();
-  });
-
-  /* ===================== RESET ===================== */
-  $("btnResetAll").addEventListener("click", () => {
-    // inputs
-    ["runoutMotor","runoutPump","sfFL","sfFR","sfRL","sfRR","v12","v6","parV","h3","h9","parH"].forEach(id=>{
-      if($(id)) $(id).value = "";
-    });
-    $("tolParV").value = "2.0";
-    $("tolParH").value = "2.0";
-
-    // state
-    state.step = 1;
-    state.runoutOK = state.softFootOK = state.angVOK = state.parVOK = state.angHOK = state.parHOK = false;
-    state.sfDelta = state.sfMaxKey = state.sfMinKey = null;
-    state.angVDelta = state.angHDelta = null;
-    state.parV = state.parH = null;
-
-    // locks
-    unlock(1);
-    lock(2); lock(3); lock(4); lock(5); lock(6);
-
-    // statuses
-    for(let i=1;i<=6;i++) setStatus(i, "", "");
-
-    refreshSoftFootKPI();
-    refreshAngVKPI();
-    refreshAngHKPI();
-
-    drawAlignmentView();
-    setPills();
-  });
-
-  /* ===================== CANVAS VIEW ===================== */
-  const alignCanvas = $("alignView");
-  const alignCtx = alignCanvas.getContext("2d");
-
+  /* ===================== CANVAS UTILS ===================== */
   function dprNow(){ return Math.min(3, window.devicePixelRatio || 1); }
 
-  function resizeAlignView(){
+  function resizeCanvas(c, ctx){
     const dpr = dprNow();
-    const w = alignCanvas.clientWidth || 1;
-    const h = alignCanvas.clientHeight || 1;
-    alignCanvas.width  = Math.round(w * dpr);
-    alignCanvas.height = Math.round(h * dpr);
-    alignCtx.setTransform(dpr,0,0,dpr,0,0);
+    const w = c.clientWidth || 300;
+    const h = c.clientHeight || 240;
+    c.width  = Math.round(w * dpr);
+    c.height = Math.round(h * dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    return { W: w, H: h };
   }
 
-  function drawMachine(x, y, w, h, color, label){
-    // corps
-    alignCtx.fillStyle = color;
-    alignCtx.fillRect(x, y, w, h);
-
-    // pattes (4)
-    const footW = 18, footH = 9;
-    // bas
-    alignCtx.fillRect(x+12,    y+h, footW, footH);
-    alignCtx.fillRect(x+w-30,  y+h, footW, footH);
-    // haut (visuel)
-    alignCtx.fillRect(x+12,    y-9, footW, footH);
-    alignCtx.fillRect(x+w-30,  y-9, footW, footH);
-
-    // label
-    alignCtx.fillStyle = "#eaf1ff";
-    alignCtx.font = "12px Arial";
-    alignCtx.textAlign = "center";
-    alignCtx.fillText(label, x+w/2, y-14);
+  function clear(ctx, W, H){
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle="#000";
+    ctx.fillRect(0,0,W,H);
   }
 
-  function drawCoupling(x1, x2, y){
-    alignCtx.strokeStyle = "rgba(255,255,255,.65)";
-    alignCtx.lineWidth = 3;
-    alignCtx.beginPath();
-    alignCtx.moveTo(x1, y);
-    alignCtx.lineTo(x2, y);
-    alignCtx.stroke();
-
-    // demi-accouplement
-    alignCtx.fillStyle = "rgba(255,255,255,.25)";
-    alignCtx.fillRect((x1+x2)/2 - 8, y-10, 16, 20);
+  function drawGrid(ctx, W, H){
+    ctx.strokeStyle="rgba(255,255,255,.06)";
+    ctx.lineWidth=1;
+    const step = 24;
+    for(let x=0; x<=W; x+=step){
+      ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke();
+    }
+    for(let y=0; y<=H; y+=step){
+      ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke();
+    }
   }
 
-  function drawIndicator(text, x, y, cls){
-    let col = "rgba(255,255,255,.85)";
-    if(cls==="ok") col = "rgba(76,175,80,.95)";
-    if(cls==="bad") col = "rgba(255,82,82,.95)";
-    if(cls==="warn") col = "rgba(255,179,0,.95)";
-
-    alignCtx.fillStyle = "rgba(0,0,0,.45)";
-    alignCtx.fillRect(x-62, y-14, 124, 22);
-
-    alignCtx.fillStyle = col;
-    alignCtx.font = "12px Arial";
-    alignCtx.textAlign = "center";
-    alignCtx.textBaseline = "middle";
-    alignCtx.fillText(text, x, y-3);
+  function drawCoupling(ctx, x, y, r){
+    ctx.strokeStyle="rgba(255,255,255,.25)";
+    ctx.lineWidth=2;
+    ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.stroke();
+    ctx.beginPath(); ctx.arc(x,y,r*0.55,0,Math.PI*2); ctx.stroke();
   }
 
-  function drawAlignmentView(){
-    resizeAlignView();
+  function drawFoot(ctx, x, y, w, h){
+    ctx.fillRect(x, y, w, h);
+  }
 
-    const dpr = dprNow();
-    const W = alignCanvas.width / dpr;
-    const H = alignCanvas.height / dpr;
+  /* ===================== RENDU – VUE DESSUS (HORIZONTAL) ===================== */
+  function drawTopView(){
+    const { W, H } = resizeCanvas(topCanvas, topCtx);
+    clear(topCtx, W, H);
+    drawGrid(topCtx, W, H);
 
-    // fond
-    alignCtx.clearRect(0,0,W,H);
-    alignCtx.fillStyle = "#000";
-    alignCtx.fillRect(0,0,W,H);
+    // plan
+    const midY = H * 0.55;
+    const baseX = 40;
+    const unitLen = Math.min(150, (W - 120) * 0.45); // longueur machine
+    const gap = Math.min(90, (W - 120) * 0.18);
 
-    // dimensions machines
-    const machineW = Math.min(140, Math.max(110, W*0.32));
-    const machineH = 54;
-    const centerY = H/2 - machineH/2;
+    // pompe (fixe)
+    const pumpX = baseX + unitLen + gap;
+    const pumpY = midY;
+    const pumpW = unitLen;
+    const pumpH = 42;
 
-    // positions
-    const leftX  = 18;
-    const rightX = W - machineW - 18;
+    // moteur (mobile) — base position (à gauche)
+    const motorX0 = baseX;
+    const motorY0 = midY;
+    const motorW = unitLen;
+    const motorH = 42;
 
-    // machines
-    drawMachine(leftX, centerY, machineW, machineH, "#00a2ff", "Moteur (mobile)");
-    drawMachine(rightX, centerY, machineW, machineH, "#ff9800", "Pompe (fixe)");
+    // transform moteur selon parH + angH
+    const g = align.gain;
+
+    // parH: translation latérale (droite=+)
+    const dx = align.parH * g;
+
+    // angH: rotation autour centre (petit angle pédagogique)
+    const ang = (align.angH * 0.0025); // radians par mil (tweak pédagogique)
+
+    // dessin pompe
+    topCtx.fillStyle="#ff9800";
+    topCtx.fillRect(pumpX, pumpY - pumpH/2, pumpW, pumpH);
+
+    // pattes pompe (4)
+    topCtx.fillStyle="#d98200";
+    const fw=16, fh=8;
+    drawFoot(topCtx, pumpX+10,         pumpY - pumpH/2 - fh - 2, fw, fh);
+    drawFoot(topCtx, pumpX+pumpW-26,   pumpY - pumpH/2 - fh - 2, fw, fh);
+    drawFoot(topCtx, pumpX+10,         pumpY + pumpH/2 + 2,      fw, fh);
+    drawFoot(topCtx, pumpX+pumpW-26,   pumpY + pumpH/2 + 2,      fw, fh);
+
+    topCtx.fillStyle="#eaf1ff";
+    topCtx.font="12px Arial";
+    topCtx.textAlign="center";
+    topCtx.fillText("Pompe (fixe)", pumpX + pumpW/2, pumpY - pumpH/2 - 16);
+
+    // dessin moteur avec rotation + translation (autour son centre)
+    const cx = motorX0 + motorW/2;
+    const cy = motorY0;
+
+    topCtx.save();
+    topCtx.translate(cx + dx, cy);
+    topCtx.rotate(ang);
+    topCtx.translate(-cx, -cy);
+
+    // corps moteur
+    topCtx.fillStyle="#00a2ff";
+    topCtx.fillRect(motorX0, motorY0 - motorH/2, motorW, motorH);
+
+    // pattes moteur (4)
+    topCtx.fillStyle="#0086d6";
+    drawFoot(topCtx, motorX0+10,        motorY0 - motorH/2 - fh - 2, fw, fh);
+    drawFoot(topCtx, motorX0+motorW-26, motorY0 - motorH/2 - fh - 2, fw, fh);
+    drawFoot(topCtx, motorX0+10,        motorY0 + motorH/2 + 2,      fw, fh);
+    drawFoot(topCtx, motorX0+motorW-26, motorY0 + motorH/2 + 2,      fw, fh);
+
+    topCtx.fillStyle="#eaf1ff";
+    topCtx.font="12px Arial";
+    topCtx.textAlign="center";
+    topCtx.fillText("Moteur (mobile)", motorX0 + motorW/2, motorY0 - motorH/2 - 16);
+
+    // arbre moteur (ligne)
+    topCtx.strokeStyle="rgba(255,255,255,.55)";
+    topCtx.lineWidth=3;
+    topCtx.beginPath();
+    topCtx.moveTo(motorX0+motorW, motorY0);
+    topCtx.lineTo(pumpX, pumpY);
+    topCtx.stroke();
+
+    // accouplement au milieu du gap
+    const coupX = motorX0 + motorW + gap/2;
+    const coupY = motorY0;
+    drawCoupling(topCtx, coupX, coupY, 12);
+
+    topCtx.restore();
+
+    // note bas
+    topCtx.fillStyle="rgba(255,255,255,.75)";
+    topCtx.font="12px Arial";
+    topCtx.textAlign="left";
+    topCtx.fillText(`parH=${align.parH.toFixed(1)} mil, angH=${align.angH.toFixed(1)} mil (visuel exagéré)`, 12, H - 12);
+  }
+
+  /* ===================== RENDU – VUE PROFIL (VERTICAL) ===================== */
+  function drawSideView(){
+    const { W, H } = resizeCanvas(sideCanvas, sideCtx);
+    clear(sideCtx, W, H);
+    drawGrid(sideCtx, W, H);
+
+    const midY = H * 0.60;
+    const baseX = 40;
+    const unitLen = Math.min(150, (W - 120) * 0.45);
+    const gap = Math.min(90, (W - 120) * 0.18);
+
+    // pompe fixe
+    const pumpX = baseX + unitLen + gap;
+    const pumpW = unitLen;
+    const pumpH = 42;
+
+    // moteur mobile
+    const motorX0 = baseX;
+    const motorW = unitLen;
+    const motorH = 42;
+
+    const g = align.gain;
+
+    // parV: translation verticale (haut = +, donc Y diminue)
+    const dy = -align.parV * g;
+
+    // angV: rotation (profil)
+    const ang = -(align.angV * 0.0025); // rad par mil (tweak)
+
+    // soft foot: patte affectée est “plus basse” (descend) => +val => patte baisse
+    const sf = getActiveSoftFoot();
+    const sfDrop = sf.val * g * 0.35; // drop visuel modéré
+    const footSel = sf.foot;
+
+    // pompe (fixe)
+    const pumpY = midY;
+    sideCtx.fillStyle="#ff9800";
+    sideCtx.fillRect(pumpX, pumpY - pumpH/2, pumpW, pumpH);
+
+    // pattes pompe (profil = 2 pattes visibles)
+    sideCtx.fillStyle="#d98200";
+    const fw=20, fh=10;
+    // avant
+    drawFoot(sideCtx, pumpX+16, pumpY + pumpH/2 + 2, fw, fh);
+    // arrière
+    drawFoot(sideCtx, pumpX+pumpW-36, pumpY + pumpH/2 + 2, fw, fh);
+
+    sideCtx.fillStyle="#eaf1ff";
+    sideCtx.font="12px Arial";
+    sideCtx.textAlign="center";
+    sideCtx.fillText("Pompe (fixe)", pumpX + pumpW/2, pumpY - pumpH/2 - 16);
+
+    // moteur transformé
+    const motorY0 = midY + dy;
+    const cx = motorX0 + motorW/2;
+    const cy = motorY0;
+
+    sideCtx.save();
+    sideCtx.translate(cx, cy);
+    sideCtx.rotate(ang);
+    sideCtx.translate(-cx, -cy);
+
+    // corps moteur
+    sideCtx.fillStyle="#00a2ff";
+    sideCtx.fillRect(motorX0, motorY0 - motorH/2, motorW, motorH);
+
+    // pattes moteur (profil=2 pattes visibles) + soft foot drop (si patte AV ou AR)
+    sideCtx.fillStyle="#0086d6";
+    // avant (FL/FR)
+    const frontDrop = (footSel === "FL" || footSel === "FR") ? sfDrop : 0;
+    // arrière (RL/RR)
+    const rearDrop  = (footSel === "RL" || footSel === "RR") ? sfDrop : 0;
+
+    drawFoot(sideCtx, motorX0+16,         motorY0 + motorH/2 + 2 + frontDrop, fw, fh);
+    drawFoot(sideCtx, motorX0+motorW-36,  motorY0 + motorH/2 + 2 + rearDrop,  fw, fh);
+
+    // arbre / ligne centre
+    sideCtx.strokeStyle="rgba(255,255,255,.55)";
+    sideCtx.lineWidth=3;
+    sideCtx.beginPath();
+    sideCtx.moveTo(motorX0+motorW, motorY0);
+    sideCtx.lineTo(pumpX, pumpY);
+    sideCtx.stroke();
 
     // accouplement
-    const shaftY = centerY + machineH/2;
-    drawCoupling(leftX + machineW, rightX, shaftY);
+    const coupX = motorX0 + motorW + gap/2;
+    const coupY = motorY0;
+    drawCoupling(sideCtx, coupX, coupY, 12);
 
-    // indicateurs (pédago)
-    if(!state.runoutOK){
-      drawIndicator("Voilage à valider", W/2, 26, "warn");
-    }else{
-      drawIndicator("Voilage OK", W/2, 26, "ok");
-    }
+    // label moteur
+    sideCtx.fillStyle="#eaf1ff";
+    sideCtx.font="12px Arial";
+    sideCtx.textAlign="center";
+    sideCtx.fillText("Moteur (mobile)", motorX0 + motorW/2, motorY0 - motorH/2 - 16);
 
-    // Soft foot indicator
-    if(state.runoutOK){
-      if(state.softFootOK){
-        drawIndicator("Pied boiteux OK", leftX + machineW/2, H - 18, "ok");
-      }else{
-        // si on a des données, afficher Δ
-        if(isNum(state.sfDelta)){
-          drawIndicator("Pied boiteux Δ=" + state.sfDelta.toFixed(2), leftX + machineW/2, H - 18, (state.sfDelta<=TOL.softFoot)?"ok":"bad");
-        }else{
-          drawIndicator("Pied boiteux à mesurer", leftX + machineW/2, H - 18, "warn");
-        }
-      }
-    }
+    sideCtx.restore();
 
-    // Ang V/H indicators
-    if(state.angVOK && isNum(state.angVDelta)){
-      drawIndicator("Ang V Δ=" + state.angVDelta.toFixed(2), W/2, 54, "ok");
-    }else if(isNum(state.angVDelta)){
-      drawIndicator("Ang V Δ=" + state.angVDelta.toFixed(2), W/2, 54, "bad");
-    }
+    // annotation soft foot
+    sideCtx.fillStyle="rgba(255,255,255,.80)";
+    sideCtx.font="12px Arial";
+    sideCtx.textAlign="left";
+    sideCtx.fillText(`SF: patte ${sf.foot} = ${sf.val.toFixed(1)} mil (affiché exagéré)`, 12, H - 28);
+    sideCtx.fillText(`parV=${align.parV.toFixed(1)} mil, angV=${align.angV.toFixed(1)} mil`, 12, H - 12);
+  }
 
-    if(state.angHOK && isNum(state.angHDelta)){
-      drawIndicator("Ang H Δ=" + state.angHDelta.toFixed(2), W/2, 80, "ok");
-    }else if(isNum(state.angHDelta)){
-      drawIndicator("Ang H Δ=" + state.angHDelta.toFixed(2), W/2, 80, "bad");
-    }
+  /* ===================== RENDER GLOBAL ===================== */
+  function render(){
+    syncFromInputs();
+    updateBadges();
+    drawTopView();
+    drawSideView();
+  }
 
-    // Parallel indicators
-    if(state.parVOK && isNum(state.parV)){
-      drawIndicator("Par V=" + state.parV.toFixed(2), rightX + machineW/2, H - 18, "ok");
-    }else if(isNum(state.parV)){
-      drawIndicator("Par V=" + state.parV.toFixed(2), rightX + machineW/2, H - 18, "bad");
-    }
+  /* ===================== RESET (valeurs) ===================== */
+  function resetValues(){
+    runout.value = "0.8";
+    runoutTol.value = "2.0";
 
-    if(state.parHOK && isNum(state.parH)){
-      drawIndicator("Par H=" + state.parH.toFixed(2), W/2, H - 44, "ok");
-    }else if(isNum(state.parH)){
-      drawIndicator("Par H=" + state.parH.toFixed(2), W/2, H - 44, "bad");
-    }
+    sfFL.value = "2.0";
+    sfFR.value = "1.0";
+    sfRL.value = "0.5";
+    sfRR.value = "3.5";
+    sfTol.value = "3.0";
+    sfFoot.value = "auto";
+
+    angV.value = "0.0";
+    angVTol.value = "1.0";
+
+    parV.value = "0.0";
+    parVTol.value = "1.0";
+
+    angH.value = "0.0";
+    angHTol.value = "1.0";
+
+    parH.value = "0.0";
+    parHTol.value = "1.0";
+
+    gain.value = "25";
+
+    render();
+  }
+
+  /* ===================== EVENTS ===================== */
+  const allInputs = [
+    runout, runoutTol,
+    sfFL, sfFR, sfRL, sfRR, sfTol, sfFoot,
+    angV, angVTol,
+    parV, parVTol,
+    angH, angHTol,
+    parH, parHTol,
+    gain
+  ];
+
+  allInputs.forEach(x => {
+    x.addEventListener("input", render, { passive:true });
+    x.addEventListener("change", render, { passive:true });
+  });
+
+  btnReset.addEventListener("click", resetValues);
+
+  window.addEventListener("resize", render);
+  if(window.visualViewport){
+    window.visualViewport.addEventListener("resize", render);
   }
 
   /* ===================== INIT ===================== */
-  function handleResize(){
-    drawAlignmentView();
-  }
-  window.addEventListener("resize", handleResize);
-  if(window.visualViewport){
-    window.visualViewport.addEventListener("resize", handleResize);
-  }
+  render();
 
-  // init locks
-  lock(2); lock(3); lock(4); lock(5); lock(6);
-
-  refreshSoftFootKPI();
-  refreshAngVKPI();
-  refreshAngHKPI();
-  drawAlignmentView();
-  setPills();
 })();
 </script>
-
 </body>
 </html>
