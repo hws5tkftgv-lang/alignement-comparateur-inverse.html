@@ -686,11 +686,76 @@ details[open] summary{
 
     // KPI text
     const sf2 = getActiveSoftFoot();
+    
     kpiV.textContent =
-      `SF ${sf2.foot}=${sf2.val.toFixed(1)} mil | angV=${align.angV.toFixed(1)} | parV=${align.parV.toFixed(1)} | gain=${align.gain.toFixed(0)}`;
+  pbText + "\n\n" + vertText;
 
-    kpiH.textContent =
-      `angH=${align.angH.toFixed(1)} | parH=${align.parH.toFixed(1)} | (+)=droite`;
+kpiH.textContent =
+  horiText;
+    
+    
+    
+      // ===== PIED BOITEUX – CALCUL OFFICIEL =====
+const pb = calculPiedBoiteux(
+  align.sf.FL,
+  align.sf.FR,
+  align.sf.RL,
+  align.sf.RR
+);
+
+let pbText = "";
+
+if(pb.diagFautive === "AUCUNE"){
+  pbText = "Pied boiteux : OK (diagonales équilibrées)";
+} else {
+  pbText =
+    `Pied boiteux détecté\n` +
+    `Diag fautive : ${pb.diagFautive}\n` +
+    `Z = ${pb.Z.toFixed(3)} mil\n` +
+    `Correction (80%) = ${pb.correction80.toFixed(3)} mil\n`;
+
+  if(pb.repartition.A){
+    pbText += `→ Ajouter ${pb.repartition.A.toFixed(3)} mil sous A et C`;
+  }
+  if(pb.repartition.B){
+    pbText += `→ Ajouter ${pb.repartition.B.toFixed(3)} mil sous B et D`;
+  }
+}
+
+// ===== VERTICAL =====
+const corrAngV = calculAngulariteVerticale(
+  6,               // diamètre accouplement (exemple, on le rendra dynamique plus tard)
+  12,              // distance pieds arrière
+  Math.abs(align.angV)
+);
+
+const corrParV = calculParalleleVertical(
+  Math.abs(align.parV)
+);
+
+let vertText =
+  `Angularité V : ${align.angV.toFixed(2)} mil\n` +
+  `→ Correction AR moteur : ${corrAngV.toFixed(3)} mil\n\n` +
+  `Parallélisme V : ${align.parV.toFixed(2)} mil\n` +
+  `→ Correction 4 pattes : ${corrParV.toFixed(3)} mil`;
+      
+      // ===== HORIZONTAL =====
+const corrAngH = calculAngulariteHorizontale(
+  Math.abs(align.angH)
+);
+
+const corrParH = calculParalleleHorizontal(
+  Math.abs(align.parH)
+);
+
+let horiText =
+  `Angularité H : ${align.angH.toFixed(2)} mil\n` +
+  `→ Pivoter AR moteur : ${corrAngH.toFixed(3)} mil\n\n` +
+  `Parallélisme H : ${align.parH.toFixed(2)} mil\n` +
+  `→ Déplacement latéral : ${corrParH.toFixed(3)} mil`;
+      
+      
+      
   }
 
   /* ===================== CANVAS UTILS ===================== */
@@ -1016,7 +1081,10 @@ document.addEventListener("DOMContentLoaded", () => {
     infoModal.classList.add("hidden");
   };
 });
-
+function toNumber(v){
+  const n = parseFloat(v);
+  return Number.isFinite(n) ? n : 0;
+}
 
 </script>
 
