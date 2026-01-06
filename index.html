@@ -261,13 +261,43 @@ canvas{
 
 .hidden{ display:none; }
 
+.headerBar{
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:14px;
+  font-size:18px;
+  font-weight:800;
+}
+
+.headerBar span{
+  pointer-events:none;
+}
+
+.infoBtn{
+  position:absolute;
+  right:14px;
+  top:50%;
+  transform:translateY(-50%);
+  font-size:20px;
+  background:none;
+  border:none;
+  color:#eaf1ff;
+}
+
 </style>
 </head>
 
 <body>
-<button id="infoBtn" aria-label="Informations" class="infoBtn">ℹ️</button>
-<div class="sub">iPhone-first • 2 vues (dessus + profil) • corrections visibles (exagérées) • pas de blocage d’étapes</div>
+<header class="headerBar">
+  <span>Alignement – Comparateur inversé (mils)</span>
+  <button id="infoBtn" aria-label="Informations" class="infoBtn">ℹ️</button>
+</header>
 
+<div class="sub">
+  iPhone-first • 2 vues (dessus + profil) • corrections visibles (exagérées) • pas de blocage d’étapes
+</div>
 <div class="wrap">
   <div class="grid">
 
@@ -970,5 +1000,7 @@ function closeInfo(){
     <button onclick="closeInfo()">Fermer</button>
   </div>
 </div>
+
+
 </body>
 </html>
