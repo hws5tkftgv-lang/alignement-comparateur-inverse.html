@@ -529,6 +529,53 @@ details[open] summary{
 
   </div>
 </div>
+<script>
+/* ===== CALCULS OFFICIELS – COMPARATEUR INVERSE ===== */
+
+function calculPiedBoiteux(A, B, C, D){
+  const diagAC = Math.abs(A - C);
+  const diagBD = Math.abs(B - D);
+
+  if(diagAC < 0.001 && diagBD < 0.001){
+    return { diagFautive:"AUCUNE", Z:0, correction80:0, repartition:{} };
+  }
+
+  const Z = Math.abs(diagAC - diagBD);
+  const correction80 = Z * 0.8;
+
+  if(diagAC > diagBD){
+    return {
+      diagFautive:"AC",
+      Z,
+      correction80,
+      repartition:{ A:correction80/2, C:correction80/2 }
+    };
+  } else {
+    return {
+      diagFautive:"BD",
+      Z,
+      correction80,
+      repartition:{ B:correction80/2, D:correction80/2 }
+    };
+  }
+}
+
+function calculAngulariteVerticale(diametre, distance, TIR){
+  return (TIR / distance) * diametre;
+}
+
+function calculParalleleVertical(TIR){
+  return TIR / 2;
+}
+
+function calculAngulariteHorizontale(TIR){
+  return TIR / 2;
+}
+
+function calculParalleleHorizontal(TIR){
+  return TIR;
+}
+</script>
 
 <script>
 (() => {
@@ -657,108 +704,61 @@ details[open] summary{
     }
     return computeWorstSoftFoot();
   }
+function updateBadges(){
 
-  function updateBadges(){
-    // 1) runout
-    const okRunout = Math.abs(align.runout) <= align.runoutTol;
-    setBadge(b1, okRunout ? "ok" : "bad", okRunout ? "OK" : "À corriger");
+  // ===== BADGES =====
+  setBadge(b1, Math.abs(align.runout)<=align.runoutTol ? "ok":"bad", "Info");
+  setBadge(b2, getActiveSoftFoot().val<=align.sfTol ? "ok":"bad", "Info");
+  setBadge(b3, Math.abs(align.angV)<=align.angVTol ? "ok":"bad", "Info");
+  setBadge(b4, Math.abs(align.parV)<=align.parVTol ? "ok":"bad", "Info");
+  setBadge(b5, Math.abs(align.angH)<=align.angHTol ? "ok":"bad", "Info");
+  setBadge(b6, Math.abs(align.parH)<=align.parHTol ? "ok":"bad", "Info");
 
-    // 2) soft foot (pire patte ou patte choisie)
-    const sf = getActiveSoftFoot();
-    const okSF = sf.val <= align.sfTol;
-    setBadge(b2, okSF ? "ok" : "bad", okSF ? "OK" : "À corriger");
+  // ===== PIED BOITEUX =====
+  const pb = calculPiedBoiteux(
+    align.sf.FL,
+    align.sf.FR,
+    align.sf.RL,
+    align.sf.RR
+  );
 
-    // 3) ang V
-    const okAngV = Math.abs(align.angV) <= align.angVTol;
-    setBadge(b3, okAngV ? "ok" : "bad", okAngV ? "OK" : "À corriger");
+  let pbText = "";
 
-    // 4) par V
-    const okParV = Math.abs(align.parV) <= align.parVTol;
-    setBadge(b4, okParV ? "ok" : "bad", okParV ? "OK" : "À corriger");
-
-    // 5) ang H
-    const okAngH = Math.abs(align.angH) <= align.angHTol;
-    setBadge(b5, okAngH ? "ok" : "bad", okAngH ? "OK" : "À corriger");
-
-    // 6) par H
-    const okParH = Math.abs(align.parH) <= align.parHTol;
-    setBadge(b6, okParH ? "ok" : "bad", okParH ? "OK" : "À corriger");
-
-    // KPI text
-    const sf2 = getActiveSoftFoot();
-    
-    kpiV.textContent =
-  pbText + "\n\n" + vertText;
-
-kpiH.textContent =
-  horiText;
-    
-    
-    
-      // ===== PIED BOITEUX – CALCUL OFFICIEL =====
-const pb = calculPiedBoiteux(
-  align.sf.FL,
-  align.sf.FR,
-  align.sf.RL,
-  align.sf.RR
-);
-
-let pbText = "";
-
-if(pb.diagFautive === "AUCUNE"){
-  pbText = "Pied boiteux : OK (diagonales équilibrées)";
-} else {
-  pbText =
-    `Pied boiteux détecté\n` +
-    `Diag fautive : ${pb.diagFautive}\n` +
-    `Z = ${pb.Z.toFixed(3)} mil\n` +
-    `Correction (80%) = ${pb.correction80.toFixed(3)} mil\n`;
-
-  if(pb.repartition.A){
-    pbText += `→ Ajouter ${pb.repartition.A.toFixed(3)} mil sous A et C`;
+  if(pb.diagFautive === "AUCUNE"){
+    pbText = "Pied boiteux : OK";
+  } else {
+    pbText =
+      `Pied boiteux détecté\n` +
+      `Diag fautive : ${pb.diagFautive}\n` +
+      `Z = ${pb.Z.toFixed(3)} mil\n` +
+      `Correction (80%) = ${pb.correction80.toFixed(3)} mil`;
   }
-  if(pb.repartition.B){
-    pbText += `→ Ajouter ${pb.repartition.B.toFixed(3)} mil sous B et D`;
-  }
+
+  // ===== VERTICAL =====
+  const corrAngV = calculAngulariteVerticale(6,12,Math.abs(align.angV));
+  const corrParV = calculParalleleVertical(Math.abs(align.parV));
+
+  const vertText =
+    `Angularité V : ${align.angV.toFixed(2)} mil\n` +
+    `→ AR moteur : ${corrAngV.toFixed(3)} mil\n\n` +
+    `Parallélisme V : ${align.parV.toFixed(2)} mil\n` +
+    `→ 4 pattes : ${corrParV.toFixed(3)} mil`;
+
+  // ===== HORIZONTAL =====
+  const corrAngH = calculAngulariteHorizontale(Math.abs(align.angH));
+  const corrParH = calculParalleleHorizontal(Math.abs(align.parH));
+
+  const horiText =
+    `Angularité H : ${align.angH.toFixed(2)} mil\n` +
+    `→ Pivot AR : ${corrAngH.toFixed(3)} mil\n\n` +
+    `Parallélisme H : ${align.parH.toFixed(2)} mil\n` +
+    `→ Déplacement : ${corrParH.toFixed(3)} mil`;
+
+  // ===== AFFICHAGE =====
+  kpiV.textContent = pbText + "\n\n" + vertText;
+  kpiH.textContent = horiText;
 }
-
-// ===== VERTICAL =====
-const corrAngV = calculAngulariteVerticale(
-  6,               // diamètre accouplement (exemple, on le rendra dynamique plus tard)
-  12,              // distance pieds arrière
-  Math.abs(align.angV)
-);
-
-const corrParV = calculParalleleVertical(
-  Math.abs(align.parV)
-);
-
-let vertText =
-  `Angularité V : ${align.angV.toFixed(2)} mil\n` +
-  `→ Correction AR moteur : ${corrAngV.toFixed(3)} mil\n\n` +
-  `Parallélisme V : ${align.parV.toFixed(2)} mil\n` +
-  `→ Correction 4 pattes : ${corrParV.toFixed(3)} mil`;
-      
-      // ===== HORIZONTAL =====
-const corrAngH = calculAngulariteHorizontale(
-  Math.abs(align.angH)
-);
-
-const corrParH = calculParalleleHorizontal(
-  Math.abs(align.parH)
-);
-
-let horiText =
-  `Angularité H : ${align.angH.toFixed(2)} mil\n` +
-  `→ Pivoter AR moteur : ${corrAngH.toFixed(3)} mil\n\n` +
-  `Parallélisme H : ${align.parH.toFixed(2)} mil\n` +
-  `→ Déplacement latéral : ${corrParH.toFixed(3)} mil`;
-      
-      
-      
-  }
-
-  /* ===================== CANVAS UTILS ===================== */
+  == CANVAS UTILS ===================== */
   function dprNow(){ return Math.min(3, window.devicePixelRatio || 1); }
 
   function resizeCanvas(c, ctx){
