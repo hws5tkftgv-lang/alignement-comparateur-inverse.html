@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Alignement">
 <title>Alignement – Comparateur inversé</title>
@@ -10,241 +10,164 @@
 <style>
 :root{
   --bg:#0b1436;
-  --card:#141f4d;
-  --text:#eaf1ff;
-  --muted:#9aa5d6;
-  --accent:#00a2ff;
-  --bad:#ff4d4d;
+  --card:#121c4a;
   --ok:#4caf50;
+  --bad:#ff5252;
+  --accent:#00a2ff;
 }
 
-*{box-sizing:border-box;}
-html,body{
+body{
   margin:0;
+  font-family:Arial, system-ui, sans-serif;
   background:var(--bg);
-  color:var(--text);
-  font-family:Arial,system-ui,sans-serif;
-  overscroll-behavior:contain;
+  color:#eaf1ff;
 }
 
 header{
   padding:14px;
   font-size:18px;
-  font-weight:700;
+  font-weight:bold;
+  text-align:center;
 }
 
-section{
-  margin:12px;
-  padding:12px;
+.step{
   background:var(--card);
+  margin:12px;
+  padding:14px;
   border-radius:14px;
 }
 
-h2{
-  margin:0 0 10px;
+.step h2{
+  margin:0 0 8px;
   font-size:16px;
 }
 
-label{
-  display:block;
+.step p{
   font-size:13px;
-  margin-bottom:6px;
-  color:var(--muted);
+  opacity:0.9;
 }
 
-input,select{
+input{
   width:100%;
   padding:10px;
   font-size:16px;
-  border:none;
+  margin-top:6px;
   border-radius:10px;
+  border:none;
 }
 
 button{
-  margin-top:10px;
   width:100%;
-  padding:14px;
+  margin-top:10px;
+  padding:12px;
   font-size:16px;
   border:none;
-  border-radius:14px;
-  background:#1c2b6a;
+  border-radius:12px;
+  background:var(--accent);
   color:white;
-  min-height:44px;
 }
 
-.result{
-  margin-top:10px;
-  padding:10px;
-  border-radius:10px;
-  background:rgba(255,255,255,.08);
-  font-size:14px;
+.status{
+  margin-top:8px;
+  font-weight:bold;
 }
 
-.good{ color:var(--ok); font-weight:700; }
-.bad{ color:var(--bad); font-weight:700; }
+.ok{ color:var(--ok); }
+.bad{ color:var(--bad); }
 
-canvas{
-  width:100%;
-  background:#000;
-  border-radius:14px;
+.locked{
+  opacity:0.4;
+  pointer-events:none;
 }
 </style>
 </head>
 
 <body>
 
-<header>🔧 Alignement – Comparateur inversé (mils)</header>
+<header>Alignement – Comparateur inversé (mils)</header>
 
-<section>
-<h2>1️⃣ Configuration</h2>
+<!-- ÉTAPE 1 -->
+<div class="step" id="step1">
+  <h2>1️⃣ Vérification du voilage</h2>
+  <p>Valider que les arbres sont acceptables avant l’alignement.</p>
+  <button onclick="validateStep(1)">Voilage OK</button>
+  <div class="status" id="status1"></div>
+</div>
 
-<label>Machine fixe</label>
-<select id="fixed">
-  <option value="motor">Moteur</option>
-  <option value="pump">Pompe</option>
-</select>
+<!-- ÉTAPE 2 -->
+<div class="step locked" id="step2">
+  <h2>2️⃣ Correction du pied boiteux</h2>
+  <p>Entrer les lectures max-min (mils).</p>
+  <input id="softFoot" type="number" placeholder="Différence mesurée (mils)">
+  <button onclick="validateSoftFoot()">Valider pied boiteux</button>
+  <div class="status" id="status2"></div>
+</div>
 
-<label>Machine mobile</label>
-<select id="mobile">
-  <option value="pump">Pompe</option>
-  <option value="motor">Moteur</option>
-</select>
-</section>
+<!-- ÉTAPE 3 -->
+<div class="step locked" id="step3">
+  <h2>3️⃣ Angularité verticale (12h–6h)</h2>
+  <p>Lecture au comparateur (mils).</p>
+  <input id="angV" type="number" placeholder="Lecture (mils)">
+  <button onclick="validateStep(3)">Valider</button>
+  <div class="status" id="status3"></div>
+</div>
 
-<section>
-<h2>2️⃣ Voilage de l’arbre</h2>
+<!-- ÉTAPE 4 -->
+<div class="step locked" id="step4">
+  <h2>4️⃣ Parallélisme vertical</h2>
+  <input id="parV" type="number" placeholder="Lecture (mils)">
+  <button onclick="validateStep(4)">Valider</button>
+  <div class="status" id="status4"></div>
+</div>
 
-<label>Lecture comparateur (mils)</label>
-<input id="runout" type="number" inputmode="decimal" placeholder="ex: 1.5">
+<!-- ÉTAPE 5 -->
+<div class="step locked" id="step5">
+  <h2>5️⃣ Angularité horizontale (3h–9h)</h2>
+  <input id="angH" type="number" placeholder="Lecture (mils)">
+  <button onclick="validateStep(5)">Valider</button>
+  <div class="status" id="status5"></div>
+</div>
 
-<button onclick="checkRunout()">Vérifier</button>
-
-<div id="runoutResult" class="result"></div>
-</section>
-
-<section>
-<h2>3️⃣ Pied boiteux</h2>
-
-<label>Variation max mesurée (mils)</label>
-<input id="softfoot" type="number" inputmode="decimal" placeholder="ex: 2">
-
-<button onclick="checkSoftFoot()">Analyser</button>
-
-<div id="softfootResult" class="result"></div>
-</section>
-
-<section>
-<h2>4️⃣ Angularité verticale</h2>
-
-<label>Différence avant / arrière (mils)</label>
-<input id="angV" type="number" inputmode="decimal" placeholder="ex: 4">
-
-<button onclick="checkAngV()">Évaluer</button>
-
-<div id="angVResult" class="result"></div>
-</section>
-
-<section>
-<h2>5️⃣ Parallélisme vertical</h2>
-
-<label>Décalage vertical (mils)</label>
-<input id="parV" type="number" inputmode="decimal" placeholder="ex: 3">
-
-<button onclick="checkParV()">Évaluer</button>
-
-<div id="parVResult" class="result"></div>
-</section>
-
-<section>
-<h2>6️⃣ Angularité horizontale</h2>
-
-<label>Différence gauche / droite (mils)</label>
-<input id="angH" type="number" inputmode="decimal" placeholder="ex: 2">
-
-<button onclick="checkAngH()">Évaluer</button>
-
-<div id="angHResult" class="result"></div>
-</section>
-
-<section>
-<h2>7️⃣ Parallélisme horizontal</h2>
-
-<label>Décalage horizontal (mils)</label>
-<input id="parH" type="number" inputmode="decimal" placeholder="ex: 1.5">
-
-<button onclick="checkParH()">Évaluer</button>
-
-<div id="parHResult" class="result"></div>
-</section>
-
-<section>
-<h2>📐 Schéma simplifié</h2>
-<canvas id="schema" height="160"></canvas>
-</section>
+<!-- ÉTAPE 6 -->
+<div class="step locked" id="step6">
+  <h2>6️⃣ Parallélisme horizontal</h2>
+  <input id="parH" type="number" placeholder="Lecture (mils)">
+  <button onclick="validateStep(6)">Valider</button>
+  <div class="status" id="status6"></div>
+</div>
 
 <script>
-function result(el,msg,ok){
-  el.innerHTML = ok
-    ? "<span class='good'>✔ "+msg+"</span>"
-    : "<span class='bad'>✖ "+msg+"</span>";
+const state = {
+  step: 1
+};
+
+function unlock(step){
+  document.getElementById("step"+step).classList.remove("locked");
 }
 
-// Règles pédagogiques simples (V1)
-function checkRunout(){
-  const v = Math.abs(+runout.value);
-  result(runoutResult,
-    v<=2 ? "Voilage acceptable" : "Voilage excessif – corriger arbre",
-    v<=2);
+function validateStep(step){
+  document.getElementById("status"+step).innerHTML =
+    "<span class='ok'>✔ Étape validée</span>";
+  unlock(step+1);
 }
 
-function checkSoftFoot(){
-  const v = Math.abs(+softfoot.value);
-  result(softfootResult,
-    v<=2 ? "Pied boiteux corrigé" : "Pied boiteux présent",
-    v<=2);
-}
+function validateSoftFoot(){
+  const v = parseFloat(document.getElementById("softFoot").value);
+  if(isNaN(v)){
+    document.getElementById("status2").innerHTML =
+      "<span class='bad'>Valeur invalide</span>";
+    return;
+  }
 
-function checkAngV(){
-  const v = Math.abs(+angV.value);
-  result(angVResult,
-    v<=5 ? "Angularité verticale acceptable" : "Corriger cales AV/AR",
-    v<=5);
+  if(v <= 3){
+    document.getElementById("status2").innerHTML =
+      "<span class='ok'>✔ Pied boiteux corrigé</span>";
+    unlock(3);
+  }else{
+    document.getElementById("status2").innerHTML =
+      "<span class='bad'>❌ Hors tolérance (&gt; 3 mils)</span>";
+  }
 }
-
-function checkParV(){
-  const v = Math.abs(+parV.value);
-  result(parVResult,
-    v<=2 ? "Parallélisme vertical OK" : "Ajuster hauteur machine",
-    v<=2);
-}
-
-function checkAngH(){
-  const v = Math.abs(+angH.value);
-  result(angHResult,
-    v<=5 ? "Angularité horizontale acceptable" : "Déplacer latéralement",
-    v<=5);
-}
-
-function checkParH(){
-  const v = Math.abs(+parH.value);
-  result(parHResult,
-    v<=2 ? "Parallélisme horizontal OK" : "Ajuster position",
-    v<=2);
-}
-
-// Schéma simple
-const c = schema.getContext("2d");
-c.fillStyle="#fff";
-c.fillRect(30,70,80,20);
-c.fillRect(190,70,80,20);
-c.fillStyle="#9aa5d6";
-c.fillText("Moteur",40,65);
-c.fillText("Pompe",200,65);
-c.strokeStyle="#00a2ff";
-c.beginPath();
-c.moveTo(110,80);
-c.lineTo(190,80);
-c.stroke();
 </script>
 
 </body>
