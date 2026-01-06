@@ -290,11 +290,15 @@ canvas{
 </head>
 
 <body>
-<header class="headerBar">
-  <span>Alignement – Comparateur inversé (mils)</span>
-  <button id="infoBtn" aria-label="Informations" class="infoBtn">ℹ️</button>
+<header style="position:relative;">
+  Alignement – Comparateur inversé (mils)
+  <button id="infoBtn"
+          aria-label="Informations"
+          class="infoBtn"
+          style="position:absolute; right:14px; top:10px;">
+    ℹ️
+  </button>
 </header>
-
 <div class="sub">
   iPhone-first • 2 vues (dessus + profil) • corrections visibles (exagérées) • pas de blocage d’étapes
 </div>
@@ -994,7 +998,79 @@ function closeInfo(){
     <h2>ℹ️ Méthode d’alignement</h2>
 
     <div class="infoScroll">
-      <!-- Le texte pédagogique viendra ici -->
+      <h3>Principe général</h3>
+<p>
+Cette application utilise la méthode du <b>comparateur inversé (TIR – Total Indicator Reading)</b>,
+une méthode standard industrielle utilisée pour l’alignement des arbres de machines tournantes.
+</p>
+
+<h3>1) TIR – Total Indicator Reading</h3>
+<p>
+Le TIR correspond à la <b>différence entre la lecture maximale et minimale</b> observée à l’indicateur à cadran.
+</p>
+<p class="mono">
+TIR = Lecture MAX − Lecture MIN
+</p>
+<p>
+Le TIR n’est <b>pas une correction</b>, mais une <b>mesure de défaut</b>.
+</p>
+
+<h3>2) Voilage (runout)</h3>
+<p>
+Le voilage mesure le faux-rond d’un arbre ou d’un accouplement.
+Un voilage excessif fausse toutes les mesures d’alignement.
+</p>
+<p>
+Si le voilage dépasse la tolérance, il doit être corrigé avant de poursuivre.
+</p>
+
+<h3>3) Pied boiteux (soft foot)</h3>
+<p>
+Un pied boiteux est présent lorsque toutes les pattes du moteur ne reposent pas
+uniformément sur la base.
+</p>
+
+<p class="mono">
+Pied boiteux = Lecture MAX − Lecture MIN
+</p>
+
+<p>
+La patte ayant la plus grande variation est considérée comme la <b>patte fautive</b>.
+</p>
+
+<p>
+En pratique, on recommande de corriger environ <b>80 % de la valeur mesurée</b>
+en utilisant des cales (shims), puis de revérifier.
+</p>
+
+<h3>4) Angularité</h3>
+<p>
+L’angularité correspond à une inclinaison entre les axes des deux machines.
+Elle est mesurée par une différence de lecture entre deux positions opposées
+(12h–6h ou 3h–9h).
+</p>
+
+<p class="mono">
+Correction ∝ TIR ÷ distance
+</p>
+
+<p>
+Dans cette application, l’effet de l’angularité est <b>exagéré visuellement</b>
+afin de faciliter la compréhension.
+</p>
+
+<h3>5) Parallélisme</h3>
+<p>
+Le parallélisme correspond à un décalage uniforme entre les axes.
+La correction se fait par un déplacement égal à la lecture observée.
+</p>
+
+<h3>Important</h3>
+<p>
+Cette application est un <b>outil pédagogique</b>.
+Les déplacements affichés sont volontairement amplifiés visuellement,
+mais les valeurs numériques respectent les formules industrielles.
+</p>
     </div>
 
     <button onclick="closeInfo()">Fermer</button>
