@@ -2,82 +2,91 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Alignement">
 <title>Alignement – Comparateur inversé</title>
 
 <style>
 :root{
   --bg:#0b1436;
-  --panel:#121c4d;
+  --card:#141f4d;
   --text:#eaf1ff;
-  --muted:#aab3ff;
+  --muted:#9aa5d6;
+  --accent:#00a2ff;
+  --bad:#ff4d4d;
   --ok:#4caf50;
-  --bad:#ff5252;
-  --btn:#1c2b6a;
 }
-*{box-sizing:border-box}
-body{
+
+*{box-sizing:border-box;}
+html,body{
   margin:0;
   background:var(--bg);
   color:var(--text);
   font-family:Arial,system-ui,sans-serif;
+  overscroll-behavior:contain;
 }
+
 header{
-  padding:12px 16px;
+  padding:14px;
   font-size:18px;
   font-weight:700;
 }
-.section{
-  background:var(--panel);
+
+section{
   margin:12px;
   padding:12px;
-  border-radius:12px;
+  background:var(--card);
+  border-radius:14px;
 }
+
 h2{
-  margin:0 0 8px 0;
-  font-size:15px;
+  margin:0 0 10px;
+  font-size:16px;
 }
+
 label{
-  font-size:12px;
-  color:var(--muted);
   display:block;
-  margin-top:6px;
+  font-size:13px;
+  margin-bottom:6px;
+  color:var(--muted);
 }
-input, select{
+
+input,select{
   width:100%;
-  padding:8px;
-  margin-top:4px;
-  border-radius:8px;
-  border:none;
-  font-size:14px;
-}
-button{
-  background:var(--btn);
-  color:#fff;
-  border:none;
   padding:10px;
+  font-size:16px;
+  border:none;
   border-radius:10px;
-  font-size:14px;
-  cursor:pointer;
 }
-button:disabled{
-  opacity:.4;
+
+button{
+  margin-top:10px;
+  width:100%;
+  padding:14px;
+  font-size:16px;
+  border:none;
+  border-radius:14px;
+  background:#1c2b6a;
+  color:white;
+  min-height:44px;
 }
-.row{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:8px;
-}
+
 .result{
   margin-top:10px;
+  padding:10px;
+  border-radius:10px;
+  background:rgba(255,255,255,.08);
   font-size:14px;
-  line-height:1.4;
 }
-.ok{color:var(--ok);font-weight:700}
-.bad{color:var(--bad);font-weight:700}
-.step-lock{
-  opacity:.35;
-  pointer-events:none;
+
+.good{ color:var(--ok); font-weight:700; }
+.bad{ color:var(--bad); font-weight:700; }
+
+canvas{
+  width:100%;
+  background:#000;
+  border-radius:14px;
 }
 </style>
 </head>
@@ -86,149 +95,156 @@ button:disabled{
 
 <header>🔧 Alignement – Comparateur inversé (mils)</header>
 
-<!-- ================= ÉTAPE 0 ================= -->
-<div class="section" id="step0">
-  <h2>Étape 0 — Configuration</h2>
+<section>
+<h2>1️⃣ Configuration</h2>
 
-  <label>Machine fixe</label>
-  <select id="fixedMachine">
-    <option value="motor">Moteur</option>
-    <option value="pump">Pompe</option>
-  </select>
+<label>Machine fixe</label>
+<select id="fixed">
+  <option value="motor">Moteur</option>
+  <option value="pump">Pompe</option>
+</select>
 
-  <label>Unité</label>
-  <input value="mils" disabled>
-</div>
+<label>Machine mobile</label>
+<select id="mobile">
+  <option value="pump">Pompe</option>
+  <option value="motor">Moteur</option>
+</select>
+</section>
 
-<!-- ================= ÉTAPE 1 ================= -->
-<div class="section" id="step1">
-  <h2>Étape 1 — Vérification du voilage</h2>
+<section>
+<h2>2️⃣ Voilage de l’arbre</h2>
 
-  <div class="row">
-    <div>
-      <label>Lecture max (mils)</label>
-      <input id="runoutMax" type="number">
-    </div>
-    <div>
-      <label>Lecture min (mils)</label>
-      <input id="runoutMin" type="number">
-    </div>
-  </div>
+<label>Lecture comparateur (mils)</label>
+<input id="runout" type="number" inputmode="decimal" placeholder="ex: 1.5">
 
-  <button onclick="checkRunout()">Valider le voilage</button>
-  <div class="result" id="runoutResult"></div>
-</div>
+<button onclick="checkRunout()">Vérifier</button>
 
-<!-- ================= ÉTAPE 2 ================= -->
-<div class="section step-lock" id="step2">
-  <h2>Étape 2 — Pied boiteux</h2>
+<div id="runoutResult" class="result"></div>
+</section>
 
-  <label>Variation max mesurée (mils)</label>
-  <input id="softFoot" type="number">
+<section>
+<h2>3️⃣ Pied boiteux</h2>
 
-  <button onclick="checkSoftFoot()">Valider pied boiteux</button>
-  <div class="result" id="softFootResult"></div>
-</div>
+<label>Variation max mesurée (mils)</label>
+<input id="softfoot" type="number" inputmode="decimal" placeholder="ex: 2">
 
-<!-- ================= ÉTAPE 3 ================= -->
-<div class="section step-lock" id="step3">
-  <h2>Étape 3 — Angularité verticale</h2>
+<button onclick="checkSoftFoot()">Analyser</button>
 
-  <div class="row">
-    <div>
-      <label>Lecture 12h (mils)</label>
-      <input id="angV12" type="number">
-    </div>
-    <div>
-      <label>Lecture 6h (mils)</label>
-      <input id="angV6" type="number">
-    </div>
-  </div>
+<div id="softfootResult" class="result"></div>
+</section>
 
-  <label>Distance entre comparateurs (po)</label>
-  <input id="distCouplingV" type="number">
+<section>
+<h2>4️⃣ Angularité verticale</h2>
 
-  <label>Distance pied avant (po)</label>
-  <input id="distFrontFootV" type="number">
+<label>Différence avant / arrière (mils)</label>
+<input id="angV" type="number" inputmode="decimal" placeholder="ex: 4">
 
-  <button onclick="calcAngularVertical()">Calculer correction</button>
-  <div class="result" id="angVResult"></div>
-</div>
+<button onclick="checkAngV()">Évaluer</button>
+
+<div id="angVResult" class="result"></div>
+</section>
+
+<section>
+<h2>5️⃣ Parallélisme vertical</h2>
+
+<label>Décalage vertical (mils)</label>
+<input id="parV" type="number" inputmode="decimal" placeholder="ex: 3">
+
+<button onclick="checkParV()">Évaluer</button>
+
+<div id="parVResult" class="result"></div>
+</section>
+
+<section>
+<h2>6️⃣ Angularité horizontale</h2>
+
+<label>Différence gauche / droite (mils)</label>
+<input id="angH" type="number" inputmode="decimal" placeholder="ex: 2">
+
+<button onclick="checkAngH()">Évaluer</button>
+
+<div id="angHResult" class="result"></div>
+</section>
+
+<section>
+<h2>7️⃣ Parallélisme horizontal</h2>
+
+<label>Décalage horizontal (mils)</label>
+<input id="parH" type="number" inputmode="decimal" placeholder="ex: 1.5">
+
+<button onclick="checkParH()">Évaluer</button>
+
+<div id="parHResult" class="result"></div>
+</section>
+
+<section>
+<h2>📐 Schéma simplifié</h2>
+<canvas id="schema" height="160"></canvas>
+</section>
 
 <script>
-/* ================= ÉTAT GLOBAL ================= */
-let stepUnlocked = {
-  runout:false,
-  softfoot:false,
-  angV:false
-};
+function result(el,msg,ok){
+  el.innerHTML = ok
+    ? "<span class='good'>✔ "+msg+"</span>"
+    : "<span class='bad'>✖ "+msg+"</span>";
+}
 
-/* ================= ÉTAPE 1 ================= */
+// Règles pédagogiques simples (V1)
 function checkRunout(){
-  const max = Number(runoutMax.value);
-  const min = Number(runoutMin.value);
-
-  if(isNaN(max)||isNaN(min)){
-    runoutResult.innerHTML = "<span class='bad'>Valeurs invalides</span>";
-    return;
-  }
-
-  const total = Math.abs(max - min);
-
-  if(total <= 2){
-    runoutResult.innerHTML =
-      `<span class="ok">Voilage acceptable (${total.toFixed(2)} mils)</span>`;
-    unlockStep(2);
-  }else{
-    runoutResult.innerHTML =
-      `<span class="bad">Voilage excessif (${total.toFixed(2)} mils)</span>`;
-  }
+  const v = Math.abs(+runout.value);
+  result(runoutResult,
+    v<=2 ? "Voilage acceptable" : "Voilage excessif – corriger arbre",
+    v<=2);
 }
 
-/* ================= ÉTAPE 2 ================= */
 function checkSoftFoot(){
-  const sf = Number(softFoot.value);
-  if(isNaN(sf)){
-    softFootResult.innerHTML = "<span class='bad'>Valeur invalide</span>";
-    return;
-  }
-
-  if(sf <= 2){
-    softFootResult.innerHTML =
-      `<span class="ok">Pied boiteux corrigé (${sf.toFixed(2)} mils)</span>`;
-    unlockStep(3);
-  }else{
-    softFootResult.innerHTML =
-      `<span class="bad">Pied boiteux présent (${sf.toFixed(2)} mils)</span>`;
-  }
+  const v = Math.abs(+softfoot.value);
+  result(softfootResult,
+    v<=2 ? "Pied boiteux corrigé" : "Pied boiteux présent",
+    v<=2);
 }
 
-/* ================= ÉTAPE 3 ================= */
-function calcAngularVertical(){
-  const v12 = Number(angV12.value);
-  const v6  = Number(angV6.value);
-  const D   = Number(distCouplingV.value);
-  const F   = Number(distFrontFootV.value);
-
-  if([v12,v6,D,F].some(isNaN)){
-    angVResult.innerHTML = "<span class='bad'>Valeurs manquantes</span>";
-    return;
-  }
-
-  const delta = v12 - v6;
-  const slope = delta / D;
-  const correctionFront = slope * F;
-
-  angVResult.innerHTML = `
-    Δ lecture = ${delta.toFixed(2)} mils<br>
-    Correction pied avant = <b>${correctionFront.toFixed(2)} mils</b>
-  `;
+function checkAngV(){
+  const v = Math.abs(+angV.value);
+  result(angVResult,
+    v<=5 ? "Angularité verticale acceptable" : "Corriger cales AV/AR",
+    v<=5);
 }
 
-/* ================= UTIL ================= */
-function unlockStep(n){
-  document.getElementById("step"+n).classList.remove("step-lock");
+function checkParV(){
+  const v = Math.abs(+parV.value);
+  result(parVResult,
+    v<=2 ? "Parallélisme vertical OK" : "Ajuster hauteur machine",
+    v<=2);
 }
+
+function checkAngH(){
+  const v = Math.abs(+angH.value);
+  result(angHResult,
+    v<=5 ? "Angularité horizontale acceptable" : "Déplacer latéralement",
+    v<=5);
+}
+
+function checkParH(){
+  const v = Math.abs(+parH.value);
+  result(parHResult,
+    v<=2 ? "Parallélisme horizontal OK" : "Ajuster position",
+    v<=2);
+}
+
+// Schéma simple
+const c = schema.getContext("2d");
+c.fillStyle="#fff";
+c.fillRect(30,70,80,20);
+c.fillRect(190,70,80,20);
+c.fillStyle="#9aa5d6";
+c.fillText("Moteur",40,65);
+c.fillText("Pompe",200,65);
+c.strokeStyle="#00a2ff";
+c.beginPath();
+c.moveTo(110,80);
+c.lineTo(190,80);
+c.stroke();
 </script>
 
 </body>
