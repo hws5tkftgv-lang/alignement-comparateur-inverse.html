@@ -1,1 +1,457 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Alignement">
+<title>Alignement — Comparateur inversé (mils)</title>
 
+<style>
+html, body { height:100%; }
+:root{
+  --bg:#0b1436;
+  --text:#eaf1ff;
+  --muted:rgba(234,241,255,.70);
+  --btn:#1c2b6a;
+  --bad:#ff4d4d;
+  --ok:#45d483;
+  --panel:rgba(255,255,255,0.08);
+}
+*{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html,body{ margin:0; background:var(--bg); color:var(--text); font-family:Arial,system-ui,sans-serif; }
+
+header{ padding:10px 14px; font-size:16px; font-weight:700; }
+
+.controls{
+  padding:10px 14px;
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:8px;
+}
+.controls label{ font-size:12px; color:var(--muted); }
+.controls input{
+  width:100%;
+  padding:8px 10px;
+  font-size:14px;
+  border-radius:10px;
+  border:none;
+}
+.controls .full{ grid-column:1/-1; }
+
+.sectionTitle{
+  grid-column:1/-1;
+  font-size:12px;
+  letter-spacing:0.02em;
+  text-transform:uppercase;
+  opacity:.8;
+  font-weight:700;
+  margin-top:6px;
+}
+
+.buttons{ display:flex; gap:10px; padding:0 14px 10px; flex-wrap:wrap; }
+button{
+  flex:1; min-width:120px;
+  padding:10px; font-size:15px;
+  border:none; border-radius:12px;
+  background:var(--btn); color:white;
+  font-weight:700;
+}
+
+.stage{ padding:10px 14px; }
+canvas{ width:100%; background:#000; border-radius:12px; display:block; }
+
+.results{
+  padding:10px 14px 18px;
+  font-size:14px;
+  line-height:1.45;
+}
+
+.box{
+  background:var(--panel);
+  border-radius:12px;
+  padding:10px;
+}
+.bad{ color:var(--bad); font-weight:800; }
+.ok{ color:var(--ok); font-weight:800; }
+.small{ font-size:12px; opacity:.8; }
+hr{ border:none; border-top:1px solid rgba(255,255,255,0.12); margin:10px 0; }
+b{ color:#cfe2ff; }
+</style>
+</head>
+
+<body>
+<header>🧭 Alignement — Comparateur inversé (vertical) — <span class="small">unités: mils (0.001")</span></header>
+
+<div class="controls">
+  <div class="sectionTitle">Lectures comparateurs (mils)</div>
+
+  <label>Dial A — Top (12h)
+    <input id="aTop" type="number" step="0.1" value="4">
+  </label>
+  <label>Dial A — Bottom (6h)
+    <input id="aBot" type="number" step="0.1" value="-2">
+  </label>
+
+  <label>Dial B — Top (12h)
+    <input id="bTop" type="number" step="0.1" value="1">
+  </label>
+  <label>Dial B — Bottom (6h)
+    <input id="bBot" type="number" step="0.1" value="-5">
+  </label>
+
+  <div class="sectionTitle">Géométrie (pouces)</div>
+
+  <label>Distance entre comparateurs D
+    <input id="D" type="number" step="0.01" value="10">
+  </label>
+  <label>Patte AV (Lf) depuis le plan A
+    <input id="Lf" type="number" step="0.01" value="2">
+  </label>
+
+  <label class="full">Patte AR (Lr) depuis le plan A
+    <input id="Lr" type="number" step="0.01" value="12">
+  </label>
+
+  <div class="sectionTitle">Actions</div>
+  <div class="full small">
+    👉 Principe: déplacement au plan = (Top − Bottom)/2.  
+    Ensuite: pente = (yB − yA)/D.  
+    Correction aux pattes = −(yA + pente×L).
+  </div>
+</div>
+
+<div class="buttons">
+  <button id="play">Play</button>
+  <button id="pause">Pause</button>
+  <button id="reset">Reset</button>
+</div>
+
+<div class="stage">
+  <canvas id="scene"></canvas>
+</div>
+
+<div class="results">
+  <div class="box" id="out"></div>
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  const TAU = Math.PI * 2;
+  const clamp = (v,a,b)=>Math.max(a, Math.min(b,v));
+  const isNum = (x)=>Number.isFinite(x);
+
+  function dprNow(){ return Math.min(3, window.devicePixelRatio || 1); }
+
+  // DOM
+  const c = document.getElementById("scene");
+  const ctx = c.getContext("2d");
+
+  const aTopEl = document.getElementById("aTop");
+  const aBotEl = document.getElementById("aBot");
+  const bTopEl = document.getElementById("bTop");
+  const bBotEl = document.getElementById("bBot");
+  const dEl    = document.getElementById("D");
+  const lfEl   = document.getElementById("Lf");
+  const lrEl   = document.getElementById("Lr");
+
+  const outEl  = document.getElementById("out");
+
+  const playBtn  = document.getElementById("play");
+  const pauseBtn = document.getElementById("pause");
+  const resetBtn = document.getElementById("reset");
+
+  // State
+  let running = false;
+  let t = 0;
+  let lockedW = null;
+
+  function readInputs(){
+    const aTop = parseFloat(aTopEl.value);
+    const aBot = parseFloat(aBotEl.value);
+    const bTop = parseFloat(bTopEl.value);
+    const bBot = parseFloat(bBotEl.value);
+
+    const D  = parseFloat(dEl.value);
+    const Lf = parseFloat(lfEl.value);
+    const Lr = parseFloat(lrEl.value);
+
+    if(![aTop,aBot,bTop,bBot,D,Lf,Lr].every(isNum)) return null;
+
+    return { aTop,aBot,bTop,bBot,D,Lf,Lr };
+  }
+
+  function validate(inp){
+    if(inp.D <= 0) return { ok:false, msg:"⛔ D doit être > 0." };
+    if(inp.Lf < 0 || inp.Lr < 0) return { ok:false, msg:"⛔ Lf et Lr doivent être ≥ 0." };
+    if(inp.Lr <= inp.Lf) return { ok:false, msg:"⛔ Lr doit être > Lf (patte arrière plus loin que la patte avant)." };
+    return { ok:true, msg:"" };
+  }
+
+  // Core math (mils + inches)
+  function calcInverseVertical(inp){
+    // déplacement au plan (mils)
+    const yA = (inp.aTop - inp.aBot) / 2;
+    const yB = (inp.bTop - inp.bBot) / 2;
+
+    // pente (mils/in)
+    const slope = (yB - yA) / inp.D;
+
+    // corrections shims (mils) : on veut ramener ligne à 0 => -(yA + slope*L)
+    const corrFront = -(yA + slope * inp.Lf);
+    const corrRear  = -(yA + slope * inp.Lr);
+
+    return { yA, yB, slope, corrFront, corrRear };
+  }
+
+  function fmt(x, d=2){
+    if(!isNum(x)) return "—";
+    const s = x.toFixed(d);
+    return (x > 0 ? "+" : "") + s;
+  }
+
+  function resize(){
+    const dpr = dprNow();
+    const maxW = Math.min(window.innerWidth - 24, 860);
+    if(!lockedW) lockedW = maxW;
+    lockedW = Math.min(lockedW, maxW);
+
+    const w = lockedW;
+    const h = Math.max(340, w * 0.55);
+
+    c.style.width = w + "px";
+    c.style.height = h + "px";
+    c.width = Math.round(w * dpr);
+    c.height = Math.round(h * dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+
+  // Dial drawing helper
+  function drawDial(cx, cy, r, label, reading){
+    // body
+    ctx.strokeStyle = "rgba(255,255,255,0.7)";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(cx,cy,r,0,TAU);
+    ctx.stroke();
+
+    // ticks
+    ctx.strokeStyle = "rgba(255,255,255,0.25)";
+    for(let i=0;i<12;i++){
+      const a = (i/12)*TAU - Math.PI/2;
+      const x1 = cx + Math.cos(a)*(r-2);
+      const y1 = cy + Math.sin(a)*(r-2);
+      const x2 = cx + Math.cos(a)*(r-10);
+      const y2 = cy + Math.sin(a)*(r-10);
+      ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+    }
+
+    // needle: map reading mils into angle (-90° center) with clamp
+    // purely visual: +/-10 mils = full sweep 140°
+    const max = 10;
+    const v = clamp(reading, -max, max) / max;
+    const sweep = (140 * Math.PI/180);
+    const aNeedle = (-Math.PI/2) + v * (sweep/2);
+
+    ctx.strokeStyle = "#00a2ff";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(cx,cy);
+    ctx.lineTo(cx + Math.cos(aNeedle)*(r-14), cy + Math.sin(aNeedle)*(r-14));
+    ctx.stroke();
+
+    // hub
+    ctx.fillStyle = "#00a2ff";
+    ctx.beginPath(); ctx.arc(cx,cy,4,0,TAU); ctx.fill();
+
+    // label + value
+    ctx.fillStyle = "rgba(234,241,255,0.92)";
+    ctx.font = "12px Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "top";
+    ctx.fillText(label, cx, cy + r + 6);
+
+    ctx.font = "12px Arial";
+    ctx.fillText(`${fmt(reading,1)} mil`, cx, cy + r + 22);
+  }
+
+  function draw(){
+    const dpr = dprNow();
+    const W = c.width / dpr;
+    const H = c.height / dpr;
+
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle = "#000";
+    ctx.fillRect(0,0,W,H);
+
+    const inp = readInputs();
+    if(!inp){
+      outEl.innerHTML = `<div class="bad">⛔ Valeurs manquantes / invalides.</div>`;
+      return;
+    }
+
+    const v = validate(inp);
+    if(!v.ok){
+      outEl.innerHTML = `<div class="bad">${v.msg}</div>`;
+      return;
+    }
+
+    const res = calcInverseVertical(inp);
+
+    // --- Animation des lectures (top ↔ bottom) ---
+    // On crée une lecture "instantanée" cohérente : reading(t) = mid + amp*cos(theta)
+    // theta = 0 => Top ; theta = pi => Bottom
+    const theta = t;
+    const aMid = (inp.aTop + inp.aBot)/2;
+    const aAmp = (inp.aTop - inp.aBot)/2;
+    const bMid = (inp.bTop + inp.bBot)/2;
+    const bAmp = (inp.bTop - inp.bBot)/2;
+
+    const aNow = aMid + aAmp * Math.cos(theta);
+    const bNow = bMid + bAmp * Math.cos(theta);
+
+    // --- Layout ---
+    const pad = 20;
+    const dialR = Math.min(78, Math.max(60, W*0.10));
+
+    const leftX = pad + 130;
+    const rightX = W - pad - 130;
+    const midY = H*0.45;
+
+    // Machines blocks
+    const blockH = 90;
+    const blockW = 190;
+    const yBlock = midY - blockH/2;
+
+    ctx.fillStyle = "rgba(255,255,255,0.10)";
+    ctx.fillRect(leftX - blockW/2, yBlock, blockW, blockH);
+    ctx.fillRect(rightX - blockW/2, yBlock, blockW, blockH);
+
+    ctx.fillStyle = "rgba(234,241,255,0.85)";
+    ctx.font = "13px Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "bottom";
+    ctx.fillText("Machine fixe", leftX, yBlock - 8);
+    ctx.fillText("Machine mobile", rightX, yBlock - 8);
+
+    // Shafts line
+    ctx.strokeStyle = "rgba(255,255,255,0.55)";
+    ctx.lineWidth = 6;
+    ctx.beginPath();
+    ctx.moveTo(leftX + blockW/2 - 10, midY);
+    ctx.lineTo(rightX - blockW/2 + 10, midY);
+    ctx.stroke();
+
+    // Coupling
+    ctx.fillStyle = "rgba(255,255,255,0.25)";
+    ctx.fillRect(W/2 - 18, midY - 14, 36, 28);
+
+    // Dials
+    drawDial(W/2 - 170, H*0.78, dialR, "Dial A (plan A)", aNow);
+    drawDial(W/2 + 170, H*0.78, dialR, "Dial B (plan B)", bNow);
+
+    // Feet + corrections
+    // We draw two feet under mobile machine, and print shim corrections
+    const footY = yBlock + blockH + 26;
+    const footFrontX = rightX - 60;
+    const footRearX  = rightX + 60;
+
+    function drawFoot(x, label, corr){
+      ctx.fillStyle = "rgba(255,255,255,0.18)";
+      ctx.fillRect(x-26, footY, 52, 18);
+
+      // shim bar visualization: positive = add shim (up)
+      const mag = clamp(Math.abs(corr)/20, 0, 1); // 20 mil = full bar
+      const barH = 48 * mag;
+      ctx.fillStyle = corr >= 0 ? "rgba(69,212,131,0.85)" : "rgba(255,77,77,0.85)";
+      ctx.fillRect(x-10, footY - barH, 20, barH);
+
+      ctx.fillStyle = "rgba(234,241,255,0.92)";
+      ctx.font = "12px Arial";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "top";
+      ctx.fillText(label, x, footY + 22);
+
+      ctx.font = "12px Arial";
+      ctx.fillText(`${fmt(corr,2)} mil`, x, footY + 38);
+    }
+
+    drawFoot(footFrontX, "Patte AV", res.corrFront);
+    drawFoot(footRearX,  "Patte AR", res.corrRear);
+
+    // Output panel
+    outEl.innerHTML = `
+      <b>Résultats (comparateur inversé — vertical)</b>
+      <hr>
+      <div>Déplacement au plan A : <b>${fmt(res.yA,2)} mil</b></div>
+      <div>Déplacement au plan B : <b>${fmt(res.yB,2)} mil</b></div>
+      <div class="small">Rappel: y = (Top − Bottom)/2</div>
+      <hr>
+      <div>Angle (pente) : <b>${fmt(res.slope,4)} mil/in</b></div>
+      <div class="small">pente = (yB − yA) / D</div>
+      <hr>
+      <div><b>Corrections shims machine mobile</b></div>
+      <div>Patte AV (Lf=${inp.Lf.toFixed(2)}") : <b>${fmt(res.corrFront,2)} mil</b></div>
+      <div>Patte AR (Lr=${inp.Lr.toFixed(2)}") : <b>${fmt(res.corrRear,2)} mil</b></div>
+      <div class="small">Formule: correction(L) = −(yA + pente×L)</div>
+      <hr>
+      <div class="small">
+        <b>Interprétation rapide</b><br>
+        • Valeur + = ajouter des shims (monter).<br>
+        • Valeur − = enlever des shims (descendre).<br>
+        • Ce module est volontairement "vertical". (On ajoutera l'horizontal ensuite.)
+      </div>
+    `;
+  }
+
+  // RAF loop
+  let last = null;
+  function loop(ts){
+    if(last === null) last = ts;
+    const dt = (ts - last)/1000;
+    last = ts;
+
+    if(running){
+      t += dt * 1.4; // vitesse animation
+    }
+    draw();
+    requestAnimationFrame(loop);
+  }
+
+  // Events
+  function safeStart(){
+    const inp = readInputs();
+    if(!inp){ running = false; draw(); return; }
+    const v = validate(inp);
+    if(!v.ok){ running = false; draw(); return; }
+    running = true;
+  }
+
+  playBtn.addEventListener("click", safeStart);
+  pauseBtn.addEventListener("click", () => { running = false; });
+  resetBtn.addEventListener("click", () => {
+    running = false;
+    t = 0;
+    draw();
+  });
+
+  [aTopEl,aBotEl,bTopEl,bBotEl,dEl,lfEl,lrEl].forEach(el=>{
+    el.addEventListener("input", () => draw());
+  });
+
+  window.addEventListener("resize", () => { resize(); draw(); });
+  if(window.visualViewport){
+    window.visualViewport.addEventListener("resize", () => { resize(); draw(); });
+  }
+
+  // Init
+  resize();
+  draw();
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
