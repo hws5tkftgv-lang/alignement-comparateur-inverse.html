@@ -222,11 +222,50 @@ canvas{
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size:12px;
 }
+
+.infoBtn{
+  position:absolute;
+  right:14px;
+  top:10px;
+  font-size:20px;
+  background:none;
+  border:none;
+  color:#eaf1ff;
+}
+.infoModal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.65);
+  z-index:9999;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.infoBox{
+  background:#121c4a;
+  width:min(92vw,520px);
+  max-height:88vh;
+  border-radius:16px;
+  padding:16px;
+  display:flex;
+  flex-direction:column;
+}
+
+.infoScroll{
+  overflow:auto;
+  font-size:13px;
+  line-height:1.45;
+  margin:10px 0;
+}
+
+.hidden{ display:none; }
+
 </style>
 </head>
 
 <body>
-<header>Alignement – Comparateur inversé (mils)</header>
+<button id="infoBtn" aria-label="Informations" class="infoBtn">ℹ️</button>
 <div class="sub">iPhone-first • 2 vues (dessus + profil) • corrections visibles (exagérées) • pas de blocage d’étapes</div>
 
 <div class="wrap">
@@ -907,6 +946,29 @@ canvas{
   render();
 
 })();
+
+const infoBtn = document.getElementById("infoBtn");
+const infoModal = document.getElementById("infoModal");
+
+infoBtn.onclick = () => infoModal.classList.remove("hidden");
+function closeInfo(){
+  infoModal.classList.add("hidden");
+}
+
+
 </script>
+
+
+<div id="infoModal" class="infoModal hidden">
+  <div class="infoBox">
+    <h2>ℹ️ Méthode d’alignement</h2>
+
+    <div class="infoScroll">
+      <!-- Le texte pédagogique viendra ici -->
+    </div>
+
+    <button onclick="closeInfo()">Fermer</button>
+  </div>
+</div>
 </body>
 </html>
