@@ -2,10 +2,10 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Alignement">
-<title>Alignement – Comparateur inversé</title>
+<title>Alignement – Comparateur inversé (mils)</title>
 
 <style>
 :root{
@@ -13,9 +13,14 @@
   --card:#121c4a;
   --ok:#4caf50;
   --bad:#ff5252;
+  --warn:#ffb300;
   --accent:#00a2ff;
+  --muted:rgba(234,241,255,.75);
+  --line:rgba(255,255,255,.12);
 }
 
+*{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html,body{ height:100%; }
 body{
   margin:0;
   font-family:Arial, system-ui, sans-serif;
@@ -24,10 +29,17 @@ body{
 }
 
 header{
-  padding:14px;
+  padding:14px 14px 10px;
   font-size:18px;
-  font-weight:bold;
+  font-weight:800;
   text-align:center;
+}
+
+.subhead{
+  text-align:center;
+  font-size:12px;
+  color:var(--muted);
+  padding:0 14px 10px;
 }
 
 .step{
@@ -35,6 +47,7 @@ header{
   margin:12px;
   padding:14px;
   border-radius:14px;
+  border:1px solid rgba(255,255,255,.06);
 }
 
 .step h2{
@@ -43,17 +56,32 @@ header{
 }
 
 .step p{
+  margin:0 0 10px;
   font-size:13px;
-  opacity:0.9;
+  opacity:0.92;
+  line-height:1.35;
 }
 
-input{
+.grid2{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+label{
+  display:block;
+  font-size:12px;
+  color:var(--muted);
+  margin-bottom:6px;
+}
+
+input, select{
   width:100%;
   padding:10px;
   font-size:16px;
-  margin-top:6px;
-  border-radius:10px;
+  border-radius:12px;
   border:none;
+  outline:none;
 }
 
 button{
@@ -65,194 +93,789 @@ button{
   border-radius:12px;
   background:var(--accent);
   color:white;
+  font-weight:800;
+}
+
+button.secondary{
+  background:rgba(255,255,255,.10);
 }
 
 .status{
-  margin-top:8px;
-  font-weight:bold;
+  margin-top:10px;
+  font-weight:800;
+  font-size:14px;
+  line-height:1.35;
 }
 
 .ok{ color:var(--ok); }
 .bad{ color:var(--bad); }
+.warn{ color:var(--warn); }
 
 .locked{
-  opacity:0.4;
+  opacity:0.40;
   pointer-events:none;
 }
 
+hr.sep{
+  border:none;
+  height:1px;
+  background:var(--line);
+  margin:10px 0;
+}
+
+.small{
+  margin-top:6px;
+  font-size:12px;
+  color:var(--muted);
+  line-height:1.35;
+}
+
+.kpi{
+  background:rgba(255,255,255,0.06);
+  border-radius:12px;
+  padding:10px;
+  font-size:13px;
+  line-height:1.35;
+}
+
+.kpi b{ color:#cfe2ff; }
+
 #alignView{
   width:100%;
-  height:220px;
+  height:240px;
   background:#000;
   border-radius:14px;
   display:block;
+  touch-action:none;
 }
 
+.pillRow{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:8px;
+}
+.pill{
+  padding:6px 10px;
+  border-radius:999px;
+  background:rgba(255,255,255,.10);
+  font-size:12px;
+  color:#eaf1ff;
+}
+.pill.ok{ background:rgba(76,175,80,.18); }
+.pill.bad{ background:rgba(255,82,82,.18); }
+.pill.warn{ background:rgba(255,179,0,.18); }
 
+footer{
+  padding:14px;
+  text-align:center;
+  font-size:12px;
+  color:var(--muted);
+  opacity:.9;
+}
 </style>
 </head>
 
 <body>
 
-<header>Alignement – Comparateur inversé (mils)</header>
+<header>Alignement – Comparateur inversé</header>
+<div class="subhead">iPhone-first • unités: <b>mils</b> • séquence métier: voilage → pied boiteux (4 pattes) → V ang → V par → H ang → H par</div>
 
 <!-- ÉTAPE 1 -->
 <div class="step" id="step1">
-  <h2>1️⃣ Vérification du voilage</h2>
-  <p>Valider que les arbres sont acceptables avant l’alignement.</p>
-  <button onclick="validateStep(1)">Voilage OK</button>
+  <h2>1️⃣ Vérification du voilage (runout)</h2>
+  <p>Confirmer que les arbres/coupleur sont acceptables AVANT l’alignement.</p>
+
+  <div class="grid2">
+    <div>
+      <label>Runout arbre moteur (mils)</label>
+      <input id="runoutMotor" type="number" inputmode="decimal" placeholder="ex: 1.5">
+    </div>
+    <div>
+      <label>Runout arbre pompe (mils)</label>
+      <input id="runoutPump" type="number" inputmode="decimal" placeholder="ex: 1.0">
+    </div>
+  </div>
+
+  <div class="small">Tolérance pédagogique par défaut: ≤ <b>2.0 mils</b> (à ajuster selon ton cours).</div>
+
+  <button id="btnStep1">Valider voilage</button>
   <div class="status" id="status1"></div>
 </div>
 
 <!-- ÉTAPE 2 -->
 <div class="step locked" id="step2">
-  <h2>2️⃣ Correction du pied boiteux</h2>
-  <p>Entrer les lectures max-min (mils).</p>
-  <input id="softFoot" type="number" placeholder="Différence mesurée (mils)">
-  <button onclick="validateSoftFoot()">Valider pied boiteux</button>
+  <h2>2️⃣ Pied boiteux – mesures des 4 pattes (moteur mobile)</h2>
+  <p>Entrer les lectures au comparateur (variation/écart) pour <b>chaque patte</b>. L’outil calcule max/min et détermine si le pied boiteux est présent.</p>
+
+  <div class="grid2">
+    <div>
+      <label>Patte AV gauche (mils)</label>
+      <input id="sfFL" type="number" inputmode="decimal" placeholder="ex: 0.0">
+    </div>
+    <div>
+      <label>Patte AV droite (mils)</label>
+      <input id="sfFR" type="number" inputmode="decimal" placeholder="ex: 0.5">
+    </div>
+    <div>
+      <label>Patte AR gauche (mils)</label>
+      <input id="sfRL" type="number" inputmode="decimal" placeholder="ex: 2.0">
+    </div>
+    <div>
+      <label>Patte AR droite (mils)</label>
+      <input id="sfRR" type="number" inputmode="decimal" placeholder="ex: 0.0">
+    </div>
+  </div>
+
+  <div class="kpi" id="sfKPI">
+    <div><b>Δ (max-min)</b> : —</div>
+    <div><b>Patte max</b> : —</div>
+    <div><b>Patte min</b> : —</div>
+  </div>
+
+  <div class="small">Tolérance pédagogique (pied boiteux): Δ ≤ <b>3.0 mils</b>.</div>
+
+  <button id="btnStep2">Valider pied boiteux</button>
   <div class="status" id="status2"></div>
 </div>
 
 <!-- ÉTAPE 3 -->
 <div class="step locked" id="step3">
   <h2>3️⃣ Angularité verticale (12h–6h)</h2>
-  <p>Lecture au comparateur (mils).</p>
-  <input id="angV" type="number" placeholder="Lecture (mils)">
-  <button onclick="validateStep(3)">Valider</button>
+  <p>Entrer les lectures <b>A</b> (mils) au comparateur inversé (12h et 6h). L’outil indique si c’est acceptable et prépare le calcul futur.</p>
+
+  <div class="grid2">
+    <div>
+      <label>Lecture 12h (mils)</label>
+      <input id="v12" type="number" inputmode="decimal" placeholder="ex: +1.0">
+    </div>
+    <div>
+      <label>Lecture 6h (mils)</label>
+      <input id="v6" type="number" inputmode="decimal" placeholder="ex: -1.0">
+    </div>
+  </div>
+
+  <div class="kpi" id="kpiAngV">
+    <div><b>ΔV</b> (12h−6h): —</div>
+  </div>
+
+  <div class="small">Tolérance pédagogique: |ΔV| ≤ <b>2.0 mils</b>.</div>
+
+  <button id="btnStep3">Valider angularité V</button>
   <div class="status" id="status3"></div>
 </div>
 
 <!-- ÉTAPE 4 -->
 <div class="step locked" id="step4">
   <h2>4️⃣ Parallélisme vertical</h2>
-  <input id="parV" type="number" placeholder="Lecture (mils)">
-  <button onclick="validateStep(4)">Valider</button>
+  <p>Entrer les lectures <b>R</b> (mils) (ex: comparateur sur le plan vertical). L’outil indique si c’est acceptable.</p>
+
+  <div class="grid2">
+    <div>
+      <label>Lecture verticale (mils)</label>
+      <input id="parV" type="number" inputmode="decimal" placeholder="ex: 1.0">
+    </div>
+    <div>
+      <label>Tolérance par défaut (mils)</label>
+      <input id="tolParV" type="number" inputmode="decimal" value="2.0">
+    </div>
+  </div>
+
+  <button id="btnStep4">Valider parallélisme V</button>
   <div class="status" id="status4"></div>
 </div>
 
 <!-- ÉTAPE 5 -->
 <div class="step locked" id="step5">
   <h2>5️⃣ Angularité horizontale (3h–9h)</h2>
-  <input id="angH" type="number" placeholder="Lecture (mils)">
-  <button onclick="validateStep(5)">Valider</button>
+  <p>Entrer les lectures au comparateur inversé (3h et 9h).</p>
+
+  <div class="grid2">
+    <div>
+      <label>Lecture 3h (mils)</label>
+      <input id="h3" type="number" inputmode="decimal" placeholder="ex: +0.5">
+    </div>
+    <div>
+      <label>Lecture 9h (mils)</label>
+      <input id="h9" type="number" inputmode="decimal" placeholder="ex: -0.5">
+    </div>
+  </div>
+
+  <div class="kpi" id="kpiAngH">
+    <div><b>ΔH</b> (3h−9h): —</div>
+  </div>
+
+  <div class="small">Tolérance pédagogique: |ΔH| ≤ <b>2.0 mils</b>.</div>
+
+  <button id="btnStep5">Valider angularité H</button>
   <div class="status" id="status5"></div>
 </div>
 
 <!-- ÉTAPE 6 -->
 <div class="step locked" id="step6">
   <h2>6️⃣ Parallélisme horizontal</h2>
-  <input id="parH" type="number" placeholder="Lecture (mils)">
-  <button onclick="validateStep(6)">Valider</button>
+  <p>Entrer la lecture horizontale (mils).</p>
+
+  <div class="grid2">
+    <div>
+      <label>Lecture horizontale (mils)</label>
+      <input id="parH" type="number" inputmode="decimal" placeholder="ex: 0.8">
+    </div>
+    <div>
+      <label>Tolérance par défaut (mils)</label>
+      <input id="tolParH" type="number" inputmode="decimal" value="2.0">
+    </div>
+  </div>
+
+  <button id="btnStep6">Valider parallélisme H</button>
   <div class="status" id="status6"></div>
 </div>
 
-<div class="step">
-  <h2>🔧 Vue moteur & pompe</h2>
-  <p>Vue pédagogique – moteur mobile / pompe fixe</p>
+<!-- Vue -->
+<div class="step" id="view">
+  <h2>🔧 Vue moteur & pompe (pédagogique)</h2>
+  <p>Moteur = mobile (bleu) • Pompe = fixe (orange). Indicateurs affichés selon les étapes.</p>
+
   <canvas id="alignView"></canvas>
+
+  <div class="pillRow" id="pillRow">
+    <span class="pill warn">Suivi: étape 1</span>
+  </div>
+
+  <hr class="sep">
+
+  <button class="secondary" id="btnResetAll">Réinitialiser tout</button>
+  <div class="small">Astuce: sur iPhone, utilise <b>Partager → Sur l’écran d’accueil</b> pour avoir une icône.</div>
 </div>
 
+<footer>Version de base (clé en main). Prochaine étape: ajouter les distances (A,B,C) + calculs de corrections (shims & latéral) + “rapport” exportable.</footer>
+
 <script>
-const state = {
-  step: 1
-};
+(() => {
+  "use strict";
 
-function unlock(step){
-  document.getElementById("step"+step).classList.remove("locked");
-}
+  /* ===================== UTIL ===================== */
+  const $ = (id)=>document.getElementById(id);
+  const isNum = (x)=>Number.isFinite(x);
 
-function validateStep(step){
-  document.getElementById("status"+step).innerHTML =
-    "<span class='ok'>✔ Étape validée</span>";
-  unlock(step+1);
-}
-
-function validateSoftFoot(){
-  const v = parseFloat(document.getElementById("softFoot").value);
-  if(isNaN(v)){
-    document.getElementById("status2").innerHTML =
-      "<span class='bad'>Valeur invalide</span>";
-    return;
+  function parseNum(id){
+    const v = parseFloat($(id).value);
+    return Number.isFinite(v) ? v : null;
   }
 
-  if(v <= 3){
-    document.getElementById("status2").innerHTML =
-      "<span class='ok'>✔ Pied boiteux corrigé</span>";
-    unlock(3);
-  }else{
-    document.getElementById("status2").innerHTML =
-      "<span class='bad'>❌ Hors tolérance (&gt; 3 mils)</span>";
+  function setStatus(step, cls, html){
+    const el = $("status"+step);
+    el.className = "status " + (cls || "");
+    el.innerHTML = html;
   }
-}
 
-const alignCanvas = document.getElementById("alignView");
-const alignCtx = alignCanvas.getContext("2d");
+  function lock(step){
+    const el = $("step"+step);
+    if(el) el.classList.add("locked");
+  }
+  function unlock(step){
+    const el = $("step"+step);
+    if(el) el.classList.remove("locked");
+  }
 
-function resizeAlignView(){
-  const dpr = Math.min(3, window.devicePixelRatio || 1);
-  const w = alignCanvas.clientWidth;
-  const h = alignCanvas.clientHeight;
+  function setPills(){
+    const row = $("pillRow");
+    row.innerHTML = "";
 
-  alignCanvas.width  = Math.round(w * dpr);
-  alignCanvas.height = Math.round(h * dpr);
-  alignCtx.setTransform(dpr,0,0,dpr,0,0);
-}
+    const s = state.step;
 
-function drawMachine(x, y, w, h, color, label){
-  // corps
-  alignCtx.fillStyle = color;
-  alignCtx.fillRect(x, y, w, h);
+    const mk = (txt, cls)=>{
+      const span = document.createElement("span");
+      span.className = "pill " + (cls||"");
+      span.textContent = txt;
+      row.appendChild(span);
+    };
 
-  // pattes (4)
-  const footW = 16;
-  const footH = 8;
+    mk("Étape actuelle: " + s, "warn");
 
-  alignCtx.fillRect(x+10,        y+h, footW, footH);
-  alignCtx.fillRect(x+w-26,      y+h, footW, footH);
-  alignCtx.fillRect(x+10,        y-8, footW, footH);
-  alignCtx.fillRect(x+w-26,      y-8, footW, footH);
+    if(state.runoutOK) mk("Voilage OK", "ok");
+    else mk("Voilage non validé", "warn");
 
-  // label
-  alignCtx.fillStyle = "#eaf1ff";
-  alignCtx.font = "12px Arial";
-  alignCtx.textAlign = "center";
-  alignCtx.fillText(label, x+w/2, y-14);
-}
+    if(state.softFootOK) mk("Pied boiteux OK", "ok");
+    else mk("Pied boiteux à vérifier", state.step>2 ? "warn":"warn");
 
-function drawAlignmentView(){
-  resizeAlignView();
+    if(state.angVOK) mk("Ang V OK", "ok");
+    if(state.parVOK) mk("Par V OK", "ok");
+    if(state.angHOK) mk("Ang H OK", "ok");
+    if(state.parHOK) mk("Par H OK", "ok");
+  }
 
-  const W = alignCanvas.width / (window.devicePixelRatio || 1);
-  const H = alignCanvas.height / (window.devicePixelRatio || 1);
+  /* ===================== STATE ===================== */
+  const state = {
+    step: 1,
 
-  alignCtx.clearRect(0,0,W,H);
+    runoutOK:false,
+    softFootOK:false,
+    angVOK:false,
+    parVOK:false,
+    angHOK:false,
+    parHOK:false,
 
-  // dimensions machines
-  const machineW = 110;
-  const machineH = 50;
-  const centerY = H/2 - machineH/2;
+    // valeurs calculées pour affichage
+    sfDelta:null,
+    sfMaxKey:null,
+    sfMinKey:null,
 
-  // moteur (mobile)
-  drawMachine(
-    30,
-    centerY,
-    machineW,
-    machineH,
-    "#00a2ff",
-    "Moteur (mobile)"
-  );
+    angVDelta:null,
+    angHDelta:null,
 
-  // pompe (fixe)
-  drawMachine(
-    W - machineW - 30,
-    centerY,
-    machineW,
-    machineH,
-    "#ff9800",
-    "Pompe (fixe)"
-  );
-}
-drawAlignmentView();
+    parV:null,
+    parH:null
+  };
+
+  /* ===================== TOLÉRANCES PÉDAGO ===================== */
+  const TOL = {
+    runout: 2.0,     // mils
+    softFoot: 3.0,   // Δ max-min (mils)
+    angDelta: 2.0    // |Δ| (mils)
+  };
+
+  /* ===================== STEP 1 (VOILAGE) ===================== */
+  $("btnStep1").addEventListener("click", () => {
+    const m = parseNum("runoutMotor");
+    const p = parseNum("runoutPump");
+
+    if(m === null || p === null){
+      setStatus(1, "bad", "❌ Entre les deux valeurs de voilage (mils).");
+      return;
+    }
+    if(m < 0 || p < 0){
+      setStatus(1, "bad", "❌ Le voilage ne peut pas être négatif.");
+      return;
+    }
+
+    const ok = (m <= TOL.runout) && (p <= TOL.runout);
+
+    if(ok){
+      state.runoutOK = true;
+      state.step = Math.max(state.step, 2);
+      setStatus(1, "ok", `✔ Voilage acceptable (≤ ${TOL.runout.toFixed(1)} mils).`);
+      unlock(2);
+    }else{
+      state.runoutOK = false;
+      setStatus(1, "bad", `⛔ Voilage trop élevé. Cible: ≤ ${TOL.runout.toFixed(1)} mils.`);
+      // on garde step2 verrouillé
+      lock(2);
+      lock(3); lock(4); lock(5); lock(6);
+    }
+
+    drawAlignmentView();
+    setPills();
+  });
+
+  /* ===================== STEP 2 (PIED BOITEUX 4 PATTES) ===================== */
+  function softFootCompute(){
+    const vals = {
+      "AV G": parseNum("sfFL"),
+      "AV D": parseNum("sfFR"),
+      "AR G": parseNum("sfRL"),
+      "AR D": parseNum("sfRR")
+    };
+    for(const k of Object.keys(vals)){
+      if(vals[k] === null) return null;
+    }
+    // autorise négatif? en pratique, la lecture peut être signée selon méthode,
+    // mais pour "écart", on veut souvent la magnitude. Ici: on garde la valeur telle quelle,
+    // et on fait max/min sur la valeur numérique.
+    let maxKey=null, minKey=null;
+    let max=-Infinity, min=Infinity;
+
+    for(const [k,v] of Object.entries(vals)){
+      if(v > max){ max=v; maxKey=k; }
+      if(v < min){ min=v; minKey=k; }
+    }
+    const delta = max - min;
+
+    return { vals, max, min, delta, maxKey, minKey };
+  }
+
+  function refreshSoftFootKPI(){
+    const r = softFootCompute();
+    const box = $("sfKPI");
+    if(!r){
+      box.innerHTML = `<div><b>Δ (max-min)</b> : —</div><div><b>Patte max</b> : —</div><div><b>Patte min</b> : —</div>`;
+      return;
+    }
+    box.innerHTML = `
+      <div><b>Δ (max-min)</b> : ${r.delta.toFixed(2)} mils</div>
+      <div><b>Patte max</b> : ${r.maxKey} (${r.max.toFixed(2)})</div>
+      <div><b>Patte min</b> : ${r.minKey} (${r.min.toFixed(2)})</div>
+    `;
+  }
+
+  ["sfFL","sfFR","sfRL","sfRR"].forEach(id=>{
+    $(id).addEventListener("input", () => {
+      refreshSoftFootKPI();
+      drawAlignmentView();
+    });
+  });
+
+  $("btnStep2").addEventListener("click", () => {
+    const r = softFootCompute();
+    if(!r){
+      setStatus(2, "bad", "❌ Entre les 4 lectures de pattes (mils).");
+      return;
+    }
+
+    state.sfDelta = r.delta;
+    state.sfMaxKey = r.maxKey;
+    state.sfMinKey = r.minKey;
+
+    if(r.delta <= TOL.softFoot){
+      state.softFootOK = true;
+      state.step = Math.max(state.step, 3);
+      setStatus(2, "ok", `✔ Pied boiteux acceptable: Δ=${r.delta.toFixed(2)} mils (≤ ${TOL.softFoot.toFixed(1)}).`);
+      unlock(3);
+    }else{
+      state.softFootOK = false;
+      setStatus(2, "bad", `⛔ Pied boiteux présent: Δ=${r.delta.toFixed(2)} mils (> ${TOL.softFoot.toFixed(1)}). Corriger AVANT l’alignement.`);
+      // On bloque la suite tant que pas OK
+      lock(3); lock(4); lock(5); lock(6);
+    }
+
+    drawAlignmentView();
+    setPills();
+  });
+
+  /* ===================== STEP 3 (ANG V) ===================== */
+  function computeDelta(a, b){ return a - b; }
+
+  function refreshAngVKPI(){
+    const a = parseNum("v12");
+    const b = parseNum("v6");
+    const box = $("kpiAngV");
+    if(a === null || b === null){
+      box.innerHTML = `<div><b>ΔV</b> (12h−6h): —</div>`;
+      return;
+    }
+    const d = computeDelta(a,b);
+    box.innerHTML = `<div><b>ΔV</b> (12h−6h): ${d.toFixed(2)} mils</div>`;
+  }
+
+  ["v12","v6"].forEach(id=>{
+    $(id).addEventListener("input", () => {
+      refreshAngVKPI();
+      drawAlignmentView();
+    });
+  });
+
+  $("btnStep3").addEventListener("click", () => {
+    const a = parseNum("v12");
+    const b = parseNum("v6");
+    if(a === null || b === null){
+      setStatus(3, "bad", "❌ Entre les lectures 12h et 6h (mils).");
+      return;
+    }
+
+    const d = computeDelta(a,b);
+    state.angVDelta = d;
+
+    if(Math.abs(d) <= TOL.angDelta){
+      state.angVOK = true;
+      state.step = Math.max(state.step, 4);
+      setStatus(3, "ok", `✔ Angularité V acceptable: ΔV=${d.toFixed(2)} mils (|Δ| ≤ ${TOL.angDelta.toFixed(1)}).`);
+      unlock(4);
+    }else{
+      state.angVOK = false;
+      setStatus(3, "bad", `⛔ Angularité V hors tolérance: ΔV=${d.toFixed(2)} mils (cible |Δ| ≤ ${TOL.angDelta.toFixed(1)}).`);
+      lock(4); lock(5); lock(6);
+    }
+
+    drawAlignmentView();
+    setPills();
+  });
+
+  /* ===================== STEP 4 (PAR V) ===================== */
+  $("btnStep4").addEventListener("click", () => {
+    const v = parseNum("parV");
+    const tol = parseNum("tolParV");
+
+    if(v === null || tol === null){
+      setStatus(4, "bad", "❌ Entre la lecture et la tolérance (mils).");
+      return;
+    }
+    state.parV = v;
+
+    if(Math.abs(v) <= Math.abs(tol)){
+      state.parVOK = true;
+      state.step = Math.max(state.step, 5);
+      setStatus(4, "ok", `✔ Parallélisme V acceptable: ${v.toFixed(2)} mils (≤ ${Math.abs(tol).toFixed(2)}).`);
+      unlock(5);
+    }else{
+      state.parVOK = false;
+      setStatus(4, "bad", `⛔ Parallélisme V hors tolérance: ${v.toFixed(2)} mils (cible ≤ ${Math.abs(tol).toFixed(2)}).`);
+      lock(5); lock(6);
+    }
+
+    drawAlignmentView();
+    setPills();
+  });
+
+  /* ===================== STEP 5 (ANG H) ===================== */
+  function refreshAngHKPI(){
+    const a = parseNum("h3");
+    const b = parseNum("h9");
+    const box = $("kpiAngH");
+    if(a === null || b === null){
+      box.innerHTML = `<div><b>ΔH</b> (3h−9h): —</div>`;
+      return;
+    }
+    const d = computeDelta(a,b);
+    box.innerHTML = `<div><b>ΔH</b> (3h−9h): ${d.toFixed(2)} mils</div>`;
+  }
+
+  ["h3","h9"].forEach(id=>{
+    $(id).addEventListener("input", () => {
+      refreshAngHKPI();
+      drawAlignmentView();
+    });
+  });
+
+  $("btnStep5").addEventListener("click", () => {
+    const a = parseNum("h3");
+    const b = parseNum("h9");
+    if(a === null || b === null){
+      setStatus(5, "bad", "❌ Entre les lectures 3h et 9h (mils).");
+      return;
+    }
+
+    const d = computeDelta(a,b);
+    state.angHDelta = d;
+
+    if(Math.abs(d) <= TOL.angDelta){
+      state.angHOK = true;
+      state.step = Math.max(state.step, 6);
+      setStatus(5, "ok", `✔ Angularité H acceptable: ΔH=${d.toFixed(2)} mils (|Δ| ≤ ${TOL.angDelta.toFixed(1)}).`);
+      unlock(6);
+    }else{
+      state.angHOK = false;
+      setStatus(5, "bad", `⛔ Angularité H hors tolérance: ΔH=${d.toFixed(2)} mils (cible |Δ| ≤ ${TOL.angDelta.toFixed(1)}).`);
+      lock(6);
+    }
+
+    drawAlignmentView();
+    setPills();
+  });
+
+  /* ===================== STEP 6 (PAR H) ===================== */
+  $("btnStep6").addEventListener("click", () => {
+    const v = parseNum("parH");
+    const tol = parseNum("tolParH");
+
+    if(v === null || tol === null){
+      setStatus(6, "bad", "❌ Entre la lecture et la tolérance (mils).");
+      return;
+    }
+    state.parH = v;
+
+    if(Math.abs(v) <= Math.abs(tol)){
+      state.parHOK = true;
+      setStatus(6, "ok", `✔ Parallélisme H acceptable: ${v.toFixed(2)} mils (≤ ${Math.abs(tol).toFixed(2)}).`);
+    }else{
+      state.parHOK = false;
+      setStatus(6, "bad", `⛔ Parallélisme H hors tolérance: ${v.toFixed(2)} mils (cible ≤ ${Math.abs(tol).toFixed(2)}).`);
+    }
+
+    drawAlignmentView();
+    setPills();
+  });
+
+  /* ===================== RESET ===================== */
+  $("btnResetAll").addEventListener("click", () => {
+    // inputs
+    ["runoutMotor","runoutPump","sfFL","sfFR","sfRL","sfRR","v12","v6","parV","h3","h9","parH"].forEach(id=>{
+      if($(id)) $(id).value = "";
+    });
+    $("tolParV").value = "2.0";
+    $("tolParH").value = "2.0";
+
+    // state
+    state.step = 1;
+    state.runoutOK = state.softFootOK = state.angVOK = state.parVOK = state.angHOK = state.parHOK = false;
+    state.sfDelta = state.sfMaxKey = state.sfMinKey = null;
+    state.angVDelta = state.angHDelta = null;
+    state.parV = state.parH = null;
+
+    // locks
+    unlock(1);
+    lock(2); lock(3); lock(4); lock(5); lock(6);
+
+    // statuses
+    for(let i=1;i<=6;i++) setStatus(i, "", "");
+
+    refreshSoftFootKPI();
+    refreshAngVKPI();
+    refreshAngHKPI();
+
+    drawAlignmentView();
+    setPills();
+  });
+
+  /* ===================== CANVAS VIEW ===================== */
+  const alignCanvas = $("alignView");
+  const alignCtx = alignCanvas.getContext("2d");
+
+  function dprNow(){ return Math.min(3, window.devicePixelRatio || 1); }
+
+  function resizeAlignView(){
+    const dpr = dprNow();
+    const w = alignCanvas.clientWidth || 1;
+    const h = alignCanvas.clientHeight || 1;
+    alignCanvas.width  = Math.round(w * dpr);
+    alignCanvas.height = Math.round(h * dpr);
+    alignCtx.setTransform(dpr,0,0,dpr,0,0);
+  }
+
+  function drawMachine(x, y, w, h, color, label){
+    // corps
+    alignCtx.fillStyle = color;
+    alignCtx.fillRect(x, y, w, h);
+
+    // pattes (4)
+    const footW = 18, footH = 9;
+    // bas
+    alignCtx.fillRect(x+12,    y+h, footW, footH);
+    alignCtx.fillRect(x+w-30,  y+h, footW, footH);
+    // haut (visuel)
+    alignCtx.fillRect(x+12,    y-9, footW, footH);
+    alignCtx.fillRect(x+w-30,  y-9, footW, footH);
+
+    // label
+    alignCtx.fillStyle = "#eaf1ff";
+    alignCtx.font = "12px Arial";
+    alignCtx.textAlign = "center";
+    alignCtx.fillText(label, x+w/2, y-14);
+  }
+
+  function drawCoupling(x1, x2, y){
+    alignCtx.strokeStyle = "rgba(255,255,255,.65)";
+    alignCtx.lineWidth = 3;
+    alignCtx.beginPath();
+    alignCtx.moveTo(x1, y);
+    alignCtx.lineTo(x2, y);
+    alignCtx.stroke();
+
+    // demi-accouplement
+    alignCtx.fillStyle = "rgba(255,255,255,.25)";
+    alignCtx.fillRect((x1+x2)/2 - 8, y-10, 16, 20);
+  }
+
+  function drawIndicator(text, x, y, cls){
+    let col = "rgba(255,255,255,.85)";
+    if(cls==="ok") col = "rgba(76,175,80,.95)";
+    if(cls==="bad") col = "rgba(255,82,82,.95)";
+    if(cls==="warn") col = "rgba(255,179,0,.95)";
+
+    alignCtx.fillStyle = "rgba(0,0,0,.45)";
+    alignCtx.fillRect(x-62, y-14, 124, 22);
+
+    alignCtx.fillStyle = col;
+    alignCtx.font = "12px Arial";
+    alignCtx.textAlign = "center";
+    alignCtx.textBaseline = "middle";
+    alignCtx.fillText(text, x, y-3);
+  }
+
+  function drawAlignmentView(){
+    resizeAlignView();
+
+    const dpr = dprNow();
+    const W = alignCanvas.width / dpr;
+    const H = alignCanvas.height / dpr;
+
+    // fond
+    alignCtx.clearRect(0,0,W,H);
+    alignCtx.fillStyle = "#000";
+    alignCtx.fillRect(0,0,W,H);
+
+    // dimensions machines
+    const machineW = Math.min(140, Math.max(110, W*0.32));
+    const machineH = 54;
+    const centerY = H/2 - machineH/2;
+
+    // positions
+    const leftX  = 18;
+    const rightX = W - machineW - 18;
+
+    // machines
+    drawMachine(leftX, centerY, machineW, machineH, "#00a2ff", "Moteur (mobile)");
+    drawMachine(rightX, centerY, machineW, machineH, "#ff9800", "Pompe (fixe)");
+
+    // accouplement
+    const shaftY = centerY + machineH/2;
+    drawCoupling(leftX + machineW, rightX, shaftY);
+
+    // indicateurs (pédago)
+    if(!state.runoutOK){
+      drawIndicator("Voilage à valider", W/2, 26, "warn");
+    }else{
+      drawIndicator("Voilage OK", W/2, 26, "ok");
+    }
+
+    // Soft foot indicator
+    if(state.runoutOK){
+      if(state.softFootOK){
+        drawIndicator("Pied boiteux OK", leftX + machineW/2, H - 18, "ok");
+      }else{
+        // si on a des données, afficher Δ
+        if(isNum(state.sfDelta)){
+          drawIndicator("Pied boiteux Δ=" + state.sfDelta.toFixed(2), leftX + machineW/2, H - 18, (state.sfDelta<=TOL.softFoot)?"ok":"bad");
+        }else{
+          drawIndicator("Pied boiteux à mesurer", leftX + machineW/2, H - 18, "warn");
+        }
+      }
+    }
+
+    // Ang V/H indicators
+    if(state.angVOK && isNum(state.angVDelta)){
+      drawIndicator("Ang V Δ=" + state.angVDelta.toFixed(2), W/2, 54, "ok");
+    }else if(isNum(state.angVDelta)){
+      drawIndicator("Ang V Δ=" + state.angVDelta.toFixed(2), W/2, 54, "bad");
+    }
+
+    if(state.angHOK && isNum(state.angHDelta)){
+      drawIndicator("Ang H Δ=" + state.angHDelta.toFixed(2), W/2, 80, "ok");
+    }else if(isNum(state.angHDelta)){
+      drawIndicator("Ang H Δ=" + state.angHDelta.toFixed(2), W/2, 80, "bad");
+    }
+
+    // Parallel indicators
+    if(state.parVOK && isNum(state.parV)){
+      drawIndicator("Par V=" + state.parV.toFixed(2), rightX + machineW/2, H - 18, "ok");
+    }else if(isNum(state.parV)){
+      drawIndicator("Par V=" + state.parV.toFixed(2), rightX + machineW/2, H - 18, "bad");
+    }
+
+    if(state.parHOK && isNum(state.parH)){
+      drawIndicator("Par H=" + state.parH.toFixed(2), W/2, H - 44, "ok");
+    }else if(isNum(state.parH)){
+      drawIndicator("Par H=" + state.parH.toFixed(2), W/2, H - 44, "bad");
+    }
+  }
+
+  /* ===================== INIT ===================== */
+  function handleResize(){
+    drawAlignmentView();
+  }
+  window.addEventListener("resize", handleResize);
+  if(window.visualViewport){
+    window.visualViewport.addEventListener("resize", handleResize);
+  }
+
+  // init locks
+  lock(2); lock(3); lock(4); lock(5); lock(6);
+
+  refreshSoftFootKPI();
+  refreshAngVKPI();
+  refreshAngHKPI();
+  drawAlignmentView();
+  setPills();
+})();
 </script>
 
 </body>
