@@ -772,7 +772,7 @@ Dernière correction`
     drawFoot(topCtx, pumpX+pumpW-26,   pumpY + pumpH/2 + 2,      fw, fh, false);
 
     // Labels remontés (ne chevauche plus A/B)
-    drawLabel(topCtx, "Pompe (fixe)", pumpX + pumpW/2, pumpY - pumpH/2 - 26);
+    drawLabel(topCtx, "Pompe (fixe)", pumpX + pumpW/2, pumpY - pumpH/2 - 38);
 
     // Moteur
     const cx = motorX0 + motorW/2;
@@ -825,7 +825,8 @@ Dernière correction`
     const coupY = motorY0;
     drawCoupling(topCtx, coupX, coupY, 12);
 
-    drawLabel(topCtx, "Moteur (mobile)", motorX0 + motorW/2, motorY0 - motorH/2 - 26);
+    drawLabel(topCtx, "Moteur (mobile)", motorX0 + motorW/2, motorY0 - motorH/2 - 38
+      );
 
     topCtx.restore();
 
