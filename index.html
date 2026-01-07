@@ -283,15 +283,7 @@ canvas{ width:100%; height:260px; display:block; background:#000; }
 
   <!-- ===== INFOS ===== -->
   <div id="infoModal" class="infoModal hidden">
-    <div style="margin-top:12px; text-align:center;">
-  <button
-    type="button"
-    class="secondary"
-    onclick="closeInfo()"
-    style="width:100%; padding:12px; font-size:16px; font-weight:700;">
-    Fermer
-  </button>
-</div>
+    
     <div class="infoBox">
       <h3>ℹ️ Aide (niveau débutant)</h3>
 
@@ -1006,10 +998,21 @@ On corrige AVANT le parallèle horizontal.`,
     updateInfoText();
     infoModal.classList.remove("hidden");
   });
-  btnCloseInfo.addEventListener("click", () => infoModal.classList.add("hidden"));
+  btnCloseInfo.addEventListener("click", () => {
+  infoModal.classList.add("hidden");
+  document.body.style.overflow = "";
+
+  // iOS Safari fix (clavier + focus)
+  if (document.activeElement && document.activeElement.blur) {
+    document.activeElement.blur();
+  }
+});
   infoModal.addEventListener("click", (e) => {
-    if(e.target === infoModal) infoModal.classList.add("hidden");
-  });
+  if (e.target === infoModal) {
+    infoModal.classList.add("hidden");
+    document.body.style.overflow = "";
+  }
+});
   infoSelect.addEventListener("change", updateInfoText);
 
   /* ===================== INIT ===================== */
