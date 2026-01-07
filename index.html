@@ -649,7 +649,15 @@ function computeSoftFootCorrection(sf){
   return result;
 }
 
-
+function isFaultyFoot(footKey, sfCalc){
+  if(sfCalc.faultyDiagonal === "AC"){
+    return footKey === "FL" || footKey === "RL";
+  }
+  if(sfCalc.faultyDiagonal === "BD"){
+    return footKey === "FR" || footKey === "RR";
+  }
+  return false;
+}
 
   function stepOk(idx){
     switch(idx){
@@ -755,7 +763,7 @@ function computeSoftFootCorrection(sf){
 
   function drawTopView(){
     const sfCalc = computeSoftFootCorrection(align.sf);
-    const isBad = (foot) => sfCalc.shims[foot] > 0;
+    const isBad = (foot) => isFaultyFoot(foot, sfCalc);
     const { W, H } = resizeCanvas(topCanvas, topCtx);
     clear(topCtx, W, H);
     drawGrid(topCtx, W, H);
