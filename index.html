@@ -576,10 +576,13 @@ function wireInputs(pairs){
     if(!input) return;
 
     const read = () => {
-      const v = parseFloat(input.value);
-      setter(Number.isFinite(v) ? v : 0);
-      renderAll(); // redraw complet (UI + dessins)
-    };
+  const v = parseFloat(input.value);
+  setter(Number.isFinite(v) ? v : 0);
+
+  // ⚠️ redraw SEULEMENT les dessins, PAS l’UI
+  drawTopView();
+  drawSideView();
+};
 
     input.addEventListener("input", read, { passive:true });
     input.addEventListener("change", read, { passive:true });
