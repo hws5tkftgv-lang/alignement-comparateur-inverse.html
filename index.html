@@ -235,6 +235,11 @@ Les pattes A / B / C / D seront affichées ici.
 <script>
 "use strict";
 let currentView = "top"; // "top" | "side"
+let blinkPhase = true;
+setInterval(() => {
+  blinkPhase = !blinkPhase;
+  renderAll();
+}, 600);
 
 /* =====================================================
    ÉTAT GLOBAL (mils)
@@ -641,32 +646,48 @@ function clear(ctx,w,h){
   ctx.fillStyle="#000";
   ctx.fillRect(0,0,w,h);
 }
-
+function isBlinking(){
+  return blinkPhase ? "#ff5252" : "#000";
+}
 function footColor(letter){
   const step = STEPS[state.step].id;
+  const bad = !isStepOK(state.step);
 
-  // ❌ Soft foot : JAMAIS en Side View
+  // ❌ Soft foot jamais en Side View
   if(step === "softfoot" && currentView === "side"){
     return "#00a2ff";
   }
 
-  if(step === "angV"){
-    const r = computeAngularVertical();
-    if(r && r.pair.includes(letter)) return "#ff5252";
+  if(step === "softfoot"){
+    const sf = computeSoftFoot();
+    if(bad && sf.faulty && sf.faulty.includes(letter)){
+      return isBlinking();
+    }
   }
 
-  if(step === "parV"){
-    return "#ff5252";
+  if(step === "angV"){
+    const r = computeAngularVertical();
+    if(bad && r && r.pair.includes(letter)){
+      return isBlinking();
+    }
+  }
+
+  if(step === "parV" && bad){
+    return isBlinking();
   }
 
   if(step === "angH"){
     const r = computeAngularHorizontal();
-    if(r && r.pair.includes(letter)) return "#ff5252";
+    if(bad && r && r.pair.includes(letter)){
+      return isBlinking();
+    }
   }
 
   if(step === "parH"){
     const r = computeParallelHorizontal();
-    if(r && r.pair.includes(letter)) return "#ff5252";
+    if(bad && r && r.pair.includes(letter)){
+      return isBlinking();
+    }
   }
 
   return "#00a2ff";
@@ -710,12 +731,17 @@ const P = {
 // Dessiner les petites pattes (rectangles)
 function drawPad(letter){
   const {x,y} = P[letter];
-
-  // Décalage visuel : pattes sous le moteur pour C & D
   const offsetY = (letter === "C" || letter === "D") ? 10 : -10;
 
+  const faulty = footColor(letter) !== "#00a2ff";
+
   topCtx.fillStyle = footColor(letter);
-  topCtx.fillRect(x-12, y + offsetY - 6, 24, 12);
+  topCtx.fillRect(
+    x - (faulty ? 14 : 12),
+    y + offsetY - (faulty ? 7 : 6),
+    faulty ? 28 : 24,
+    faulty ? 14 : 12
+  );
 }
 drawPad("A"); drawPad("B"); drawPad("D"); drawPad("C");
 
@@ -778,6 +804,7 @@ if(STEPS[state.step].id === "softfoot"){
     topCtx.fillStyle = "#ff5252";
     topCtx.font = "12px Arial";
     topCtx.textAlign = "left";
+    topCtx.font = blinkPhase ? "bold 13px Arial" : "12px Arial";
     topCtx.fillText(`+${v.toFixed(1)} mil`, x + 14, y + 4);
   }
 
