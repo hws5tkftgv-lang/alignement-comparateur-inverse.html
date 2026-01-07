@@ -932,18 +932,16 @@ canvas{ width:100%; height:260px; display:block; background:#000; }
   window.addEventListener("resize", renderAll);
   if(window.visualViewport) window.visualViewport.addEventListener("resize", renderAll);
 
-  /* ===================== INFO MODAL ===================== */
-  const infoModal  = el("infoModal");
-  const infoBtn    = el("infoBtn");
+    /* ===================== INFO MODAL (iOS FIX) ===================== */
+  const infoModal    = el("infoModal");
+  const infoBtn      = el("infoBtn");
   const btnCloseInfo = el("btnCloseInfo");
-  const infoSelect = el("infoSelect");
-  const infoText   = el("infoText");
-  const infoBox = document.querySelector(".infoBox");
-["pointerdown","touchstart","click"].forEach(evt=>{
-  infoBox.addEventListener(evt, (e)=>e.stopPropagation(), { passive:false });
-});
-const INFO = {
-  principe: `Ordre obligatoire d’alignement :
+  const infoSelect   = el("infoSelect");
+  const infoText     = el("infoText");
+  const infoBox      = document.querySelector(".infoBox");
+
+  const INFO = {
+    principe: `Ordre obligatoire d’alignement :
 
 1) Voilage
 2) Pied boiteux (4 pattes)
@@ -955,12 +953,12 @@ const INFO = {
 Règle clé :
 • Toujours corriger l’angulaire AVANT le parallèle.`,
 
-  runout: `Voilage (runout) :
+    runout: `Voilage (runout) :
 • Faux-rond de l’arbre ou de l’accouplement
 • Si trop élevé → mesures fausses
 • Toujours corriger AVANT l’alignement`,
 
-  softfoot: `Pied boiteux :
+    softfoot: `Pied boiteux :
 • Une patte ne touche pas
 • En serrant → on crée un défaut
 
@@ -969,64 +967,81 @@ Méthode simple :
 • Resserrer
 • Re-mesurer`,
 
-  angV: `Angularité verticale :
+    angV: `Angularité verticale :
 • Vue de profil
 • Avant ≠ arrière
 • Inclinaison du moteur
 
 On corrige AVANT le parallèle vertical.`,
 
-  parV: `Parallélisme vertical :
+    parV: `Parallélisme vertical :
 • Vue de profil
 • Tout le moteur est trop haut ou trop bas
 • Se corrige APRÈS l’angulaire vertical`,
 
-  angH: `Angularité horizontale :
+    angH: `Angularité horizontale :
 • Vue de dessus
 • Inclinaison gauche / droite
 • Représentée haut / bas à l’écran
 
 On corrige AVANT le parallèle horizontal.`,
 
-  parH: `Parallélisme horizontal :
+    parH: `Parallélisme horizontal :
 • Vue de dessus
 • Décalage gauche / droite uniforme
 • Dernière correction`
-};
+  };
 
   function updateInfoText(){
     const key = infoSelect.value || "principe";
     infoText.textContent = INFO[key] || INFO.principe;
   }
 
-  infoBtn.addEventListener("click", () => {
+  function openInfo(){
     updateInfoText();
     infoModal.classList.remove("hidden");
+    document.body.style.overflow = "hidden";   // bloque le scroll derrière (iOS)
+  }
+
+  function closeInfo(){
+    infoModal.classList.add("hidden");
+    document.body.style.overflow = "";
+
+    // iOS: enlève le focus clavier / select
+    if (document.activeElement && document.activeElement.blur) {
+      document.activeElement.blur();
+    }
+  }
+
+  // OUVRIR
+  infoBtn.addEventListener("click", openInfo);
+
+  // IMPORTANT: empêcher le clic sur la box de fermer le modal
+  ["pointerdown","pointerup","touchstart","touchend","click"].forEach(evt=>{
+    infoBox.addEventListener(evt, (e)=>e.stopPropagation(), true); // capture=true
   });
-  function closeInfoModal(e){
-  if (e) {
-    e.preventDefault();
-    e.stopPropagation();
-  }
 
-  infoModal.classList.add("hidden");
-  document.body.style.overflow = "";
+  // FERMER via le bouton (capture=true + touchend/pointerup = iOS safe)
+  ["pointerup","touchend","click"].forEach(evt=>{
+    btnCloseInfo.addEventListener(evt, (e)=>{
+      e.preventDefault();
+      e.stopPropagation();
+      closeInfo();
+    }, true);
+  });
 
-  if (document.activeElement && document.activeElement.blur) {
-    document.activeElement.blur();
-  }
-}
-// bouton Fermer → PRIORITÉ tactile
-["pointerdown","touchstart","click"].forEach(evt=>{
-  btnCloseInfo.addEventListener(evt, closeInfoModal, { passive:false });
-});
+  // FERMER en tapant le fond (backdrop)
+  ["pointerup","touchend","click"].forEach(evt=>{
+    infoModal.addEventListener(evt, (e)=>{
+      if (e.target === infoModal) {
+        e.preventDefault();
+        closeInfo();
+      }
+    }, true);
+  });
 
-["pointerdown","touchstart","click"].forEach(evt=>{
-  infoModal.addEventListener(evt, (e)=>{
-    if (e.target === infoModal) closeInfoModal(e);
-  }, { passive:false });
-});
-
+  // Changement du sujet
+  infoSelect.addEventListener("change", updateInfoText);
   /* ===================== INIT ===================== */
   showStep(0);
 })();
