@@ -826,23 +826,27 @@ function updateBadges(){
 }
   /* ===================== RENDU – VUE DESSUS (HORIZONTAL) ===================== */
   function drawTopView(){
+
+  // 1️⃣ Préparer la surface de dessin
   const { W, H } = resizeCanvas(topCanvas, topCtx);
-
-  /* ===== FOND ===== */
   clear(topCtx, W, H);
-  drawGrid(topCtx, W, H);
+  drawGrid(topCtx, W, H); // grille pour voir les déplacements
 
-  /* ===== GÉOMÉTRIE GÉNÉRALE ===== */
-  const midY = H * 0.55;
-  const baseX = 40;
-  const unitLen = Math.min(160, (W - 120) * 0.45);
-  const gap = Math.min(90, (W - 120) * 0.18);
+  // 2️⃣ Position générale des machines
+  const midY = H * 0.55;        // ligne centrale
+  const baseX = 40;             // marge gauche
+  const unitLen = Math.min(160, (W - 120) * 0.45); // longueur moteur/pompe
+  const gap = Math.min(90, (W - 120) * 0.18);      // espace accouplement
 
-  const fw = 16; // largeur patte
-  const fh = 8;  // hauteur patte
-  const g  = align.gain;
+  // Dimensions des pattes
+  const fw = 16;
+  const fh = 8;
 
-  /* ===== CALCUL PIED BOITEUX ===== */
+  // Gain visuel (exagération)
+  const g = align.gain;
+
+  // 3️⃣ Détection du pied boiteux
+  // Si une patte est fautive → elle sera colorée en rouge
   const pb = calculPiedBoiteux(
     align.sf.FL,
     align.sf.FR,
@@ -850,9 +854,12 @@ function updateBadges(){
     align.sf.RR
   );
 
-  const isBad = (p) => pb.pattes && pb.pattes.includes(p);
+  const patteDefectueuse = (p) =>
+    pb.pattes && pb.pattes.includes(p);
 
-  /* ===== POMPE (FIXE) ===== */
+  // ======================
+  // 🟠 POMPE (FIXE)
+  // ======================
   const pumpX = baseX + unitLen + gap;
   const pumpY = midY;
   const pumpW = unitLen;
@@ -861,25 +868,28 @@ function updateBadges(){
   topCtx.fillStyle = "#ff9800";
   topCtx.fillRect(pumpX, pumpY - pumpH/2, pumpW, pumpH);
 
+  // Pattes pompe (toujours correctes)
   topCtx.fillStyle = "#d98200";
-  drawFoot(topCtx, pumpX + 10,         pumpY - pumpH/2 - fh - 2, fw, fh, false);
-  drawFoot(topCtx, pumpX + pumpW - 26, pumpY - pumpH/2 - fh - 2, fw, fh, false);
-  drawFoot(topCtx, pumpX + 10,         pumpY + pumpH/2 + 2,      fw, fh, false);
-  drawFoot(topCtx, pumpX + pumpW - 26, pumpY + pumpH/2 + 2,      fw, fh, false);
+  drawFoot(topCtx, pumpX+10, pumpY-pumpH/2-fh-2, fw, fh);
+  drawFoot(topCtx, pumpX+pumpW-26, pumpY-pumpH/2-fh-2, fw, fh);
+  drawFoot(topCtx, pumpX+10, pumpY+pumpH/2+2, fw, fh);
+  drawFoot(topCtx, pumpX+pumpW-26, pumpY+pumpH/2+2, fw, fh);
 
-  topCtx.fillStyle = "#eaf1ff";
-  topCtx.font = "12px Arial";
-  topCtx.textAlign = "center";
-  topCtx.fillText("Pompe (fixe)", pumpX + pumpW/2, pumpY - pumpH/2 - 14);
-
-  /* ===== MOTEUR (MOBILE) ===== */
+  // ======================
+  // 🔵 MOTEUR (MOBILE)
+  // ======================
   const motorX0 = baseX;
   const motorY0 = midY;
   const motorW  = unitLen;
   const motorH  = 42;
 
-  const dx  = align.parH * g;
-  const ang = align.angH * 0.0025; // rad/mil (exagéré pédagogique)
+  // Parallélisme horizontal :
+  // + mil → moteur se déplace vers la droite
+  const dx = align.parH * g;
+
+  // Angularité horizontale :
+  // le moteur pivote (nez à droite ou gauche)
+  const ang = align.angH * 0.0025;
 
   const cx = motorX0 + motorW/2;
   const cy = motorY0;
@@ -889,70 +899,28 @@ function updateBadges(){
   topCtx.rotate(ang);
   topCtx.translate(-cx, -cy);
 
-  // corps moteur
+  // Corps moteur
   topCtx.fillStyle = "#00a2ff";
-  topCtx.fillRect(motorX0, motorY0 - motorH/2, motorW, motorH);
+  topCtx.fillRect(motorX0, motorY0-motorH/2, motorW, motorH);
 
-  // pattes moteur AV-G / AV-D / AR-G / AR-D
-  drawFoot(
-    topCtx,
-    motorX0 + 10,
-    motorY0 - motorH/2 - fh - 2,
-    fw, fh,
-    isBad("FL")
-  );
+  // Pattes moteur
+  drawFoot(topCtx, motorX0+10, motorY0-motorH/2-fh-2, fw, fh, patteDefectueuse("FL"));
+  drawFoot(topCtx, motorX0+motorW-26, motorY0-motorH/2-fh-2, fw, fh, patteDefectueuse("FR"));
+  drawFoot(topCtx, motorX0+10, motorY0+motorH/2+2, fw, fh, patteDefectueuse("RL"));
+  drawFoot(topCtx, motorX0+motorW-26, motorY0+motorH/2+2, fw, fh, patteDefectueuse("RR"));
 
-  drawFoot(
-    topCtx,
-    motorX0 + motorW - 26,
-    motorY0 - motorH/2 - fh - 2,
-    fw, fh,
-    isBad("FR")
-  );
-
-  drawFoot(
-    topCtx,
-    motorX0 + 10,
-    motorY0 + motorH/2 + 2,
-    fw, fh,
-    isBad("RL")
-  );
-
-  drawFoot(
-    topCtx,
-    motorX0 + motorW - 26,
-    motorY0 + motorH/2 + 2,
-    fw, fh,
-    isBad("RR")
-  );
-
-  // arbre moteur → pompe
+  // Arbre entre moteur et pompe
   topCtx.strokeStyle = "rgba(255,255,255,.55)";
   topCtx.lineWidth = 3;
   topCtx.beginPath();
-  topCtx.moveTo(motorX0 + motorW, motorY0);
+  topCtx.moveTo(motorX0+motorW, motorY0);
   topCtx.lineTo(pumpX, pumpY);
   topCtx.stroke();
 
-  // accouplement
-  drawCoupling(
-    topCtx,
-    motorX0 + motorW + gap/2,
-    motorY0,
-    12
-  );
+  // Accouplement
+  drawCoupling(topCtx, motorX0+motorW+gap/2, motorY0, 12);
 
   topCtx.restore();
-
-  /* ===== ANNOTATION ===== */
-  topCtx.fillStyle = "rgba(255,255,255,.8)";
-  topCtx.font = "12px Arial";
-  topCtx.textAlign = "left";
-  topCtx.fillText(
-    `parH = ${align.parH.toFixed(1)} mil   angH = ${align.angH.toFixed(1)} mil (visuel exagéré)`,
-    12,
-    H - 12
-  );
 }
   /* ===================== RENDU – VUE PROFIL (VERTICAL) ===================== */
   function drawSideView(){
