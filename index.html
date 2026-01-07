@@ -698,11 +698,32 @@ function drawTopView(){
 
   // pattes (ordre demandé)
 // haut gauche -> A ; haut droite -> B ; bas gauche -> D ; bas droite -> C
-drawFoot(topCtx, cx-70, cy-30, "A");
-drawFoot(topCtx, cx+70, cy-30, "B");
-drawFoot(topCtx, cx-70, cy+30, "D");
-drawFoot(topCtx, cx+70, cy+30, "C");
+// --- PATTES TOP VIEW (4 rectangles visibles) ---
+// Positions coins (inchangées)
+const P = {
+  A:{x:cx-70, y:cy-30},
+  B:{x:cx+70, y:cy-30},
+  D:{x:cx-70, y:cy+30},
+  C:{x:cx+70, y:cy+30},
+};
 
+// Dessiner les petites pattes (rectangles)
+function drawPad(letter){
+  const {x,y} = P[letter];
+  topCtx.fillStyle = footColor(letter);     // rouge si correction, sinon bleu
+  topCtx.fillRect(x-12, y-6, 24, 12);       // petite patte visible
+}
+drawPad("A"); drawPad("B"); drawPad("D"); drawPad("C");
+
+// Lettres PLUS HAUT (au-dessus de chaque patte)
+topCtx.fillStyle = "#fff";
+topCtx.font = "14px Arial";
+topCtx.textAlign = "center";
+function drawLetter(letter){
+  const {x,y} = P[letter];
+  topCtx.fillText(letter, x, y-16);         // <- monte la lettre
+}
+drawLetter("A"); drawLetter("B"); drawLetter("D"); drawLetter("C");
   // pompe
   topCtx.fillStyle="#ff9800";
   topCtx.fillRect(cx+120,cy-40,160,80);
@@ -710,8 +731,8 @@ drawFoot(topCtx, cx+70, cy+30, "C");
   topCtx.fillStyle="#fff";
   topCtx.font="13px Arial";
   topCtx.textAlign="center";
-  topCtx.fillText("MOTEUR (mobile)", cx, cy-92);
-topCtx.fillText("POMPE (fixe)",    cx+200, cy-92);
+  topCtx.fillText("MOTEUR (mobile)", cx, cy-110);
+topCtx.fillText("POMPE (fixe)",    cx+200, cy-110);
 
   // softfoot seulement : afficher la PLUS GRANDE diagonale + shims près des pattes
 if(STEPS[state.step].id === "softfoot"){
