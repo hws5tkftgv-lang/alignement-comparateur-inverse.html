@@ -307,11 +307,11 @@ canvas{ width:100%; height:260px; display:block; background:#000; }
 
   /* ===================== ÉTAT (mils) ===================== */
   const align = {
-    runout: 0.8,
+    runout: 0.0,
     runoutTol: 2.0,
 
     // soft foot (4 pattes)
-    sf: { FL:2.0, FR:1.0, RL:0.5, RR:3.5 },
+    sf: { FL:0.0, FR:0.0, RL:0.0, RR:0.0 },
     sfTol: 3.0,
 
     // ordre demandé : 3 angV, 4 parV, 5 angH, 6 parH
@@ -763,7 +763,10 @@ function isFaultyFoot(footKey, sfCalc){
 
   function drawTopView(){
     const sfCalc = computeSoftFootCorrection(align.sf);
-    const isBad = (foot) => isFaultyFoot(foot, sfCalc);
+    const isBad = (foot) => {
+  if (STEPS[stepIndex].id !== "softfoot") return false;
+  return isFaultyFoot(foot, sfCalc);
+};
     const { W, H } = resizeCanvas(topCanvas, topCtx);
     clear(topCtx, W, H);
     drawGrid(topCtx, W, H);
@@ -799,7 +802,7 @@ function isFaultyFoot(footKey, sfCalc){
     drawFoot(topCtx, pumpX+10,         pumpY + pumpH/2 + 2,      fw, fh, false);
     drawFoot(topCtx, pumpX+pumpW-26,   pumpY + pumpH/2 + 2,      fw, fh, false);
 
-    drawLabel(topCtx, "Pompe (fixe)", pumpX + pumpW/2, pumpY - pumpH/2 - 14);
+    drawLabel(topCtx, "Pompe (fixe)", pumpX + pumpW/2, pumpY - pumpH/2 - 26);
 
     const cx = motorX0 + motorW/2;
     const cy = motorY0 + dyPar;
@@ -834,7 +837,7 @@ drawLabel(topCtx, FOOT_LABEL.RR, motorX0+motorW-18, motorY0 + motorH/2 + 26);
     const coupY = motorY0;
     drawCoupling(topCtx, coupX, coupY, 12);
 
-    drawLabel(topCtx, "Moteur (mobile)", motorX0 + motorW/2, motorY0 - motorH/2 - 14);
+    drawLabel(topCtx, "Moteur (mobile)", motorX0 + motorW/2, motorY0 - motorH/2 - 26);
 
     topCtx.restore();
 
@@ -880,7 +883,7 @@ drawLabel(topCtx, FOOT_LABEL.RR, motorX0+motorW-18, motorY0 + motorH/2 + 26);
     drawFoot(sideCtx, pumpX+16,        pumpY + pumpH/2 + 2, fw, fh, false);
     drawFoot(sideCtx, pumpX+pumpW-36,  pumpY + pumpH/2 + 2, fw, fh, false);
 
-    drawLabel(sideCtx, "Pompe (fixe)", pumpX + pumpW/2, pumpY - pumpH/2 - 14);
+    drawLabel(sideCtx, "Pompe (fixe)", pumpX + pumpW/2, pumpY - pumpH/2 - 26);
 
     const cx = motorX0 + motorW/2;
     const cy = motorY0 + dyPar;
@@ -910,7 +913,7 @@ drawLabel(topCtx, FOOT_LABEL.RR, motorX0+motorW-18, motorY0 + motorH/2 + 26);
     const coupY = motorY0;
     drawCoupling(sideCtx, coupX, coupY, 12);
 
-    drawLabel(sideCtx, "Moteur (mobile)", motorX0 + motorW/2, motorY0 - motorH/2 - 14);
+    drawLabel(sideCtx, "Moteur (mobile)", motorX0 + motorW/2, motorY0 - motorH/2 - 26);
 
     sideCtx.restore();
 
@@ -1003,8 +1006,8 @@ Object.entries(sfCalc.shims).forEach(([k,v])=>{
 
   /* ===================== RESET ===================== */
   function resetAll(){
-    align.runout = 0.8; align.runoutTol = 2.0;
-    align.sf = { FL:2.0, FR:1.0, RL:0.5, RR:3.5 }; align.sfTol = 3.0;
+    align.runout = 0.0; align.runoutTol = 2.0;
+    align.sf = { FL:0.0, FR:0.0, RL:0.0, RR:0.0 }; align.sfTol = 3.0;
     align.angV = 0.0; align.angVTol = 1.0;
     align.parV = 0.0; align.parVTol = 1.0;
     align.angH = 0.0; align.angHTol = 1.0;
