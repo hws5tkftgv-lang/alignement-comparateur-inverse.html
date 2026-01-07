@@ -378,10 +378,18 @@ Règle clé :
 • Une patte ne touche pas
 • En serrant → on crée un défaut
 
-Méthode simple :
-• Ajouter ~80 % de la valeur mesurée en cales
-• Resserrer
-• Re-mesurer`,
+Repérage des pattes :
+A = Avant gauche
+B = Avant droite
+C = Arrière gauche
+D = Arrière droite
+
+Méthode :
+• Comparer A + C et B + D
+• Calculer la différence (Δ)
+• Ajouter ~80 % en cales
+• Répartir sur les 2 pattes de la diagonale fautive
+• Resserrer et re-vérifier`
 
     angV: `Angularité verticale :
 • Vue de profil
@@ -473,21 +481,21 @@ Méthode pédagogique :
         return `
           <div class="row">
             <div>
-              <label>Patte AV-G (FL) (mils)</label>
+             <label>Patte A (Avant gauche)</label>
               <input id="sfFL" type="number" inputmode="decimal" step="0.1" value="${align.sf.FL}">
             </div>
             <div>
-              <label>Patte AV-D (FR) (mils)</label>
+           <label>Patte B (Avant droite)</label>
               <input id="sfFR" type="number" inputmode="decimal" step="0.1" value="${align.sf.FR}">
             </div>
           </div>
           <div class="row" style="margin-top:8px;">
             <div>
-              <label>Patte AR-G (RL) (mils)</label>
+            <label>Patte C (Arrière gauche)</label>
               <input id="sfRL" type="number" inputmode="decimal" step="0.1" value="${align.sf.RL}">
             </div>
             <div>
-              <label>Patte AR-D (RR) (mils)</label>
+              <label>Patte D (Arrière droite)</label>
               <input id="sfRR" type="number" inputmode="decimal" step="0.1" value="${align.sf.RR}">
             </div>
           </div>
@@ -598,7 +606,12 @@ Méthode pédagogique :
     stepBadge.classList.add(kind);
     stepBadge.textContent = txt;
   }
-
+const FOOT_LABEL = {
+  FL: "A",
+  FR: "B",
+  RL: "C",
+  RR: "D"
+};
   
 
 function computeSoftFootCorrection(sf){
@@ -798,7 +811,10 @@ function computeSoftFootCorrection(sf){
     drawFoot(topCtx, motorX0+motorW-26, motorY0 - motorH/2 - fh - 2, fw, fh, isBad("FR"));
     drawFoot(topCtx, motorX0+10,        motorY0 + motorH/2 + 2,      fw, fh, isBad("RL"));
     drawFoot(topCtx, motorX0+motorW-26, motorY0 + motorH/2 + 2,      fw, fh, isBad("RR"));
-
+    drawLabel(topCtx, FOOT_LABEL.FL, motorX0+18,        motorY0 - motorH/2 - 18);
+drawLabel(topCtx, FOOT_LABEL.FR, motorX0+motorW-18, motorY0 - motorH/2 - 18);
+drawLabel(topCtx, FOOT_LABEL.RL, motorX0+18,        motorY0 + motorH/2 + 26);
+drawLabel(topCtx, FOOT_LABEL.RR, motorX0+motorW-18, motorY0 + motorH/2 + 26);
     topCtx.strokeStyle="rgba(255,255,255,.55)";
     topCtx.lineWidth=3;
     topCtx.beginPath();
@@ -928,7 +944,7 @@ lines.push("• Resserrer et re-vérifier le pied boiteux");
     lines.push("Répartition des cales :");
 Object.entries(sfCalc.shims).forEach(([k,v])=>{
   if(v > 0){
-    lines.push(`• ${k} ≈ ${v.toFixed(1)} mil`);
+    lines.push(`• Patte ${FOOT_LABEL[k]} ≈ ${v.toFixed(1)} mil`);
   }
 });
     
