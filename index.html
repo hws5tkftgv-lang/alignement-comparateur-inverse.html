@@ -2,9 +2,10 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Alignement">
+
 <title>Alignement – Comparateur inversé (mils)</title>
 
 <style>
@@ -15,1003 +16,370 @@
   --muted:rgba(234,241,255,.75);
   --ok:#4caf50;
   --bad:#ff5252;
-  --warn:#ffb300;
   --accent:#00a2ff;
-  --line:rgba(255,255,255,.10);
 }
 *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-html,body{ margin:0; background:var(--bg); color:var(--text); font-family:Arial,system-ui,sans-serif; }
+html,body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:Arial,system-ui,sans-serif;
+}
 
-.headerBar{
-  position:sticky; top:0; z-index:50;
-  background:linear-gradient(to bottom, rgba(11,20,54,.98), rgba(11,20,54,.88));
-  border-bottom:1px solid rgba(255,255,255,.08);
-  padding:12px 12px 10px;
-  display:flex; align-items:center; justify-content:center;
-  font-weight:900; font-size:16px;
-}
-.headerBar .infoBtn{
-  position:absolute; right:10px;
-  background:none; border:none; color:var(--text);
-  font-size:20px; padding:6px 10px;
-}
-.sub{
+/* ===== HEADER ===== */
+.header{
+  position:sticky;
+  top:0;
+  z-index:20;
+  padding:12px;
   text-align:center;
-  padding:8px 14px 0;
-  font-size:12px;
-  color:var(--muted);
+  font-weight:900;
+  background:linear-gradient(to bottom,rgba(11,20,54,.98),rgba(11,20,54,.88));
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.header button{
+  position:absolute;
+  right:10px;
+  top:8px;
+  background:none;
+  border:none;
+  color:var(--text);
+  font-size:20px;
 }
 
-.wrap{ padding:12px; max-width:980px; margin:0 auto; }
+/* ===== LAYOUT ===== */
+.wrap{ padding:12px; max-width:1000px; margin:auto; }
 .grid{
-  display:grid; gap:12px;
+  display:grid;
+  gap:12px;
 }
-@media (min-width: 900px){
-  .grid{ grid-template-columns: 1fr 1fr; align-items:start; }
+@media(min-width:900px){
+  .grid{ grid-template-columns:1fr 1fr; }
 }
 
 .card{
   background:var(--card);
   border-radius:14px;
   padding:12px;
-  border:1px solid rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.08);
 }
 
 h2{ margin:0 0 8px; font-size:15px; }
-p{ margin:6px 0 10px; font-size:13px; color:var(--muted); line-height:1.35; }
 
 .badge{
-  display:inline-flex; align-items:center; gap:6px;
-  font-size:12px; font-weight:900;
-  padding:4px 10px; border-radius:999px;
-  background:rgba(255,255,255,.10);
-  color:var(--muted);
-}
-.badge.ok{ background:rgba(76,175,80,.15); color:#bff3c1; }
-.badge.bad{ background:rgba(255,82,82,.15); color:#ffc2c2; }
-.badge.warn{ background:rgba(255,179,0,.16); color:#ffe6b0; }
-
-.step{
-  border:1px solid rgba(255,255,255,.10);
-  border-radius:14px;
-  padding:12px;
-  background:rgba(255,255,255,.03);
-}
-.stepHead{
-  display:flex; align-items:center; justify-content:space-between; gap:10px;
-  margin-bottom:6px;
-}
-.stepTitle{ font-weight:900; font-size:14px; }
-.stepDesc{ margin:0 0 10px; font-size:13px; color:var(--muted); }
-
-.row{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-@media (max-width: 420px){ .row{ grid-template-columns:1fr; } }
-
-label{ display:block; font-size:12px; color:var(--muted); margin-bottom:4px; }
-input, select{
-  width:100%;
-  padding:10px 10px;
-  font-size:16px;
-  border-radius:12px;
-  border:none;
-  outline:none;
-}
-.smallNote{
-  margin-top:10px;
-  padding:10px;
-  border-radius:12px;
-  border:1px solid rgba(255,255,255,.10);
-  background:rgba(0,0,0,.15);
-  color:rgba(234,241,255,.85);
+  display:inline-block;
+  padding:4px 10px;
+  border-radius:999px;
   font-size:12px;
-  line-height:1.35;
-  white-space:pre-line;
-}
-
-.navRow{
-  display:flex; gap:10px; flex-wrap:wrap;
-  margin-top:10px;
-}
-button{
-  flex:1;
-  min-width:140px;
-  padding:12px;
-  font-size:16px;
-  border:none;
-  border-radius:12px;
-  background:var(--accent);
-  color:#fff;
   font-weight:900;
 }
-button.secondary{ background:rgba(255,255,255,.12); }
+.badge.ok{ background:rgba(76,175,80,.18); color:#c8f7cb; }
+.badge.bad{ background:rgba(255,82,82,.18); color:#ffd0d0; }
 
-.hr{ height:1px; background:rgba(255,255,255,.10); margin:12px 0; }
+/* ===== STEP ===== */
+.stepHead{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.stepDesc{
+  font-size:13px;
+  color:var(--muted);
+  margin:6px 0 10px;
+}
+.row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+@media(max-width:420px){
+  .row{ grid-template-columns:1fr; }
+}
+label{
+  font-size:12px;
+  color:var(--muted);
+}
+input{
+  width:100%;
+  padding:10px;
+  font-size:16px;
+  border-radius:12px;
+  border:none;
+}
+button{
+  padding:12px;
+  border:none;
+  border-radius:12px;
+  font-size:16px;
+  font-weight:900;
+  background:var(--accent);
+  color:#fff;
+}
+button.secondary{ background:rgba(255,255,255,.15); }
 
-.canvasGrid{ display:grid; gap:12px; }
-@media (min-width: 900px){ .canvasGrid{ grid-template-columns:1fr 1fr; } }
+.nav{
+  display:flex;
+  gap:10px;
+  margin-top:10px;
+}
+
+/* ===== CANVAS ===== */
 .canvasCard{
   background:#000;
   border-radius:14px;
   overflow:hidden;
   border:1px solid rgba(255,255,255,.10);
 }
-.canvasHeader{
-  padding:10px 12px;
+.canvasTitle{
+  padding:8px 12px;
   font-size:13px;
-  font-weight:900;
   background:rgba(0,0,0,.35);
-  color:#eaf1ff;
-  border-bottom:1px solid rgba(255,255,255,.08);
 }
-canvas{ width:100%; height:260px; display:block; background:#000; }
-@media (min-width: 900px){ canvas{ height:300px; } }
+canvas{
+  width:100%;
+  height:260px;
+  display:block;
+}
 
-.legend{ display:flex; gap:12px; flex-wrap:wrap; margin-top:10px; font-size:12px; color:var(--muted); }
-.dot{ width:10px;height:10px;border-radius:999px;display:inline-block;margin-right:6px; }
-.dot.motor{ background:#00a2ff; }
-.dot.pump{ background:#ff9800; }
-.dot.bad{ background:#ff5252; }
-
-.mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:12px; }
-
+/* ===== KPI ===== */
 .kpi{
   margin-top:10px;
   padding:10px;
   border-radius:12px;
-  border:1px solid rgba(255,255,255,.10);
-  background:rgba(0,0,0,.15);
+  background:rgba(0,0,0,.18);
+  font-family:ui-monospace,monospace;
+  font-size:12px;
   white-space:pre-line;
 }
 
-/* ===== Info modal ===== */
+/* ===== MODAL (SAFE iOS) ===== */
 .hidden{ display:none; }
-.infoModal{
+.modal{
   position:fixed;
   inset:0;
   background:rgba(0,0,0,.65);
-  z-index:9999;
   display:flex;
   align-items:center;
   justify-content:center;
   padding:12px;
+  z-index:9999;
 }
-.infoBox{
+.modalBox{
   width:min(92vw,560px);
-  max-height:88vh;
   background:var(--card);
   border-radius:16px;
-  border:1px solid rgba(255,255,255,.12);
   padding:14px;
-  display:flex; flex-direction:column; gap:10px;
+  border:1px solid rgba(255,255,255,.12);
 }
-.infoBox h3{ margin:0; font-size:15px; }
-.infoScroll{
-  overflow:auto;
+.modalBox h3{ margin:0 0 10px; }
+.modalBox select, .modalBox button{
+  width:100%;
+  margin-top:6px;
+}
+.modalText{
+  margin-top:10px;
   padding:10px;
   border-radius:12px;
-  border:1px solid rgba(255,255,255,.10);
-  background:rgba(0,0,0,.15);
-  color:rgba(234,241,255,.92);
+  background:rgba(0,0,0,.18);
   font-size:13px;
-  line-height:1.4;
   white-space:pre-line;
 }
 </style>
 </head>
 
 <body>
-  <div class="headerBar">
-    Alignement (mils) – Comparateur inversé
-    <!-- IMPORTANT iOS: onclick inline -->
-    <button id="infoBtn" class="infoBtn" aria-label="Infos" type="button" onclick="openInfo()">ℹ️</button>
+
+<div class="header">
+  Alignement – Comparateur inversé (mils)
+  <button onclick="openInfo()">ℹ️</button>
+</div>
+
+<div class="wrap">
+<div class="grid">
+
+<!-- ===== ÉTAPES ===== -->
+<div class="card">
+<h2>Étapes pédagogiques</h2>
+
+<div class="stepHead">
+  <div id="stepTitle">—</div>
+  <div id="stepBadge" class="badge">—</div>
+</div>
+
+<div id="stepDesc" class="stepDesc">—</div>
+<div id="stepBody"></div>
+
+<div class="nav">
+  <button class="secondary" onclick="prevStep()">◀︎</button>
+  <button onclick="nextStep()">Suivant ▶︎</button>
+</div>
+
+<div class="kpi" id="kpi"></div>
+</div>
+
+<!-- ===== DESSINS ===== -->
+<div class="card">
+<h2>Dessins</h2>
+
+<div class="canvasCard">
+  <div class="canvasTitle">Vue de dessus (horizontal)</div>
+  <canvas id="top"></canvas>
+</div>
+
+<div class="canvasCard" style="margin-top:12px;">
+  <div class="canvasTitle">Vue de profil (vertical)</div>
+  <canvas id="side"></canvas>
+</div>
+
+</div>
+
+</div>
+</div>
+
+<!-- ===== MODAL ===== -->
+<div id="infoModal" class="modal hidden">
+  <div class="modalBox">
+    <h3>Aide pédagogique</h3>
+    <select id="infoSel">
+      <option value="ordre">Ordre logique</option>
+      <option value="runout">Voilage</option>
+      <option value="softfoot">Soft foot</option>
+      <option value="ang">Angularité</option>
+      <option value="par">Parallélisme</option>
+    </select>
+    <div id="infoTxt" class="modalText"></div>
+    <button class="secondary" onclick="closeInfo()">Fermer</button>
   </div>
-
-  <div class="sub">
-    Objectif : apprendre l’ordre logique. On affiche seulement “⚠️ À corriger” quand ça dépasse la tolérance.
-  </div>
-
-  <div class="wrap">
-    <div class="grid">
-
-      <!-- ===== ÉTAPES ===== -->
-      <div class="card">
-        <h2>Étapes (dans l’ordre)</h2>
-        <p>Unités : <b>mils</b>. Rappel : 1 mil = 0.001 po.</p>
-
-        <div class="step" id="stepCard">
-          <div class="stepHead">
-            <div class="stepTitle" id="stepTitle">—</div>
-            <div class="badge" id="stepBadge">Info</div>
-          </div>
-
-          <div class="stepDesc" id="stepDesc">—</div>
-
-          <!-- Zone inputs (remplie par JS) -->
-          <div id="stepBody"></div>
-
-          <div class="smallNote" id="stepHint">—</div>
-
-          <div class="navRow">
-            <button class="secondary" id="btnPrev" type="button">◀︎ Précédent</button>
-            <button id="btnNext" type="button">Suivant ▶︎</button>
-          </div>
-
-          <div class="hr"></div>
-
-          <div class="row">
-            <div>
-              <label>Gain visuel (px par mil) – pour bien voir le dessin</label>
-              <input id="gain" type="number" inputmode="decimal" step="1" value="25">
-            </div>
-            <div>
-              <label>Reset</label>
-              <button class="secondary" id="btnReset" type="button">Reset valeurs</button>
-            </div>
-          </div>
-
-          <div class="kpi mono" id="kpiText">—</div>
-        </div>
-      </div>
-
-      <!-- ===== DESSINS ===== -->
-      <div class="card">
-        <h2>Dessins (toujours 2 vues)</h2>
-        <p>
-          • <b>Vue de dessus</b> = défauts <b>horizontaux</b> (gauche/droite) → l’objet bouge <b>haut/bas</b> sur l’écran.
-          <br>• <b>Vue de profil</b> = défauts <b>verticaux</b> (haut/bas).
-        </p>
-
-        <div class="canvasGrid">
-          <div class="canvasCard">
-            <div class="canvasHeader">Vue de dessus (horizontal)</div>
-            <canvas id="topView"></canvas>
-          </div>
-          <div class="canvasCard">
-            <div class="canvasHeader">Vue de profil (vertical)</div>
-            <canvas id="sideView"></canvas>
-          </div>
-        </div>
-
-        <div class="legend">
-          <div><span class="dot motor"></span>Moteur (mobile)</div>
-          <div><span class="dot pump"></span>Pompe (fixe)</div>
-          <div><span class="dot bad"></span>Patte “à corriger” (soft foot)</div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- ===== INFOS ===== -->
-  <!-- IMPORTANT iOS: onclick backdrop + onclick fermer -->
-  <div id="infoModal" class="infoModal hidden" onclick="forceCloseInfoBackdrop(event)">
-    <div class="infoBox">
-      <h3>ℹ️ Aide (niveau débutant)</h3>
-
-      <div class="row">
-        <div>
-          <label>Choisir un sujet</label>
-          <select id="infoSelect">
-            <option value="principe">Principe & ordre</option>
-            <option value="runout">1) Voilage</option>
-            <option value="softfoot">2) Pied boiteux</option>
-            <option value="angV">3) Angularité verticale</option>
-            <option value="parV">4) Parallélisme vertical</option>
-            <option value="angH">5) Angularité horizontale</option>
-            <option value="parH">6) Parallélisme horizontal</option>
-          </select>
-        </div>
-        <div>
-          <label>Fermer</label>
-          <!-- IMPORTANT iOS: onclick inline -->
-          <button class="secondary" type="button"
-        onclick="forceCloseInfo(); event.stopPropagation();">
-  Fermer
-</button>
-        </div>
-      </div>
-
-      <div class="infoScroll" id="infoText"></div>
-    </div>
-  </div>
+</div>
 
 <script>
-/* =========================================================
-   MODAL iOS SAFARI (GLOBAL + ONCLICK INLINE + REPAINT)
-   ========================================================= */
+/* ===================== DONNÉES ===================== */
+const data = {
+  runout:1.2, runoutTol:2,
+  sf:{FL:2,FR:1,RL:0.5,RR:3.5}, sfTol:3,
+  angV:0, angVTol:1,
+  parV:0, parVTol:1,
+  angH:0, angHTol:1,
+  parH:0, parHTol:1
+};
 
+/* ===================== STEPS ===================== */
+let step=0;
+const STEPS=[
+{t:"1) Voilage",d:"Toujours corriger avant toute chose.",
+ r:()=>`
+ <div class=row>
+ <div><label>Voilage</label><input id=runout value="${data.runout}"></div>
+ <div><label>Tolérance</label><input id=runoutTol value="${data.runoutTol}"></div>
+ </div>`},
+{t:"2) Soft foot",d:"Les 4 pattes doivent toucher.",
+ r:()=>`
+ <div class=row>
+ <div><label>FL</label><input id=sfFL value="${data.sf.FL}"></div>
+ <div><label>FR</label><input id=sfFR value="${data.sf.FR}"></div>
+ </div>
+ <div class=row>
+ <div><label>RL</label><input id=sfRL value="${data.sf.RL}"></div>
+ <div><label>RR</label><input id=sfRR value="${data.sf.RR}"></div>
+ </div>
+ <div class=row>
+ <div><label>Tolérance</label><input id=sfTol value="${data.sfTol}"></div>
+ </div>`},
+{t:"3) Angularité verticale",d:"Inclinaison avant / arrière.", r:()=>`
+ <div class=row>
+ <div><label>Valeur</label><input id=angV value="${data.angV}"></div>
+ <div><label>Tolérance</label><input id=angVTol value="${data.angVTol}"></div>
+ </div>`},
+{t:"4) Parallélisme vertical",d:"Décalage global haut / bas.", r:()=>`
+ <div class=row>
+ <div><label>Valeur</label><input id=parV value="${data.parV}"></div>
+ <div><label>Tolérance</label><input id=parVTol value="${data.parVTol}"></div>
+ </div>`},
+{t:"5) Angularité horizontale",d:"Inclinaison gauche / droite.", r:()=>`
+ <div class=row>
+ <div><label>Valeur</label><input id=angH value="${data.angH}"></div>
+ <div><label>Tolérance</label><input id=angHTol value="${data.angHTol}"></div>
+ </div>`},
+{t:"6) Parallélisme horizontal",d:"Décalage global gauche / droite.", r:()=>`
+ <div class=row>
+ <div><label>Valeur</label><input id=parH value="${data.parH}"></div>
+ <div><label>Tolérance</label><input id=parHTol value="${data.parHTol}"></div>
+ </div>`}
+];
 
-let __infoLock = false;
+/* ===================== UI ===================== */
+function render(){
+ const s=STEPS[step];
+ stepTitle.textContent=s.t;
+ stepDesc.textContent=s.d;
+ stepBody.innerHTML=s.r();
+ document.getElementById("stepBadge").className=
+   Math.abs(readVal())<=readTol()?"badge ok":"badge bad";
+ document.getElementById("stepBadge").textContent=
+   Math.abs(readVal())<=readTol()?"OK":"À corriger";
+ draw();
+}
 
+function readVal(){
+ const ids=["runout","sfFL","angV","parV","angH","parH"];
+ const el=document.getElementById(ids[step]);
+ return el?parseFloat(el.value)||0:0;
+}
+function readTol(){
+ const ids=["runoutTol","sfTol","angVTol","parVTol","angHTol","parHTol"];
+ const el=document.getElementById(ids[step]);
+ return el?parseFloat(el.value)||0:0;
+}
+function nextStep(){ if(step<5) step++; render(); }
+function prevStep(){ if(step>0) step--; render(); }
 
+/* ===================== CANVAS (simple & stable) ===================== */
+function draw(){
+ drawView("top");
+ drawView("side");
+}
+function drawView(id){
+ const c=document.getElementById(id);
+ const ctx=c.getContext("2d");
+ const dpr=window.devicePixelRatio||1;
+ c.width=c.clientWidth*dpr;
+ c.height=c.clientHeight*dpr;
+ ctx.setTransform(dpr,0,0,dpr,0,0);
+ ctx.fillStyle="#000";
+ ctx.fillRect(0,0,c.width,c.height);
+ ctx.fillStyle="#00a2ff";
+ ctx.fillRect(40,c.height/2-20,120,40);
+ ctx.fillStyle="#ff9800";
+ ctx.fillRect(220,c.height/2-20,120,40);
+ ctx.strokeStyle="#fff";
+ ctx.beginPath();
+ ctx.moveTo(160,c.height/2);
+ ctx.lineTo(220,c.height/2);
+ ctx.stroke();
+}
 
+/* ===================== MODAL ===================== */
 function openInfo(){
-  if(__infoLock) return;
-
-  const m = document.getElementById("infoModal");
-  if(!m) return;
-
-  if(typeof window.__updateInfoText === "function"){
-    window.__updateInfoText();
-  }
-
-  __infoLock = true;
-  m.classList.remove("hidden");
-  document.body.style.overflow = "hidden";
-
-  // petit délai pour autoriser interactions internes
-  setTimeout(()=>{ __infoLock = false; }, 200);
+ document.getElementById("infoModal").classList.remove("hidden");
+ updateInfo();
 }
-
-function forceCloseInfo(){
-  const m = document.getElementById("infoModal");
-  if(!m) return;
-
-  __infoLock = true;
-
-  if (document.activeElement && document.activeElement.blur) {
-    document.activeElement.blur();
-  }
-
-  m.style.display = "none";
-  void m.offsetHeight; // repaint iOS
-  m.style.display = "";
-
-  m.classList.add("hidden");
-  document.body.style.overflow = "";
-
-  // bloque tout tap résiduel
-  setTimeout(()=>{ __infoLock = false; }, 300);
+function closeInfo(){
+ document.getElementById("infoModal").classList.add("hidden");
 }
-function forceCloseInfoBackdrop(e){
-  if(__infoLock) return;
-  if(e && e.target && e.target.id === "infoModal"){
-    forceCloseInfo();
-  }
+const INFO={
+ ordre:"Ordre obligatoire :\n1 Voilage\n2 Soft foot\n3 Angularité\n4 Parallélisme",
+ runout:"Voilage : faux-rond.\nToujours corriger avant.",
+ softfoot:"Soft foot : une patte flotte.\nAjouter ~80% en cales.",
+ ang:"Angularité : inclinaison.\nToujours avant parallèle.",
+ par:"Parallélisme : décalage global."
+};
+function updateInfo(){
+ infoTxt.textContent=INFO[infoSel.value];
 }
-</script>
+infoSel.onchange=updateInfo;
 
-<script>
-(() => {
-  "use strict";
-
-  /* ===================== ÉTAT (mils) ===================== */
-  const align = {
-    runout: 0.8,
-    runoutTol: 2.0,
-
-    // soft foot (4 pattes)
-    sf: { FL:2.0, FR:1.0, RL:0.5, RR:3.5 },
-    sfTol: 3.0,
-
-    // ordre demandé : 3 angV, 4 parV, 5 angH, 6 parH
-    angV: 0.0, angVTol: 1.0,
-    parV: 0.0, parVTol: 1.0,
-    angH: 0.0, angHTol: 1.0,
-    parH: 0.0, parHTol: 1.0,
-
-    gain: 25
-  };
-
-  const clamp = (v,a,b)=>Math.max(a, Math.min(b, v));
-  const isNum = (x)=>Number.isFinite(x);
-
-  /* ===================== DOM ===================== */
-  const el = (id)=>document.getElementById(id);
-
-  const stepTitle = el("stepTitle");
-  const stepBadge = el("stepBadge");
-  const stepDesc  = el("stepDesc");
-  const stepBody  = el("stepBody");
-  const stepHint  = el("stepHint");
-
-  const btnPrev = el("btnPrev");
-  const btnNext = el("btnNext");
-  const btnReset = el("btnReset");
-  const gainEl = el("gain");
-
-  const kpiText = el("kpiText");
-
-  const topCanvas = el("topView");
-  const topCtx = topCanvas.getContext("2d");
-
-  const sideCanvas = el("sideView");
-  const sideCtx = sideCanvas.getContext("2d");
-
-  /* ===================== STEP MODEL ===================== */
-  let stepIndex = 0;
-
-  const STEPS = [
-    {
-      id:"runout",
-      title:"1) Voilage (runout)",
-      desc:"But : vérifier que l’accouplement / arbre ne “danse” pas. Si le voilage est trop haut, tes mesures d’alignement ne valent rien.",
-      hint:"Règle simple : si Voilage > Tolérance → ⚠️ à corriger avant de continuer.",
-      render(){
-        return `
-          <div class="row">
-            <div>
-              <label>Voilage (mils)</label>
-              <input id="runout" type="number" inputmode="decimal" step="0.1" value="${align.runout}">
-            </div>
-            <div>
-              <label>Tolérance voilage (mils)</label>
-              <input id="runoutTol" type="number" inputmode="decimal" step="0.1" value="${align.runoutTol}">
-            </div>
-          </div>
-        `;
-      }
-    },
-    {
-      id:"softfoot",
-      title:"2) Pied boiteux (soft foot) – 4 pattes",
-      desc:"But : les 4 pattes doivent toucher la base. Si une patte “flotte”, tu vas créer des défauts quand tu serres les boulons.",
-      hint:"Règle simple : si la pire patte > Tolérance → ⚠️ à corriger.\nCorrection pratique (débutant) : ajoute environ 80% de la valeur en cales sous la patte fautive, puis re-vérifie.",
-      render(){
-        return `
-          <div class="row">
-            <div>
-              <label>Patte AV-G (FL) (mils)</label>
-              <input id="sfFL" type="number" inputmode="decimal" step="0.1" value="${align.sf.FL}">
-            </div>
-            <div>
-              <label>Patte AV-D (FR) (mils)</label>
-              <input id="sfFR" type="number" inputmode="decimal" step="0.1" value="${align.sf.FR}">
-            </div>
-          </div>
-          <div class="row" style="margin-top:8px;">
-            <div>
-              <label>Patte AR-G (RL) (mils)</label>
-              <input id="sfRL" type="number" inputmode="decimal" step="0.1" value="${align.sf.RL}">
-            </div>
-            <div>
-              <label>Patte AR-D (RR) (mils)</label>
-              <input id="sfRR" type="number" inputmode="decimal" step="0.1" value="${align.sf.RR}">
-            </div>
-          </div>
-          <div class="row" style="margin-top:8px;">
-            <div>
-              <label>Tolérance soft foot (mils)</label>
-              <input id="sfTol" type="number" inputmode="decimal" step="0.1" value="${align.sfTol}">
-            </div>
-            <div>
-              <label>Note</label>
-              <input disabled value="La patte fautive sera affichée en rouge sur les dessins">
-            </div>
-          </div>
-        `;
-      }
-    },
-    {
-      id:"angV",
-      title:"3) Angularité verticale (vue de profil)",
-      desc:"But : corriger l’inclinaison (avant vs arrière). On corrige l’angulaire AVANT le parallèle.",
-      hint:"Lecture simple :\n• + = le nez du moteur monte\n• − = le nez du moteur descend\n\nOn veut revenir proche de 0 (dans la tolérance).",
-      render(){
-        return `
-          <div class="row">
-            <div>
-              <label>Angularité verticale (mils)</label>
-              <input id="angV" type="number" inputmode="decimal" step="0.1" value="${align.angV}">
-            </div>
-            <div>
-              <label>Tolérance (mils)</label>
-              <input id="angVTol" type="number" inputmode="decimal" step="0.1" value="${align.angVTol}">
-            </div>
-          </div>
-        `;
-      }
-    },
-    {
-      id:"parV",
-      title:"4) Parallélisme vertical (vue de profil)",
-      desc:"But : corriger le décalage “tout le moteur monte/descend” (les deux paires de pattes ensemble).",
-      hint:"Lecture simple :\n• + = le moteur est trop haut (en général)\n• − = le moteur est trop bas",
-      render(){
-        return `
-          <div class="row">
-            <div>
-              <label>Parallélisme vertical (mils)</label>
-              <input id="parV" type="number" inputmode="decimal" step="0.1" value="${align.parV}">
-            </div>
-            <div>
-              <label>Tolérance (mils)</label>
-              <input id="parVTol" type="number" inputmode="decimal" step="0.1" value="${align.parVTol}">
-            </div>
-          </div>
-        `;
-      }
-    },
-    {
-      id:"angH",
-      title:"5) Angularité horizontale (vue de dessus)",
-      desc:"But : inclinaison gauche/droite (avant vs arrière). On corrige l’angulaire AVANT le parallèle.",
-      hint:"Sur le dessin (vue de dessus) :\n• On représente gauche/droite par un mouvement HAUT/BAS (c’est plus clair visuellement).\n• + = le nez du moteur va “à droite” (sur l’écran ça bouge).",
-      render(){
-        return `
-          <div class="row">
-            <div>
-              <label>Angularité horizontale (mils)</label>
-              <input id="angH" type="number" inputmode="decimal" step="0.1" value="${align.angH}">
-            </div>
-            <div>
-              <label>Tolérance (mils)</label>
-              <input id="angHTol" type="number" inputmode="decimal" step="0.1" value="${align.angHTol}">
-            </div>
-          </div>
-        `;
-      }
-    },
-    {
-      id:"parH",
-      title:"6) Parallélisme horizontal (vue de dessus)",
-      desc:"But : décalage gauche/droite uniforme (tout le moteur se déplace latéralement).",
-      hint:"Sur le dessin (vue de dessus) :\n• + = moteur “va à droite” (on le montre haut/bas)\n• − = moteur “va à gauche” (inverse)",
-      render(){
-        return `
-          <div class="row">
-            <div>
-              <label>Parallélisme horizontal (mils)</label>
-              <input id="parH" type="number" inputmode="decimal" step="0.1" value="${align.parH}">
-            </div>
-            <div>
-              <label>Tolérance (mils)</label>
-              <input id="parHTol" type="number" inputmode="decimal" step="0.1" value="${align.parHTol}">
-            </div>
-          </div>
-        `;
-      }
-    }
-  ];
-
-  /* ===================== UTILS ===================== */
-  function readFloat(inputEl, fallback){
-    if(!inputEl) return fallback;
-    const v = parseFloat(inputEl.value);
-    return isNum(v) ? v : fallback;
-  }
-
-  function setBadge(kind, txt){
-    stepBadge.classList.remove("ok","bad","warn");
-    stepBadge.classList.add(kind);
-    stepBadge.textContent = txt;
-  }
-
-  function worstSoftFoot(){
-    const entries = Object.entries(align.sf);
-    entries.sort((a,b)=>b[1]-a[1]);
-    return { foot: entries[0][0], val: entries[0][1] };
-  }
-
-  function stepOk(idx){
-    switch(idx){
-      case 0: return Math.abs(align.runout) <= align.runoutTol;
-      case 1: return worstSoftFoot().val <= align.sfTol;
-      case 2: return Math.abs(align.angV) <= align.angVTol;
-      case 3: return Math.abs(align.parV) <= align.parVTol;
-      case 4: return Math.abs(align.angH) <= align.angHTol;
-      case 5: return Math.abs(align.parH) <= align.parHTol;
-      default: return true;
-    }
-  }
-
-  function syncCommonInputs(){
-    align.gain = clamp(readFloat(gainEl, align.gain), 1, 120);
-  }
-
-  function syncStepInputs(){
-    const id = STEPS[stepIndex].id;
-
-    if(id==="runout"){
-      align.runout    = readFloat(el("runout"), align.runout);
-      align.runoutTol = Math.max(0, readFloat(el("runoutTol"), align.runoutTol));
-    }
-
-    if(id==="softfoot"){
-      align.sf.FL = Math.abs(readFloat(el("sfFL"), align.sf.FL));
-      align.sf.FR = Math.abs(readFloat(el("sfFR"), align.sf.FR));
-      align.sf.RL = Math.abs(readFloat(el("sfRL"), align.sf.RL));
-      align.sf.RR = Math.abs(readFloat(el("sfRR"), align.sf.RR));
-      align.sfTol = Math.max(0, readFloat(el("sfTol"), align.sfTol));
-    }
-
-    if(id==="angV"){
-      align.angV = readFloat(el("angV"), align.angV);
-      align.angVTol = Math.max(0, readFloat(el("angVTol"), align.angVTol));
-    }
-
-    if(id==="parV"){
-      align.parV = readFloat(el("parV"), align.parV);
-      align.parVTol = Math.max(0, readFloat(el("parVTol"), align.parVTol));
-    }
-
-    if(id==="angH"){
-      align.angH = readFloat(el("angH"), align.angH);
-      align.angHTol = Math.max(0, readFloat(el("angHTol"), align.angHTol));
-    }
-
-    if(id==="parH"){
-      align.parH = readFloat(el("parH"), align.parH);
-      align.parHTol = Math.max(0, readFloat(el("parHTol"), align.parHTol));
-    }
-  }
-
-  /* ===================== CANVAS ===================== */
-  function dprNow(){ return Math.min(3, window.devicePixelRatio || 1); }
-
-  function resizeCanvas(c, ctx){
-    const dpr = dprNow();
-    const w = c.clientWidth || 320;
-    const h = c.clientHeight || 260;
-    c.width  = Math.round(w * dpr);
-    c.height = Math.round(h * dpr);
-    ctx.setTransform(dpr,0,0,dpr,0,0);
-    return { W: w, H: h };
-  }
-
-  function clear(ctx, W, H){
-    ctx.clearRect(0,0,W,H);
-    ctx.fillStyle="#000";
-    ctx.fillRect(0,0,W,H);
-  }
-
-  function drawGrid(ctx, W, H){
-    ctx.strokeStyle="rgba(255,255,255,.06)";
-    ctx.lineWidth=1;
-    const step=26;
-    for(let x=0;x<=W;x+=step){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
-    for(let y=0;y<=H;y+=step){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
-  }
-
-  function drawCoupling(ctx, x, y, r){
-    ctx.strokeStyle="rgba(255,255,255,.28)";
-    ctx.lineWidth=2;
-    ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.stroke();
-    ctx.beginPath(); ctx.arc(x,y,r*0.55,0,Math.PI*2); ctx.stroke();
-  }
-
-  function drawFoot(ctx, x, y, w, h, isBad=false){
-    ctx.fillStyle = isBad ? "#ff5252" : ctx.fillStyle;
-    ctx.fillRect(x,y,w,h);
-  }
-
-  function drawLabel(ctx, text, x, y){
-    ctx.fillStyle="#eaf1ff";
-    ctx.font="12px Arial";
-    ctx.textAlign="center";
-    ctx.fillText(text, x, y);
-  }
-
-  function drawTopView(){
-    const { W, H } = resizeCanvas(topCanvas, topCtx);
-    clear(topCtx, W, H);
-    drawGrid(topCtx, W, H);
-
-    const baseY = H * 0.58;
-    const baseX = 34;
-    const unitLen = Math.min(165, (W - 110) * 0.46);
-    const gap = Math.min(96,  (W - 110) * 0.20);
-
-    const motorW = unitLen, motorH = 44;
-    const pumpW  = unitLen, pumpH  = 44;
-
-    const pumpX = baseX + unitLen + gap;
-    const pumpY = baseY;
-
-    const motorX0 = baseX;
-    const motorY0 = baseY;
-
-    const g = align.gain;
-
-    const dyPar = -(align.parH * g);
-    const ang = (align.angH * 0.0025);
-
-    const worst = worstSoftFoot();
-    const badFoot = worst.foot;
-
-    topCtx.fillStyle="#ff9800";
-    topCtx.fillRect(pumpX, pumpY - pumpH/2, pumpW, pumpH);
-
-    topCtx.fillStyle="#d98200";
-    const fw=16, fh=8;
-    drawFoot(topCtx, pumpX+10,         pumpY - pumpH/2 - fh - 2, fw, fh, false);
-    drawFoot(topCtx, pumpX+pumpW-26,   pumpY - pumpH/2 - fh - 2, fw, fh, false);
-    drawFoot(topCtx, pumpX+10,         pumpY + pumpH/2 + 2,      fw, fh, false);
-    drawFoot(topCtx, pumpX+pumpW-26,   pumpY + pumpH/2 + 2,      fw, fh, false);
-
-    drawLabel(topCtx, "Pompe (fixe)", pumpX + pumpW/2, pumpY - pumpH/2 - 14);
-
-    const cx = motorX0 + motorW/2;
-    const cy = motorY0 + dyPar;
-
-    topCtx.save();
-    topCtx.translate(cx, cy);
-    topCtx.rotate(ang);
-    topCtx.translate(-cx, -(motorY0));
-
-    topCtx.fillStyle="#00a2ff";
-    topCtx.fillRect(motorX0, motorY0 - motorH/2, motorW, motorH);
-
-    topCtx.fillStyle="#0086d6";
-    const isBad = (f) => (f === badFoot) && (worst.val > align.sfTol);
-
-    drawFoot(topCtx, motorX0+10,        motorY0 - motorH/2 - fh - 2, fw, fh, isBad("FL"));
-    drawFoot(topCtx, motorX0+motorW-26, motorY0 - motorH/2 - fh - 2, fw, fh, isBad("FR"));
-    drawFoot(topCtx, motorX0+10,        motorY0 + motorH/2 + 2,      fw, fh, isBad("RL"));
-    drawFoot(topCtx, motorX0+motorW-26, motorY0 + motorH/2 + 2,      fw, fh, isBad("RR"));
-
-    topCtx.strokeStyle="rgba(255,255,255,.55)";
-    topCtx.lineWidth=3;
-    topCtx.beginPath();
-    topCtx.moveTo(motorX0+motorW, motorY0);
-    topCtx.lineTo(pumpX, pumpY);
-    topCtx.stroke();
-
-    const coupX = motorX0 + motorW + gap/2;
-    const coupY = motorY0;
-    drawCoupling(topCtx, coupX, coupY, 12);
-
-    drawLabel(topCtx, "Moteur (mobile)", motorX0 + motorW/2, motorY0 - motorH/2 - 14);
-
-    topCtx.restore();
-
-    topCtx.fillStyle="rgba(255,255,255,.80)";
-    topCtx.font="12px Arial";
-    topCtx.textAlign="left";
-    topCtx.fillText(`H: ang=${align.angH.toFixed(1)} mil, par=${align.parH.toFixed(1)} mil (vue de dessus = mouvement haut/bas)`, 10, H-12);
-  }
-
-  function drawSideView(){
-    const { W, H } = resizeCanvas(sideCanvas, sideCtx);
-    clear(sideCtx, W, H);
-    drawGrid(sideCtx, W, H);
-
-    const baseY = H * 0.62;
-    const baseX = 34;
-    const unitLen = Math.min(165, (W - 110) * 0.46);
-    const gap = Math.min(96,  (W - 110) * 0.20);
-
-    const motorW = unitLen, motorH = 44;
-    const pumpW  = unitLen, pumpH  = 44;
-
-    const pumpX = baseX + unitLen + gap;
-    const pumpY = baseY;
-
-    const motorX0 = baseX;
-    const motorY0 = baseY;
-
-    const g = align.gain;
-
-    const dyPar = -(align.parV * g);
-    const ang = -(align.angV * 0.0025);
-
-    const worst = worstSoftFoot();
-    const badFoot = worst.foot;
-    const sfDrop = (worst.val > align.sfTol) ? (worst.val * g * 0.28) : 0;
-
-    sideCtx.fillStyle="#ff9800";
-    sideCtx.fillRect(pumpX, pumpY - pumpH/2, pumpW, pumpH);
-
-    sideCtx.fillStyle="#d98200";
-    const fw=20, fh=10;
-    drawFoot(sideCtx, pumpX+16,        pumpY + pumpH/2 + 2, fw, fh, false);
-    drawFoot(sideCtx, pumpX+pumpW-36,  pumpY + pumpH/2 + 2, fw, fh, false);
-
-    drawLabel(sideCtx, "Pompe (fixe)", pumpX + pumpW/2, pumpY - pumpH/2 - 14);
-
-    const cx = motorX0 + motorW/2;
-    const cy = motorY0 + dyPar;
-
-    sideCtx.save();
-    sideCtx.translate(cx, cy);
-    sideCtx.rotate(ang);
-    sideCtx.translate(-cx, -(motorY0));
-
-    sideCtx.fillStyle="#00a2ff";
-    sideCtx.fillRect(motorX0, motorY0 - motorH/2, motorW, motorH);
-
-    const frontDrop = (badFoot==="FL" || badFoot==="FR") ? sfDrop : 0;
-    const rearDrop  = (badFoot==="RL" || badFoot==="RR") ? sfDrop : 0;
-
-    sideCtx.fillStyle="#0086d6";
-    drawFoot(sideCtx, motorX0+16,        motorY0 + motorH/2 + 2 + frontDrop, fw, fh, sfDrop>0 && frontDrop>0);
-    drawFoot(sideCtx, motorX0+motorW-36, motorY0 + motorH/2 + 2 + rearDrop,  fw, fh, sfDrop>0 && rearDrop>0);
-
-    sideCtx.strokeStyle="rgba(255,255,255,.55)";
-    sideCtx.lineWidth=3;
-    sideCtx.beginPath();
-    sideCtx.moveTo(motorX0+motorW, motorY0);
-    sideCtx.lineTo(pumpX, pumpY);
-    sideCtx.stroke();
-
-    const coupX = motorX0 + motorW + gap/2;
-    const coupY = motorY0;
-    drawCoupling(sideCtx, coupX, coupY, 12);
-
-    drawLabel(sideCtx, "Moteur (mobile)", motorX0 + motorW/2, motorY0 - motorH/2 - 14);
-
-    sideCtx.restore();
-
-    sideCtx.fillStyle="rgba(255,255,255,.80)";
-    sideCtx.font="12px Arial";
-    sideCtx.textAlign="left";
-    sideCtx.fillText(`V: ang=${align.angV.toFixed(1)} mil, par=${align.parV.toFixed(1)} mil`, 10, H-28);
-    sideCtx.fillText(`Soft foot: pire patte ${worst.foot} = ${worst.val.toFixed(1)} mil`, 10, H-12);
-  }
-
-  /* ===================== KPI (texte simple) ===================== */
-  function buildKpi(){
-    const ok = stepOk(stepIndex);
-    const worst = worstSoftFoot();
-
-    const lines = [];
-    lines.push(`Étape actuelle : ${STEPS[stepIndex].title}`);
-    lines.push(ok ? `État : OK (dans la tolérance)` : `⚠️ État : À corriger (hors tolérance)`);
-    lines.push("");
-
-    lines.push("Résumé (simple) :");
-    lines.push(`1 Voilage : ${align.runout.toFixed(1)} / tol ${align.runoutTol.toFixed(1)} mil`);
-    lines.push(`2 Soft foot (pire patte ${worst.foot}) : ${worst.val.toFixed(1)} / tol ${align.sfTol.toFixed(1)} mil`);
-    lines.push(`3 Ang V : ${align.angV.toFixed(1)} / tol ${align.angVTol.toFixed(1)} mil`);
-    lines.push(`4 Par V : ${align.parV.toFixed(1)} / tol ${align.parVTol.toFixed(1)} mil`);
-    lines.push(`5 Ang H : ${align.angH.toFixed(1)} / tol ${align.angHTol.toFixed(1)} mil`);
-    lines.push(`6 Par H : ${align.parH.toFixed(1)} / tol ${align.parHTol.toFixed(1)} mil`);
-    lines.push("");
-
-    const shim80 = worst.val * 0.8;
-    lines.push("Conseil (débutant) :");
-    lines.push(`• Soft foot : essayer ~80% → ajouter ~${shim80.toFixed(1)} mil de cales sous la patte ${worst.foot}, puis re-vérifier.`);
-
-    return lines.join("\n");
-  }
-
-  /* ===================== RENDER STEP UI ===================== */
-  function wireStepInputs(){
-    const inputs = stepBody.querySelectorAll("input, select");
-    inputs.forEach(inp => {
-      inp.addEventListener("input", renderAll, { passive:true });
-      inp.addEventListener("change", renderAll, { passive:true });
-    });
-  }
-
-  function showStep(idx){
-    stepIndex = clamp(idx, 0, STEPS.length-1);
-
-    const s = STEPS[stepIndex];
-    stepTitle.textContent = s.title;
-    stepDesc.textContent  = s.desc;
-    stepHint.textContent  = s.hint;
-
-    stepBody.innerHTML = s.render();
-    wireStepInputs();
-
-    btnPrev.disabled = (stepIndex === 0);
-    btnNext.textContent = (stepIndex === STEPS.length-1) ? "Terminer" : "Suivant ▶︎";
-
-    renderAll();
-  }
-
-  /* ===================== LOGIQUE “ordre obligatoire” ===================== */
-  function goNext(){
-    if(!stepOk(stepIndex)){
-      renderAll();
-      return;
-    }
-    if(stepIndex < STEPS.length-1){
-      showStep(stepIndex+1);
-    }
-  }
-
-  function goPrev(){
-    if(stepIndex > 0) showStep(stepIndex-1);
-  }
-
-  /* ===================== RESET ===================== */
-  function resetAll(){
-    align.runout = 0.8; align.runoutTol = 2.0;
-    align.sf = { FL:2.0, FR:1.0, RL:0.5, RR:3.5 }; align.sfTol = 3.0;
-    align.angV = 0.0; align.angVTol = 1.0;
-    align.parV = 0.0; align.parVTol = 1.0;
-    align.angH = 0.0; align.angHTol = 1.0;
-    align.parH = 0.0; align.parHTol = 1.0;
-    align.gain = 25;
-
-    gainEl.value = "25";
-    showStep(0);
-  }
-
-  /* ===================== RENDER GLOBAL ===================== */
-  function renderAll(){
-    syncCommonInputs();
-    syncStepInputs();
-
-    const ok = stepOk(stepIndex);
-    setBadge(ok ? "ok" : "bad", ok ? "OK" : "⚠️ À corriger");
-
-    kpiText.textContent = buildKpi();
-
-    drawTopView();
-    drawSideView();
-  }
-
-  /* ===================== EVENTS ===================== */
-  btnPrev.addEventListener("click", goPrev);
-  btnNext.addEventListener("click", goNext);
-  btnReset.addEventListener("click", resetAll);
-
-  gainEl.addEventListener("input", renderAll, { passive:true });
-  window.addEventListener("resize", renderAll);
-  if(window.visualViewport) window.visualViewport.addEventListener("resize", renderAll);
-
-  /* ===================== INFO CONTENT ===================== */
-  const infoSelect   = el("infoSelect");
-  const infoText     = el("infoText");
-
-  const INFO = {
-    principe: `Ordre obligatoire d’alignement :
-
-1) Voilage
-2) Pied boiteux (4 pattes)
-3) Angularité verticale
-4) Parallélisme vertical
-5) Angularité horizontale
-6) Parallélisme horizontal
-
-Règle clé :
-• Toujours corriger l’angulaire AVANT le parallèle.`,
-
-    runout: `Voilage (runout) :
-• Faux-rond de l’arbre ou de l’accouplement
-• Si trop élevé → mesures fausses
-• Toujours corriger AVANT l’alignement`,
-
-    softfoot: `Pied boiteux :
-• Une patte ne touche pas
-• En serrant → on crée un défaut
-
-Méthode simple :
-• Ajouter ~80 % de la valeur mesurée en cales
-• Resserrer
-• Re-mesurer`,
-
-    angV: `Angularité verticale :
-• Vue de profil
-• Avant ≠ arrière
-• Inclinaison du moteur
-
-On corrige AVANT le parallèle vertical.`,
-
-    parV: `Parallélisme vertical :
-• Vue de profil
-• Tout le moteur est trop haut ou trop bas
-• Se corrige APRÈS l’angulaire vertical`,
-
-    angH: `Angularité horizontale :
-• Vue de dessus
-• Inclinaison gauche / droite
-• Représentée haut / bas à l’écran
-
-On corrige AVANT le parallèle horizontal.`,
-
-    parH: `Parallélisme horizontal :
-• Vue de dessus
-• Décalage gauche / droite uniforme
-• Dernière correction`
-  };
-
-  function updateInfoText(){
-    const key = infoSelect?.value || "principe";
-    if(infoText) infoText.textContent = INFO[key] || INFO.principe;
-  }
-
-  // exposée pour openInfo() global
-  window.__updateInfoText = updateInfoText;
-
-  infoSelect.addEventListener("change", updateInfoText);
-
-  /* ===================== INIT ===================== */
-  showStep(0);
-})();
+/* INIT */
+render();
 </script>
 </body>
 </html>
