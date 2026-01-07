@@ -802,7 +802,7 @@ function isFaultyFoot(footKey, sfCalc){
     drawFoot(topCtx, pumpX+10,         pumpY + pumpH/2 + 2,      fw, fh, false);
     drawFoot(topCtx, pumpX+pumpW-26,   pumpY + pumpH/2 + 2,      fw, fh, false);
 
-    drawLabel(topCtx, "Pompe (fixe)", pumpX + pumpW/2, pumpY - pumpH/2 - 26);
+    drawLabel(topCtx, "Pompe (fixe)", pumpX + pumpW/2, pumpY - pumpH/2 - 35);
 
     const cx = motorX0 + motorW/2;
     const cy = motorY0 + dyPar;
@@ -837,7 +837,7 @@ drawLabel(topCtx, FOOT_LABEL.RR, motorX0+motorW-18, motorY0 + motorH/2 + 26);
     const coupY = motorY0;
     drawCoupling(topCtx, coupX, coupY, 12);
 
-    drawLabel(topCtx, "Moteur (mobile)", motorX0 + motorW/2, motorY0 - motorH/2 - 26);
+    drawLabel(topCtx, "Moteur (mobile)", motorX0 + motorW/2, motorY0 - motorH/2 - 35);
 
     topCtx.restore();
 
