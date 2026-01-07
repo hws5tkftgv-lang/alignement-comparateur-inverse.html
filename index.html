@@ -418,6 +418,89 @@ const ui = {
 };
 
 /* =====================================================
+   MESSAGES DE CORRECTION PÉDAGOGIQUES
+===================================================== */
+function buildCorrectionMessage(){
+  const stepId = STEPS[state.step].id;
+  let msg = "";
+
+  // ---------- PIED BOITEUX ----------
+  if(stepId === "softfoot"){
+    const sf = computeSoftFoot();
+    if(sf.delta <= state.softFootTol){
+      return "✔️ Pied boiteux corrigé — aucune cale requise.";
+    }
+
+    const each = (sf.correction / 2).toFixed(1);
+    msg += "🦶 Pied boiteux détecté\n\n";
+    msg += `➕ Ajouter **+${each} mil** sous les pattes :\n`;
+    msg += `👉 ${sf.faulty.join(" + ")}\n`;
+    msg += "\n⚠️ Toujours corriger en DIAGONALE";
+    return msg;
+  }
+
+  // ---------- ANGULARITÉ VERTICALE ----------
+  if(stepId === "angV"){
+    if(ok(state.angV, state.angVTol)){
+      return "✔️ Angularité verticale conforme.";
+    }
+
+    const r = computeAngularVertical();
+    msg += "📐 Angularité verticale\n\n";
+    msg += `➕ Ajouter des cales sous :\n`;
+    msg += `👉 ${r.pair.join(" + ")}\n`;
+    msg += `(${r.direction})`;
+    return msg;
+  }
+
+  // ---------- PARALLÉLISME VERTICAL ----------
+  if(stepId === "parV"){
+    if(ok(state.parV, state.parVTol)){
+      return "✔️ Parallélisme vertical conforme.";
+    }
+
+    msg += "⬆️ Parallélisme vertical\n\n";
+    msg += "➕ Ajouter des cales sous :\n";
+    msg += "👉 A + B + C + D\n";
+    msg += "(montée uniforme du moteur)";
+    return msg;
+  }
+
+  // ---------- ANGULARITÉ HORIZONTALE ----------
+  if(stepId === "angH"){
+    if(ok(state.angH, state.angHTol)){
+      return "✔️ Angularité horizontale conforme.";
+    }
+
+    const r = computeAngularHorizontal();
+    msg += "↔️ Angularité horizontale\n\n";
+    msg += "➕ Déplacer / caler côté :\n";
+    msg += `👉 ${r.pair.join(" + ")}\n`;
+    msg += `(${r.direction})`;
+    return msg;
+  }
+
+  // ---------- PARALLÉLISME HORIZONTAL ----------
+  if(stepId === "parH"){
+    if(ok(state.parH, state.parHTol)){
+      return "✔️ Parallélisme horizontal conforme.";
+    }
+
+    const r = computeParallelHorizontal();
+    msg += "↔️ Parallélisme horizontal\n\n";
+    msg += "➕ Déplacer le moteur côté :\n";
+    msg += `👉 ${r.pair.join(" + ")}\n`;
+    msg += `(${r.direction})`;
+    return msg;
+  }
+
+  return "";
+}
+
+
+
+
+/* =====================================================
    UI — Inputs par étape (avec IDs)
 ===================================================== */
 function renderInputsForCurrentStep(){
@@ -604,7 +687,8 @@ function refreshUI(){
   ui.stepBadge.classList.toggle("bad", !okNow);
 
   renderInputsForCurrentStep();
-  ui.infoBox.textContent = buildMessage();
+  ui.infoBox.textContent =
+  buildMessage() + "\n\n" + buildCorrectionMessage();
 }
 
 /* =====================================================
