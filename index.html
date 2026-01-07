@@ -460,7 +460,14 @@ On corrige AVANT le parallèle horizontal.`,
       id:"softfoot",
       title:"2) Pied boiteux (soft foot) – 4 pattes",
       desc:"But : les 4 pattes doivent toucher la base. Si une patte “flotte”, tu vas créer des défauts quand tu serres les boulons.",
-      hint:"Règle simple : si la pire patte > Tolérance → ⚠️ à corriger.\nCorrection pratique (débutant) : ajoute environ 80% de la valeur en cales sous la patte fautive, puis re-vérifie.",
+      hint:"Règle simple : si la différence entre les deux diagonales (AC / BD) dépasse la tolérance → ⚠️ à corriger.",
+
+Méthode pédagogique :
+• Comparer les diagonales AC et BD
+• Calculer la différence (Δ)
+• Ajouter environ 80 % de cette différence en cales
+• Répartir les cales sur les 2 pattes de la diagonale fautive
+• Resserrer et re-vérifier
       render(){
         return `
           <div class="row">
@@ -769,8 +776,7 @@ function computeSoftFootCorrection(sf){
     drawFoot(topCtx, pumpX+pumpW-26,   pumpY - pumpH/2 - fh - 2, fw, fh, false);
     drawFoot(topCtx, pumpX+10,         pumpY + pumpH/2 + 2,      fw, fh, false);
     drawFoot(topCtx, pumpX+pumpW-26,   pumpY + pumpH/2 + 2,      fw, fh, false);
-drawFoot(sideCtx, motorX0+16,        motorY0 + motorH/2 + 2, fw, fh, isBad("FL") || isBad("FR"));
-drawFoot(sideCtx, motorX0+motorW-36, motorY0 + motorH/2 + 2, fw, fh, isBad("RL") || isBad("RR"));
+
     drawLabel(topCtx, "Pompe (fixe)", pumpX + pumpW/2, pumpY - pumpH/2 - 14);
 
     const cx = motorX0 + motorW/2;
@@ -785,7 +791,7 @@ drawFoot(sideCtx, motorX0+motorW-36, motorY0 + motorH/2 + 2, fw, fh, isBad("RL")
     topCtx.fillRect(motorX0, motorY0 - motorH/2, motorW, motorH);
 
     topCtx.fillStyle="#0086d6";
-    const isBad = (foot) => sfCalc.shims[foot] > 0;
+    
 
     drawFoot(topCtx, motorX0+10,        motorY0 - motorH/2 - fh - 2, fw, fh, isBad("FL"));
     drawFoot(topCtx, motorX0+motorW-26, motorY0 - motorH/2 - fh - 2, fw, fh, isBad("FR"));
@@ -924,7 +930,7 @@ Object.entries(sfCalc.shims).forEach(([k,v])=>{
     lines.push(`• ${k} ≈ ${v.toFixed(1)} mil`);
   }
 });
-    lines.push("Conseil (débutant) :");
+    
     
 
     return lines.join("\n");
