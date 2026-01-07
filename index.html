@@ -627,9 +627,8 @@ function calculPiedBoiteuxSimple(FL, FR, RL, RR){
 
     // transformations moteur (H)
     const g  = align.gain;
-    const dx = align.parH * g;            // translation latérale
-    const ang = align.angH * 0.0025;      // rotation (pédagogique)
-
+const dy = -align.parH * g;           // + (droite) => vers le HAUT (Y diminue)
+const ang = align.angH * 0.0025; 
     // zones pieds (dessus = 4 pattes)
     const fw=16, fh=8;
 
@@ -653,10 +652,9 @@ function calculPiedBoiteuxSimple(FL, FR, RL, RR){
     const cy = motorY0;
 
     topCtx.save();
-    topCtx.translate(cx + dx, cy);
-    topCtx.rotate(ang);
-    topCtx.translate(-cx, -cy);
-
+topCtx.translate(cx, cy + dy);        // on applique le déplacement en Y
+topCtx.rotate(ang);
+topCtx.translate(-cx, -cy);
     // corps moteur
     topCtx.fillStyle="#00a2ff";
     topCtx.fillRect(motorX0, motorY0 - motorH/2, motorW, motorH);
@@ -704,7 +702,7 @@ function calculPiedBoiteuxSimple(FL, FR, RL, RR){
     topCtx.fillStyle="rgba(255,255,255,.80)";
     topCtx.font="12px Arial";
     topCtx.textAlign="left";
-    topCtx.fillText(`Dessus: angH=${align.angH.toFixed(1)} mil, parH=${align.parH.toFixed(1)} mil (gain=${align.gain})`, 12, H - 12);
+    topCtx.fillText(`Dessus: angH=${align.angH.toFixed(1)} mil, parH=${align.parH.toFixed(1)} mil (déplacement haut/bas)`, 12, H - 12);
   }
 
   // ---------- DRAW SIDE VIEW (profil) ----------
