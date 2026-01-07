@@ -949,7 +949,22 @@ function closeInfo(){
   const btnCloseInfo = el("btnCloseInfo");
   const infoSelect = el("infoSelect");
   const infoText   = el("infoText");
+  document.querySelector(".infoBox")
+  .addEventListener("pointerdown", e => e.stopPropagation());
+  
+function closeInfoModal(e){
+  if (e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
 
+  infoModal.classList.add("hidden");
+  document.body.style.overflow = "";
+
+  if (document.activeElement && document.activeElement.blur) {
+    document.activeElement.blur();
+  }
+}
   const INFO = {
     principe:
 `Ordre obligatoire (le plus important) :
@@ -1004,15 +1019,24 @@ On corrige AVANT le parallèle horizontal.`,
     updateInfoText();
     infoModal.classList.remove("hidden");
   });
-  btnCloseInfo.addEventListener("click", () => {
+  function closeInfoModal(e){
+  if (e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
   infoModal.classList.add("hidden");
   document.body.style.overflow = "";
 
-  // iOS Safari fix (clavier + focus)
+  // iOS Safari fix
   if (document.activeElement && document.activeElement.blur) {
     document.activeElement.blur();
   }
-});
+}
+
+// bouton Fermer → PRIORITÉ tactile
+btnCloseInfo.addEventListener("pointerdown", closeInfoModal);
+btnCloseInfo.addEventListener("touchstart", closeInfoModal);
   infoModal.addEventListener("click", (e) => {
   if (e.target === infoModal) {
     infoModal.classList.add("hidden");
