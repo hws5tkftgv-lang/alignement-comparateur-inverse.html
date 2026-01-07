@@ -715,15 +715,18 @@ function drawPad(letter){
 }
 drawPad("A"); drawPad("B"); drawPad("D"); drawPad("C");
 
-// Lettres PLUS HAUT (au-dessus de chaque patte)
+// --- LETTRES TOP VIEW (zone noire, PAS dans le moteur) ---
 topCtx.fillStyle = "#fff";
 topCtx.font = "14px Arial";
 topCtx.textAlign = "center";
-function drawLetter(letter){
-  const {x,y} = P[letter];
-  topCtx.fillText(letter, x, y-16);         // <- monte la lettre
-}
-drawLetter("A"); drawLetter("B"); drawLetter("D"); drawLetter("C");
+
+// A & B : AU-DESSUS du moteur
+topCtx.fillText("A", P.A.x, P.A.y - 18);
+topCtx.fillText("B", P.B.x, P.B.y - 18);
+
+// C & D : EN DESSOUS du moteur
+topCtx.fillText("D", P.D.x, P.D.y + 28);
+topCtx.fillText("C", P.C.x, P.C.y + 28);
   // pompe
   topCtx.fillStyle="#ff9800";
   topCtx.fillRect(cx+120,cy-40,160,80);
