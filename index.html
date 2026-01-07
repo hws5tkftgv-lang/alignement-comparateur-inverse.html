@@ -597,6 +597,43 @@ On corrige AVANT le parallèle horizontal.`,
     return { foot: entries[0][0], val: entries[0][1] };
   }
 
+function computeSoftFootCorrection(sf){
+  const A = sf.FL;
+  const B = sf.FR;
+  const C = sf.RL;
+  const D = sf.RR;
+
+  const diagAC = A + C;
+  const diagBD = B + D;
+
+  const delta = Math.abs(diagAC - diagBD);
+  const correction = delta * 0.8;
+
+  let result = {
+    diagAC,
+    diagBD,
+    delta,
+    correction,
+    faultyDiagonal: null,
+    shims: { FL:0, FR:0, RL:0, RR:0 }
+  };
+
+  if (diagAC >= diagBD && diagAC > 0){
+    result.faultyDiagonal = "AC";
+    result.shims.FL = correction * (A / diagAC);
+    result.shims.RL = correction * (C / diagAC);
+  } 
+  else if (diagBD > diagAC && diagBD > 0){
+    result.faultyDiagonal = "BD";
+    result.shims.FR = correction * (B / diagBD);
+    result.shims.RR = correction * (D / diagBD);
+  }
+
+  return result;
+}
+
+
+
   function stepOk(idx){
     switch(idx){
       case 0: return Math.abs(align.runout) <= align.runoutTol;
@@ -697,6 +734,7 @@ On corrige AVANT le parallèle horizontal.`,
   }
 
   function drawTopView(){
+    const sfCalc = computeSoftFootCorrection(align.sf);
     const { W, H } = resizeCanvas(topCanvas, topCtx);
     clear(topCtx, W, H);
     drawGrid(topCtx, W, H);
@@ -720,8 +758,7 @@ On corrige AVANT le parallèle horizontal.`,
     const dyPar = -(align.parH * g);
     const ang = (align.angH * 0.0025);
 
-    const worst = worstSoftFoot();
-    const badFoot = worst.foot;
+    
 
     topCtx.fillStyle="#ff9800";
     topCtx.fillRect(pumpX, pumpY - pumpH/2, pumpW, pumpH);
@@ -747,7 +784,7 @@ On corrige AVANT le parallèle horizontal.`,
     topCtx.fillRect(motorX0, motorY0 - motorH/2, motorW, motorH);
 
     topCtx.fillStyle="#0086d6";
-    const isBad = (f) => (f === badFoot) && (worst.val > align.sfTol);
+    const isBad = (foot) => sfCalc.shims[foot] > 0;
 
     drawFoot(topCtx, motorX0+10,        motorY0 - motorH/2 - fh - 2, fw, fh, isBad("FL"));
     drawFoot(topCtx, motorX0+motorW-26, motorY0 - motorH/2 - fh - 2, fw, fh, isBad("FR"));
@@ -776,6 +813,7 @@ On corrige AVANT le parallèle horizontal.`,
   }
 
   function drawSideView(){
+    const sfCalc = computeSoftFootCorrection(align.sf);
     const { W, H } = resizeCanvas(sideCanvas, sideCtx);
     clear(sideCtx, W, H);
     drawGrid(sideCtx, W, H);
@@ -799,8 +837,7 @@ On corrige AVANT le parallèle horizontal.`,
     const dyPar = -(align.parV * g);
     const ang = -(align.angV * 0.0025);
 
-    const worst = worstSoftFoot();
-    const badFoot = worst.foot;
+    
     const sfDrop = (worst.val > align.sfTol) ? (worst.val * g * 0.28) : 0;
 
     sideCtx.fillStyle="#ff9800";
@@ -856,8 +893,8 @@ On corrige AVANT le parallèle horizontal.`,
   /* ===================== KPI (texte simple) ===================== */
   function buildKpi(){
     const ok = stepOk(stepIndex);
-    const worst = worstSoftFoot();
-
+    
+    const sfCalc = computeSoftFootCorrection(align.sf);
     const lines = [];
     lines.push(`Étape actuelle : ${STEPS[stepIndex].title}`);
     lines.push(ok ? `État : OK (dans la tolérance)` : `⚠️ État : À corriger (hors tolérance)`);
@@ -865,14 +902,24 @@ On corrige AVANT le parallèle horizontal.`,
 
     lines.push("Résumé (simple) :");
     lines.push(`1 Voilage : ${align.runout.toFixed(1)} / tol ${align.runoutTol.toFixed(1)} mil`);
-    lines.push(`2 Soft foot (pire patte ${worst.foot}) : ${worst.val.toFixed(1)} / tol ${align.sfTol.toFixed(1)} mil`);
+    lines.push(`2 Soft foot :`);
+lines.push(`   Diag AC = ${(sfCalc.diagAC).toFixed(1)} mil`);
+lines.push(`   Diag BD = ${(sfCalc.diagBD).toFixed(1)} mil`);
+lines.push(`   Δ = ${sfCalc.delta.toFixed(1)} mil`);
+lines.push(`   80 % → ${sfCalc.correction.toFixed(1)} mil`);
+lines.push(`   Diagonale fautive : ${sfCalc.faultyDiagonal}`);
     lines.push(`3 Ang V : ${align.angV.toFixed(1)} / tol ${align.angVTol.toFixed(1)} mil`);
     lines.push(`4 Par V : ${align.parV.toFixed(1)} / tol ${align.parVTol.toFixed(1)} mil`);
     lines.push(`5 Ang H : ${align.angH.toFixed(1)} / tol ${align.angHTol.toFixed(1)} mil`);
     lines.push(`6 Par H : ${align.parH.toFixed(1)} / tol ${align.parHTol.toFixed(1)} mil`);
     lines.push("");
 
-    const shim80 = worst.val * 0.8;
+    lines.push("Répartition des cales :");
+Object.entries(sfCalc.shims).forEach(([k,v])=>{
+  if(v > 0){
+    lines.push(`• ${k} ≈ ${v.toFixed(1)} mil`);
+  }
+});
     lines.push("Conseil (débutant) :");
     lines.push(`• Soft foot : essayer ~80% → ajouter ~${shim80.toFixed(1)} mil de cales sous la patte ${worst.foot}, puis re-vérifier.`);
 
