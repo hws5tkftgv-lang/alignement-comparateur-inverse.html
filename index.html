@@ -234,6 +234,7 @@ Les pattes A / B / C / D seront affichées ici.
 
 <script>
 "use strict";
+let currentView = "top"; // "top" | "side"
 
 /* =====================================================
    ÉTAT GLOBAL (mils)
@@ -644,9 +645,9 @@ function clear(ctx,w,h){
 function footColor(letter){
   const step = STEPS[state.step].id;
 
-  if(step === "softfoot"){
-    const sf = computeSoftFoot();
-    if(sf.faulty && sf.faulty.includes(letter)) return "#ff5252";
+  // ❌ Soft foot : JAMAIS en Side View
+  if(step === "softfoot" && currentView === "side"){
+    return "#00a2ff";
   }
 
   if(step === "angV"){
@@ -684,6 +685,7 @@ function drawFoot(ctx,x,y,label){
    TOP VIEW
 ===================================================== */
 function drawTopView(){
+  currentView = "top";
   const {w,h} = resizeCanvas(topCanvas,topCtx);
   clear(topCtx,w,h);
 
@@ -763,6 +765,7 @@ if(STEPS[state.step].id === "softfoot"){
    SIDE VIEW
 ===================================================== */
 function drawSideView(){
+  currentView = "side";
   const {w,h} = resizeCanvas(sideCanvas,sideCtx);
   clear(sideCtx,w,h);
 
@@ -774,9 +777,9 @@ function drawSideView(){
   sideCtx.fillRect(cx-80,cy-30,160,60);
 
   // pattes
-  drawFoot(sideCtx,cx-70,cy+40,"A");
+  
   drawFoot(sideCtx,cx+70,cy+40,"D");
-  drawFoot(sideCtx,cx-70,cy-40,"B");
+  
   drawFoot(sideCtx,cx+70,cy-40,"C");
 
   // pompe
