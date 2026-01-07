@@ -238,7 +238,10 @@ let currentView = "top"; // "top" | "side"
 let blinkPhase = true;
 setInterval(() => {
   blinkPhase = !blinkPhase;
-  renderAll();
+
+  // ⚠️ JAMAIS toucher à l’UI ici
+  drawTopView();
+  drawSideView();
 }, 600);
 
 /* =====================================================
