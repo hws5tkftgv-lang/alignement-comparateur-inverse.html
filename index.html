@@ -201,7 +201,11 @@ canvas{
 
 <div id="orderWarning" class="warning" style="display:none"></div>
 
-<canvas id="view"></canvas>
+<h3>Vue de dessus (horizontal)</h3>
+<canvas id="topView"></canvas>
+
+<h3>Vue de profil (vertical)</h3>
+<canvas id="sideView"></canvas>
 
 </div>
 </div>
@@ -258,29 +262,88 @@ function render(){
     warn.style.display="none";
   }
 
-  draw();
+  drawTopView();
+drawSideView();
 }
 
-function draw(){
-  const c=$("view"),ctx=c.getContext("2d");
-  c.width=c.clientWidth;
-  c.height=c.clientHeight;
+function drawTopView(){
+  const c = $("topView");
+  const ctx = c.getContext("2d");
+  c.width = c.clientWidth;
+  c.height = 220;
+
   ctx.clearRect(0,0,c.width,c.height);
 
+  const y = c.height/2;
+  const gain = 15;
+
+  // moteur (mobile)
+  const dx = parH.value * gain;
+  const ang = angH.value * 0.01;
+
+  ctx.save();
+  ctx.translate(120 + dx, y);
+  ctx.rotate(ang);
+
   ctx.fillStyle="#00a2ff";
-  ctx.fillRect(60,100,120,40);
+  ctx.fillRect(-60,-20,120,40);
+  ctx.restore();
 
+  // pompe (fixe)
   ctx.fillStyle="#ff9800";
-  ctx.fillRect(240,100,120,40);
+  ctx.fillRect(260,y-20,120,40);
 
+  // arbre
   ctx.strokeStyle="#fff";
   ctx.lineWidth=3;
   ctx.beginPath();
-  ctx.moveTo(180,120);
-  ctx.lineTo(240,120);
+  ctx.moveTo(180 + dx,y);
+  ctx.lineTo(260,y);
   ctx.stroke();
 }
+function drawSideView(){
+  const c = $("sideView");
+  const ctx = c.getContext("2d");
+  c.width = c.clientWidth;
+  c.height = 220;
 
+  ctx.clearRect(0,0,c.width,c.height);
+
+  const xMotor = 120;
+  const xPump  = 260;
+  const gain = 15;
+
+  // moteur vertical
+  const dy = -parV.value * gain;
+  const ang = -angV.value * 0.01;
+
+  ctx.save();
+  ctx.translate(xMotor,110 + dy);
+  ctx.rotate(ang);
+
+  ctx.fillStyle="#00a2ff";
+  ctx.fillRect(-60,-20,120,40);
+  ctx.restore();
+
+  // pompe
+  ctx.fillStyle="#ff9800";
+  ctx.fillRect(xPump-60,90,120,40);
+
+  // arbre
+  ctx.strokeStyle="#fff";
+  ctx.lineWidth=3;
+  ctx.beginPath();
+  ctx.moveTo(xMotor+60,110+dy);
+  ctx.lineTo(xPump-60,110);
+  ctx.stroke();
+
+  // pied boiteux (patte la plus mauvaise)
+  const sf = worstSoftFoot();
+  if(sf > sfTol.value){
+    ctx.fillStyle="#ff5252";
+    ctx.fillRect(xMotor-40,130 + sf*gain*0.3,20,8);
+  }
+}
 document.querySelectorAll("input").forEach(i=>{
   i.addEventListener("input",render);
 });
