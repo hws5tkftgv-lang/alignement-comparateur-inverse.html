@@ -175,13 +175,6 @@ canvas{ width:100%; height:260px; display:block; background:#000; }
   justify-content:center;
   padding:12px;
 }
-.infoModal{
-  pointer-events:auto;
-}
-
-.infoBox{
-  pointer-events:auto;
-}
 .infoBox{
   width:min(92vw,560px);
   max-height:88vh;
@@ -209,8 +202,10 @@ canvas{ width:100%; height:260px; display:block; background:#000; }
 <body>
   <div class="headerBar">
     Alignement (mils) – Comparateur inversé
-    <button id="infoBtn" class="infoBtn" aria-label="Infos">ℹ️</button>
+    <!-- IMPORTANT iOS: onclick inline -->
+    <button id="infoBtn" class="infoBtn" aria-label="Infos" type="button" onclick="openInfo()">ℹ️</button>
   </div>
+
   <div class="sub">
     Objectif : apprendre l’ordre logique. On affiche seulement “⚠️ À corriger” quand ça dépasse la tolérance.
   </div>
@@ -288,8 +283,8 @@ canvas{ width:100%; height:260px; display:block; background:#000; }
   </div>
 
   <!-- ===== INFOS ===== -->
-  <div id="infoModal" class="infoModal hidden">
-    
+  <!-- IMPORTANT iOS: onclick backdrop + onclick fermer -->
+  <div id="infoModal" class="infoModal hidden" onclick="forceCloseInfoBackdrop(event)">
     <div class="infoBox">
       <h3>ℹ️ Aide (niveau débutant)</h3>
 
@@ -308,13 +303,60 @@ canvas{ width:100%; height:260px; display:block; background:#000; }
         </div>
         <div>
           <label>Fermer</label>
-        <button class="secondary" type="button" onclick="forceCloseInfo()">Fermer</button>
+          <!-- IMPORTANT iOS: onclick inline -->
+          <button class="secondary" type="button" onclick="forceCloseInfo()">Fermer</button>
         </div>
       </div>
 
       <div class="infoScroll" id="infoText"></div>
     </div>
   </div>
+
+<script>
+/* =========================================================
+   MODAL iOS SAFARI (GLOBAL + ONCLICK INLINE + REPAINT)
+   ========================================================= */
+function openInfo(){
+  const m = document.getElementById("infoModal");
+  const sel = document.getElementById("infoSelect");
+  const txt = document.getElementById("infoText");
+  if(!m || !sel || !txt) return;
+
+  // met le bon texte
+  if(typeof window.__updateInfoText === "function"){
+    window.__updateInfoText();
+  }
+
+  m.classList.remove("hidden");
+  document.body.style.overflow = "hidden";
+}
+
+function forceCloseInfo(){
+  const m = document.getElementById("infoModal");
+  if(!m) return;
+
+  // 1) blur focus (select clavier)
+  if (document.activeElement && document.activeElement.blur) {
+    document.activeElement.blur();
+  }
+
+  // 2) fermeture forcée + repaint iOS
+  m.style.display = "none";
+  void m.offsetHeight; // repaint
+  m.style.display = "";
+
+  // 3) état final
+  m.classList.add("hidden");
+  document.body.style.overflow = "";
+}
+
+function forceCloseInfoBackdrop(e){
+  // ferme seulement si on clique le fond, pas la boîte
+  if(e && e.target && e.target.id === "infoModal"){
+    forceCloseInfo();
+  }
+}
+</script>
 
 <script>
 (() => {
@@ -516,27 +558,6 @@ canvas{ width:100%; height:260px; display:block; background:#000; }
     return isNum(v) ? v : fallback;
   }
 
-
-function forceCloseInfo(){
-  const m = document.getElementById("infoModal");
-  if(!m) return;
-
-  // fermeture brutale (iOS safe)
-  m.style.display = "none";
-  m.offsetHeight; // force repaint
-  m.style.display = "";
-
-  m.classList.add("hidden");
-  document.body.style.overflow = "";
-
-  if (document.activeElement && document.activeElement.blur) {
-    document.activeElement.blur();
-  }
-}
-
-
-
-
   function setBadge(kind, txt){
     stepBadge.classList.remove("ok","bad","warn");
     stepBadge.classList.add(kind);
@@ -544,7 +565,7 @@ function forceCloseInfo(){
   }
 
   function worstSoftFoot(){
-    const entries = Object.entries(align.sf); // [ ["FL",val], ... ]
+    const entries = Object.entries(align.sf);
     entries.sort((a,b)=>b[1]-a[1]);
     return { foot: entries[0][0], val: entries[0][1] };
   }
@@ -566,7 +587,6 @@ function forceCloseInfo(){
   }
 
   function syncStepInputs(){
-    // step-specific
     const id = STEPS[stepIndex].id;
 
     if(id==="runout"){
@@ -654,8 +674,7 @@ function forceCloseInfo(){
     clear(topCtx, W, H);
     drawGrid(topCtx, W, H);
 
-    // IMPORTANT : en vue de dessus, on montre "gauche/droite" en HAUT/BAS (plus clair)
-    const baseY = H * 0.58;           // ligne de référence (pompe fixe)
+    const baseY = H * 0.58;
     const baseX = 34;
     const unitLen = Math.min(165, (W - 110) * 0.46);
     const gap = Math.min(96,  (W - 110) * 0.20);
@@ -663,35 +682,25 @@ function forceCloseInfo(){
     const motorW = unitLen, motorH = 44;
     const pumpW  = unitLen, pumpH  = 44;
 
-    // positions fixes pompe
     const pumpX = baseX + unitLen + gap;
     const pumpY = baseY;
 
-    // moteur de base
     const motorX0 = baseX;
     const motorY0 = baseY;
 
-    // gains / défauts
     const g = align.gain;
 
-    // Parallèle horizontal = déplacement latéral → sur l’écran : dy (haut/bas)
     const dyPar = -(align.parH * g);
-
-    // Angularité horizontale = rotation (avant/arrière) → petit angle pédagogique
     const ang = (align.angH * 0.0025);
 
-    // soft foot worst
     const worst = worstSoftFoot();
-    const badFoot = worst.val > align.sfTol ? worst.foot : worst.foot; // on affiche toujours la pire, et rouge si hors tol
+    const badFoot = worst.foot;
 
-    // ===== Pompe (fixe) =====
     topCtx.fillStyle="#ff9800";
     topCtx.fillRect(pumpX, pumpY - pumpH/2, pumpW, pumpH);
 
-    // pieds pompe (juste décor)
     topCtx.fillStyle="#d98200";
     const fw=16, fh=8;
-    // (on ne met pas rouge sur la pompe, seulement sur le moteur)
     drawFoot(topCtx, pumpX+10,         pumpY - pumpH/2 - fh - 2, fw, fh, false);
     drawFoot(topCtx, pumpX+pumpW-26,   pumpY - pumpH/2 - fh - 2, fw, fh, false);
     drawFoot(topCtx, pumpX+10,         pumpY + pumpH/2 + 2,      fw, fh, false);
@@ -699,33 +708,25 @@ function forceCloseInfo(){
 
     drawLabel(topCtx, "Pompe (fixe)", pumpX + pumpW/2, pumpY - pumpH/2 - 14);
 
-    // ===== Moteur (mobile) =====
     const cx = motorX0 + motorW/2;
     const cy = motorY0 + dyPar;
 
     topCtx.save();
     topCtx.translate(cx, cy);
     topCtx.rotate(ang);
-    topCtx.translate(-cx, -(motorY0)); // revenir au repère
+    topCtx.translate(-cx, -(motorY0));
 
-    // corps moteur
     topCtx.fillStyle="#00a2ff";
     topCtx.fillRect(motorX0, motorY0 - motorH/2, motorW, motorH);
 
-    // pattes moteur (4)
     topCtx.fillStyle="#0086d6";
     const isBad = (f) => (f === badFoot) && (worst.val > align.sfTol);
 
-    // FL (AV-G) = coin haut-gauche
     drawFoot(topCtx, motorX0+10,        motorY0 - motorH/2 - fh - 2, fw, fh, isBad("FL"));
-    // FR (AV-D) = coin haut-droit
     drawFoot(topCtx, motorX0+motorW-26, motorY0 - motorH/2 - fh - 2, fw, fh, isBad("FR"));
-    // RL (AR-G) = coin bas-gauche
     drawFoot(topCtx, motorX0+10,        motorY0 + motorH/2 + 2,      fw, fh, isBad("RL"));
-    // RR (AR-D) = coin bas-droit
     drawFoot(topCtx, motorX0+motorW-26, motorY0 + motorH/2 + 2,      fw, fh, isBad("RR"));
 
-    // arbres + espace accouplement
     topCtx.strokeStyle="rgba(255,255,255,.55)";
     topCtx.lineWidth=3;
     topCtx.beginPath();
@@ -737,12 +738,10 @@ function forceCloseInfo(){
     const coupY = motorY0;
     drawCoupling(topCtx, coupX, coupY, 12);
 
-    // label moteur
     drawLabel(topCtx, "Moteur (mobile)", motorX0 + motorW/2, motorY0 - motorH/2 - 14);
 
     topCtx.restore();
 
-    // note
     topCtx.fillStyle="rgba(255,255,255,.80)";
     topCtx.font="12px Arial";
     topCtx.textAlign="left";
@@ -770,53 +769,41 @@ function forceCloseInfo(){
 
     const g = align.gain;
 
-    // Parallèle vertical = dy (haut/bas)
     const dyPar = -(align.parV * g);
-
-    // Angularité verticale = rotation (avant/arrière)
     const ang = -(align.angV * 0.0025);
 
-    // soft foot worst (pour montrer une patte plus basse)
     const worst = worstSoftFoot();
     const badFoot = worst.foot;
     const sfDrop = (worst.val > align.sfTol) ? (worst.val * g * 0.28) : 0;
 
-    // pompe fixe
     sideCtx.fillStyle="#ff9800";
     sideCtx.fillRect(pumpX, pumpY - pumpH/2, pumpW, pumpH);
 
     sideCtx.fillStyle="#d98200";
     const fw=20, fh=10;
-    // 2 pattes visibles (avant / arrière)
     drawFoot(sideCtx, pumpX+16,        pumpY + pumpH/2 + 2, fw, fh, false);
     drawFoot(sideCtx, pumpX+pumpW-36,  pumpY + pumpH/2 + 2, fw, fh, false);
 
     drawLabel(sideCtx, "Pompe (fixe)", pumpX + pumpW/2, pumpY - pumpH/2 - 14);
 
-    // moteur (transformé)
     const cx = motorX0 + motorW/2;
     const cy = motorY0 + dyPar;
 
     sideCtx.save();
     sideCtx.translate(cx, cy);
     sideCtx.rotate(ang);
-    sideCtx.translate(-cx, -(motorY0)); // repère
+    sideCtx.translate(-cx, -(motorY0));
 
     sideCtx.fillStyle="#00a2ff";
     sideCtx.fillRect(motorX0, motorY0 - motorH/2, motorW, motorH);
 
-    // pattes moteur (2 visibles)
-    // si la patte fautive est FL/FR => "avant" ; RL/RR => "arrière"
     const frontDrop = (badFoot==="FL" || badFoot==="FR") ? sfDrop : 0;
     const rearDrop  = (badFoot==="RL" || badFoot==="RR") ? sfDrop : 0;
 
     sideCtx.fillStyle="#0086d6";
-    // avant
     drawFoot(sideCtx, motorX0+16,        motorY0 + motorH/2 + 2 + frontDrop, fw, fh, sfDrop>0 && frontDrop>0);
-    // arrière
     drawFoot(sideCtx, motorX0+motorW-36, motorY0 + motorH/2 + 2 + rearDrop,  fw, fh, sfDrop>0 && rearDrop>0);
 
-    // arbres + accouplement
     sideCtx.strokeStyle="rgba(255,255,255,.55)";
     sideCtx.lineWidth=3;
     sideCtx.beginPath();
@@ -832,7 +819,6 @@ function forceCloseInfo(){
 
     sideCtx.restore();
 
-    // note
     sideCtx.fillStyle="rgba(255,255,255,.80)";
     sideCtx.font="12px Arial";
     sideCtx.textAlign="left";
@@ -850,7 +836,6 @@ function forceCloseInfo(){
     lines.push(ok ? `État : OK (dans la tolérance)` : `⚠️ État : À corriger (hors tolérance)`);
     lines.push("");
 
-    // mini résumé global (sans “gros maths”)
     lines.push("Résumé (simple) :");
     lines.push(`1 Voilage : ${align.runout.toFixed(1)} / tol ${align.runoutTol.toFixed(1)} mil`);
     lines.push(`2 Soft foot (pire patte ${worst.foot}) : ${worst.val.toFixed(1)} / tol ${align.sfTol.toFixed(1)} mil`);
@@ -860,7 +845,6 @@ function forceCloseInfo(){
     lines.push(`6 Par H : ${align.parH.toFixed(1)} / tol ${align.parHTol.toFixed(1)} mil`);
     lines.push("");
 
-    // conseils soft foot très débutant
     const shim80 = worst.val * 0.8;
     lines.push("Conseil (débutant) :");
     lines.push(`• Soft foot : essayer ~80% → ajouter ~${shim80.toFixed(1)} mil de cales sous la patte ${worst.foot}, puis re-vérifier.`);
@@ -896,10 +880,8 @@ function forceCloseInfo(){
 
   /* ===================== LOGIQUE “ordre obligatoire” ===================== */
   function goNext(){
-    // On impose l’ordre : si étape actuelle pas OK → on reste ici et on affiche ⚠️
-    // (tu voulais logique + obligatoire)
     if(!stepOk(stepIndex)){
-      renderAll(); // met badge rouge + KPI
+      renderAll();
       return;
     }
     if(stepIndex < STEPS.length-1){
@@ -948,13 +930,9 @@ function forceCloseInfo(){
   window.addEventListener("resize", renderAll);
   if(window.visualViewport) window.visualViewport.addEventListener("resize", renderAll);
 
-    /* ===================== INFO MODAL (iOS FIX) ===================== */
-  const infoModal    = el("infoModal");
-  const infoBtn      = el("infoBtn");
-  const btnCloseInfo = el("btnCloseInfo");
+  /* ===================== INFO CONTENT ===================== */
   const infoSelect   = el("infoSelect");
   const infoText     = el("infoText");
-  const infoBox      = document.querySelector(".infoBox");
 
   const INFO = {
     principe: `Ordre obligatoire d’alignement :
@@ -1009,32 +987,15 @@ On corrige AVANT le parallèle horizontal.`,
   };
 
   function updateInfoText(){
-    const key = infoSelect.value || "principe";
-    infoText.textContent = INFO[key] || INFO.principe;
+    const key = infoSelect?.value || "principe";
+    if(infoText) infoText.textContent = INFO[key] || INFO.principe;
   }
 
-  function openInfo(){
-    updateInfoText();
-    infoModal.classList.remove("hidden");
-    document.body.style.overflow = "hidden";   // bloque le scroll derrière (iOS)
-  }
+  // exposée pour openInfo() global
+  window.__updateInfoText = updateInfoText;
 
-  function closeInfo(){
-    infoModal.classList.add("hidden");
-    document.body.style.overflow = "";
-
-    // iOS: enlève le focus clavier / select
-    if (document.activeElement && document.activeElement.blur) {
-      document.activeElement.blur();
-    }
-  }
-
-  // OUVRIR
-  infoBtn.addEventListener("click", openInfo);
-
-  
-  // Changement du sujet
   infoSelect.addEventListener("change", updateInfoText);
+
   /* ===================== INIT ===================== */
   showStep(0);
 })();
