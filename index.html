@@ -710,8 +710,12 @@ const P = {
 // Dessiner les petites pattes (rectangles)
 function drawPad(letter){
   const {x,y} = P[letter];
-  topCtx.fillStyle = footColor(letter);     // rouge si correction, sinon bleu
-  topCtx.fillRect(x-12, y-6, 24, 12);       // petite patte visible
+
+  // Décalage visuel : pattes sous le moteur pour C & D
+  const offsetY = (letter === "C" || letter === "D") ? 10 : -10;
+
+  topCtx.fillStyle = footColor(letter);
+  topCtx.fillRect(x-12, y + offsetY - 6, 24, 12);
 }
 drawPad("A"); drawPad("B"); drawPad("D"); drawPad("C");
 
