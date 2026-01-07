@@ -591,11 +591,7 @@ On corrige AVANT le parallèle horizontal.`,
     stepBadge.textContent = txt;
   }
 
-  function worstSoftFoot(){
-    const entries = Object.entries(align.sf);
-    entries.sort((a,b)=>b[1]-a[1]);
-    return { foot: entries[0][0], val: entries[0][1] };
-  }
+  
 
 function computeSoftFootCorrection(sf){
   const A = sf.FL;
@@ -637,7 +633,10 @@ function computeSoftFootCorrection(sf){
   function stepOk(idx){
     switch(idx){
       case 0: return Math.abs(align.runout) <= align.runoutTol;
-      case 1: return worstSoftFoot().val <= align.sfTol;
+      case 1: {
+  const sfCalc = computeSoftFootCorrection(align.sf);
+  return sfCalc.delta <= align.sfTol;
+}
       case 2: return Math.abs(align.angV) <= align.angVTol;
       case 3: return Math.abs(align.parV) <= align.parVTol;
       case 4: return Math.abs(align.angH) <= align.angHTol;
@@ -735,6 +734,7 @@ function computeSoftFootCorrection(sf){
 
   function drawTopView(){
     const sfCalc = computeSoftFootCorrection(align.sf);
+    const isBad = (foot) => sfCalc.shims[foot] > 0;
     const { W, H } = resizeCanvas(topCanvas, topCtx);
     clear(topCtx, W, H);
     drawGrid(topCtx, W, H);
@@ -769,7 +769,8 @@ function computeSoftFootCorrection(sf){
     drawFoot(topCtx, pumpX+pumpW-26,   pumpY - pumpH/2 - fh - 2, fw, fh, false);
     drawFoot(topCtx, pumpX+10,         pumpY + pumpH/2 + 2,      fw, fh, false);
     drawFoot(topCtx, pumpX+pumpW-26,   pumpY + pumpH/2 + 2,      fw, fh, false);
-
+drawFoot(sideCtx, motorX0+16,        motorY0 + motorH/2 + 2, fw, fh, isBad("FL") || isBad("FR"));
+drawFoot(sideCtx, motorX0+motorW-36, motorY0 + motorH/2 + 2, fw, fh, isBad("RL") || isBad("RR"));
     drawLabel(topCtx, "Pompe (fixe)", pumpX + pumpW/2, pumpY - pumpH/2 - 14);
 
     const cx = motorX0 + motorW/2;
@@ -838,7 +839,7 @@ function computeSoftFootCorrection(sf){
     const ang = -(align.angV * 0.0025);
 
     
-    const sfDrop = (worst.val > align.sfTol) ? (worst.val * g * 0.28) : 0;
+    
 
     sideCtx.fillStyle="#ff9800";
     sideCtx.fillRect(pumpX, pumpY - pumpH/2, pumpW, pumpH);
@@ -861,12 +862,11 @@ function computeSoftFootCorrection(sf){
     sideCtx.fillStyle="#00a2ff";
     sideCtx.fillRect(motorX0, motorY0 - motorH/2, motorW, motorH);
 
-    const frontDrop = (badFoot==="FL" || badFoot==="FR") ? sfDrop : 0;
-    const rearDrop  = (badFoot==="RL" || badFoot==="RR") ? sfDrop : 0;
+    
 
     sideCtx.fillStyle="#0086d6";
-    drawFoot(sideCtx, motorX0+16,        motorY0 + motorH/2 + 2 + frontDrop, fw, fh, sfDrop>0 && frontDrop>0);
-    drawFoot(sideCtx, motorX0+motorW-36, motorY0 + motorH/2 + 2 + rearDrop,  fw, fh, sfDrop>0 && rearDrop>0);
+    
+    
 
     sideCtx.strokeStyle="rgba(255,255,255,.55)";
     sideCtx.lineWidth=3;
@@ -887,7 +887,7 @@ function computeSoftFootCorrection(sf){
     sideCtx.font="12px Arial";
     sideCtx.textAlign="left";
     sideCtx.fillText(`V: ang=${align.angV.toFixed(1)} mil, par=${align.parV.toFixed(1)} mil`, 10, H-28);
-    sideCtx.fillText(`Soft foot: pire patte ${worst.foot} = ${worst.val.toFixed(1)} mil`, 10, H-12);
+    
   }
 
   /* ===================== KPI (texte simple) ===================== */
@@ -913,6 +913,10 @@ lines.push(`   Diagonale fautive : ${sfCalc.faultyDiagonal}`);
     lines.push(`5 Ang H : ${align.angH.toFixed(1)} / tol ${align.angHTol.toFixed(1)} mil`);
     lines.push(`6 Par H : ${align.parH.toFixed(1)} / tol ${align.parHTol.toFixed(1)} mil`);
     lines.push("");
+lines.push("Conseil (débutant) :");
+lines.push("• Ajouter ~80 % de la différence entre les diagonales");
+lines.push("• Répartir cette valeur sur les 2 pattes de la diagonale fautive");
+lines.push("• Resserrer et re-vérifier le pied boiteux");
 
     lines.push("Répartition des cales :");
 Object.entries(sfCalc.shims).forEach(([k,v])=>{
@@ -921,7 +925,7 @@ Object.entries(sfCalc.shims).forEach(([k,v])=>{
   }
 });
     lines.push("Conseil (débutant) :");
-    lines.push(`• Soft foot : essayer ~80% → ajouter ~${shim80.toFixed(1)} mil de cales sous la patte ${worst.foot}, puis re-vérifier.`);
+    
 
     return lines.join("\n");
   }
