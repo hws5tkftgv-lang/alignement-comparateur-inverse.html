@@ -545,17 +545,24 @@ function calculPiedBoiteux(A, B, C, D){
 
   if(diagAC > diagBD){
     return {
-      diagFautive:"AC",
-      Z,
-      correction80,
-      repartition:{ A:correction80/2, C:correction80/2 }
+  diagFautive:"AC",
+  Z,
+  correction80,
+  lettres:["A","C"],
+  pattes:["FL","RL"],
+  repartition:{ A:correction80/2, C:correction80/2 }
+
     };
   } else {
     return {
-      diagFautive:"BD",
-      Z,
-      correction80,
-      repartition:{ B:correction80/2, D:correction80/2 }
+      return {
+  diagFautive:"AC",
+  Z,
+  correction80,
+  lettres:["A","C"],
+  pattes:["FL","RL"],
+  repartition:{ A:correction80/2, C:correction80/2 }
+
     };
   }
 }
@@ -704,6 +711,14 @@ function calculParalleleHorizontal(TIR){
     }
     return computeWorstSoftFoot();
   }
+  
+  const FOOT_MAP = {
+  A: "FL", // AV-G
+  B: "FR", // AV-D
+  C: "RL", // AR-G
+  D: "RR"  // AR-D
+};
+  
 function updateBadges(){
 
   // ===== BADGES =====
@@ -796,107 +811,140 @@ function updateBadges(){
     ctx.beginPath(); ctx.arc(x,y,r*0.55,0,Math.PI*2); ctx.stroke();
   }
 
-  function drawFoot(ctx, x, y, w, h){
-    ctx.fillRect(x, y, w, h);
-  }
-
+  function drawFoot(ctx, x, y, w, h, highlight=false){
+  ctx.fillStyle = highlight ? "#ff5252" : ctx.fillStyle;
+  ctx.fillRect(x, y, w, h);
+}
   /* ===================== RENDU – VUE DESSUS (HORIZONTAL) ===================== */
   function drawTopView(){
-    const { W, H } = resizeCanvas(topCanvas, topCtx);
-    clear(topCtx, W, H);
-    drawGrid(topCtx, W, H);
+  const { W, H } = resizeCanvas(topCanvas, topCtx);
 
-    // plan
-    const midY = H * 0.55;
-    const baseX = 40;
-    const unitLen = Math.min(150, (W - 120) * 0.45); // longueur machine
-    const gap = Math.min(90, (W - 120) * 0.18);
+  /* ===== FOND ===== */
+  clear(topCtx, W, H);
+  drawGrid(topCtx, W, H);
 
-    // pompe (fixe)
-    const pumpX = baseX + unitLen + gap;
-    const pumpY = midY;
-    const pumpW = unitLen;
-    const pumpH = 42;
+  /* ===== GÉOMÉTRIE GÉNÉRALE ===== */
+  const midY = H * 0.55;
+  const baseX = 40;
+  const unitLen = Math.min(160, (W - 120) * 0.45);
+  const gap = Math.min(90, (W - 120) * 0.18);
 
-    // moteur (mobile) — base position (à gauche)
-    const motorX0 = baseX;
-    const motorY0 = midY;
-    const motorW = unitLen;
-    const motorH = 42;
+  const fw = 16; // largeur patte
+  const fh = 8;  // hauteur patte
+  const g  = align.gain;
 
-    // transform moteur selon parH + angH
-    const g = align.gain;
+  /* ===== CALCUL PIED BOITEUX ===== */
+  const pb = calculPiedBoiteux(
+    align.sf.FL,
+    align.sf.FR,
+    align.sf.RL,
+    align.sf.RR
+  );
 
-    // parH: translation latérale (droite=+)
-    const dx = align.parH * g;
+  const isBad = (p) => pb.pattes && pb.pattes.includes(p);
 
-    // angH: rotation autour centre (petit angle pédagogique)
-    const ang = (align.angH * 0.0025); // radians par mil (tweak pédagogique)
+  /* ===== POMPE (FIXE) ===== */
+  const pumpX = baseX + unitLen + gap;
+  const pumpY = midY;
+  const pumpW = unitLen;
+  const pumpH = 42;
 
-    // dessin pompe
-    topCtx.fillStyle="#ff9800";
-    topCtx.fillRect(pumpX, pumpY - pumpH/2, pumpW, pumpH);
+  topCtx.fillStyle = "#ff9800";
+  topCtx.fillRect(pumpX, pumpY - pumpH/2, pumpW, pumpH);
 
-    // pattes pompe (4)
-    topCtx.fillStyle="#d98200";
-    const fw=16, fh=8;
-    drawFoot(topCtx, pumpX+10,         pumpY - pumpH/2 - fh - 2, fw, fh);
-    drawFoot(topCtx, pumpX+pumpW-26,   pumpY - pumpH/2 - fh - 2, fw, fh);
-    drawFoot(topCtx, pumpX+10,         pumpY + pumpH/2 + 2,      fw, fh);
-    drawFoot(topCtx, pumpX+pumpW-26,   pumpY + pumpH/2 + 2,      fw, fh);
+  topCtx.fillStyle = "#d98200";
+  drawFoot(topCtx, pumpX + 10,         pumpY - pumpH/2 - fh - 2, fw, fh, false);
+  drawFoot(topCtx, pumpX + pumpW - 26, pumpY - pumpH/2 - fh - 2, fw, fh, false);
+  drawFoot(topCtx, pumpX + 10,         pumpY + pumpH/2 + 2,      fw, fh, false);
+  drawFoot(topCtx, pumpX + pumpW - 26, pumpY + pumpH/2 + 2,      fw, fh, false);
 
-    topCtx.fillStyle="#eaf1ff";
-    topCtx.font="12px Arial";
-    topCtx.textAlign="center";
-    topCtx.fillText("Pompe (fixe)", pumpX + pumpW/2, pumpY - pumpH/2 - 16);
+  topCtx.fillStyle = "#eaf1ff";
+  topCtx.font = "12px Arial";
+  topCtx.textAlign = "center";
+  topCtx.fillText("Pompe (fixe)", pumpX + pumpW/2, pumpY - pumpH/2 - 14);
 
-    // dessin moteur avec rotation + translation (autour son centre)
-    const cx = motorX0 + motorW/2;
-    const cy = motorY0;
+  /* ===== MOTEUR (MOBILE) ===== */
+  const motorX0 = baseX;
+  const motorY0 = midY;
+  const motorW  = unitLen;
+  const motorH  = 42;
 
-    topCtx.save();
-    topCtx.translate(cx + dx, cy);
-    topCtx.rotate(ang);
-    topCtx.translate(-cx, -cy);
+  const dx  = align.parH * g;
+  const ang = align.angH * 0.0025; // rad/mil (exagéré pédagogique)
 
-    // corps moteur
-    topCtx.fillStyle="#00a2ff";
-    topCtx.fillRect(motorX0, motorY0 - motorH/2, motorW, motorH);
+  const cx = motorX0 + motorW/2;
+  const cy = motorY0;
 
-    // pattes moteur (4)
-    topCtx.fillStyle="#0086d6";
-    drawFoot(topCtx, motorX0+10,        motorY0 - motorH/2 - fh - 2, fw, fh);
-    drawFoot(topCtx, motorX0+motorW-26, motorY0 - motorH/2 - fh - 2, fw, fh);
-    drawFoot(topCtx, motorX0+10,        motorY0 + motorH/2 + 2,      fw, fh);
-    drawFoot(topCtx, motorX0+motorW-26, motorY0 + motorH/2 + 2,      fw, fh);
+  topCtx.save();
+  topCtx.translate(cx + dx, cy);
+  topCtx.rotate(ang);
+  topCtx.translate(-cx, -cy);
 
-    topCtx.fillStyle="#eaf1ff";
-    topCtx.font="12px Arial";
-    topCtx.textAlign="center";
-    topCtx.fillText("Moteur (mobile)", motorX0 + motorW/2, motorY0 - motorH/2 - 16);
+  // corps moteur
+  topCtx.fillStyle = "#00a2ff";
+  topCtx.fillRect(motorX0, motorY0 - motorH/2, motorW, motorH);
 
-    // arbre moteur (ligne)
-    topCtx.strokeStyle="rgba(255,255,255,.55)";
-    topCtx.lineWidth=3;
-    topCtx.beginPath();
-    topCtx.moveTo(motorX0+motorW, motorY0);
-    topCtx.lineTo(pumpX, pumpY);
-    topCtx.stroke();
+  // pattes moteur AV-G / AV-D / AR-G / AR-D
+  drawFoot(
+    topCtx,
+    motorX0 + 10,
+    motorY0 - motorH/2 - fh - 2,
+    fw, fh,
+    isBad("FL")
+  );
 
-    // accouplement au milieu du gap
-    const coupX = motorX0 + motorW + gap/2;
-    const coupY = motorY0;
-    drawCoupling(topCtx, coupX, coupY, 12);
+  drawFoot(
+    topCtx,
+    motorX0 + motorW - 26,
+    motorY0 - motorH/2 - fh - 2,
+    fw, fh,
+    isBad("FR")
+  );
 
-    topCtx.restore();
+  drawFoot(
+    topCtx,
+    motorX0 + 10,
+    motorY0 + motorH/2 + 2,
+    fw, fh,
+    isBad("RL")
+  );
 
-    // note bas
-    topCtx.fillStyle="rgba(255,255,255,.75)";
-    topCtx.font="12px Arial";
-    topCtx.textAlign="left";
-    topCtx.fillText(`parH=${align.parH.toFixed(1)} mil, angH=${align.angH.toFixed(1)} mil (visuel exagéré)`, 12, H - 12);
-  }
+  drawFoot(
+    topCtx,
+    motorX0 + motorW - 26,
+    motorY0 + motorH/2 + 2,
+    fw, fh,
+    isBad("RR")
+  );
 
+  // arbre moteur → pompe
+  topCtx.strokeStyle = "rgba(255,255,255,.55)";
+  topCtx.lineWidth = 3;
+  topCtx.beginPath();
+  topCtx.moveTo(motorX0 + motorW, motorY0);
+  topCtx.lineTo(pumpX, pumpY);
+  topCtx.stroke();
+
+  // accouplement
+  drawCoupling(
+    topCtx,
+    motorX0 + motorW + gap/2,
+    motorY0,
+    12
+  );
+
+  topCtx.restore();
+
+  /* ===== ANNOTATION ===== */
+  topCtx.fillStyle = "rgba(255,255,255,.8)";
+  topCtx.font = "12px Arial";
+  topCtx.textAlign = "left";
+  topCtx.fillText(
+    `parH = ${align.parH.toFixed(1)} mil   angH = ${align.angH.toFixed(1)} mil (visuel exagéré)`,
+    12,
+    H - 12
+  );
+}
   /* ===================== RENDU – VUE PROFIL (VERTICAL) ===================== */
   function drawSideView(){
     const { W, H } = resizeCanvas(sideCanvas, sideCtx);
