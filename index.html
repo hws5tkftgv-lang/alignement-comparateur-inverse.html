@@ -778,9 +778,14 @@ function drawSideView(){
 
   // pattes
   
-  drawFoot(sideCtx,cx+70,cy+40,"D");
-  
-  drawFoot(sideCtx,cx+70,cy-40,"C");
+  // Pattes visibles en vue de profil (Side View)
+// A et B sont cachées derrière
+
+// D = bas gauche (arrière moteur)
+drawFoot(sideCtx, cx-70, cy+40, "D");
+
+// C = bas droite (côté pompe)
+drawFoot(sideCtx, cx+70, cy+40, "C");
 
   // pompe
   sideCtx.fillStyle="#ff9800";
