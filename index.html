@@ -166,11 +166,15 @@ canvas{ width:100%; height:260px; display:block; background:#000; }
 /* ===== Info modal ===== */
 .hidden{ display:none; }
 .infoModal{
-  position:fixed; inset:0;
+  position:fixed;
+  inset:0;
   background:rgba(0,0,0,.65);
   z-index:9999;
-  display:flex; align-items:center; justify-content:center;
-  padding:14px;
+  display:flex;
+  align-items:flex-end; /* ⬅️ IMPORTANT */
+  justify-content:center;
+  padding:12px;
+}
 }
 .infoBox{
   width:min(92vw,560px);
@@ -279,6 +283,15 @@ canvas{ width:100%; height:260px; display:block; background:#000; }
 
   <!-- ===== INFOS ===== -->
   <div id="infoModal" class="infoModal hidden">
+    <div style="margin-top:12px; text-align:center;">
+  <button
+    type="button"
+    class="secondary"
+    onclick="closeInfo()"
+    style="width:100%; padding:12px; font-size:16px; font-weight:700;">
+    Fermer
+  </button>
+</div>
     <div class="infoBox">
       <h3>ℹ️ Aide (niveau débutant)</h3>
 
@@ -504,6 +517,22 @@ canvas{ width:100%; height:260px; display:block; background:#000; }
     const v = parseFloat(inputEl.value);
     return isNum(v) ? v : fallback;
   }
+
+
+function closeInfo(){
+  const infoModal = document.getElementById("infoModal");
+
+  infoModal.classList.add("hidden");
+
+  // iPhone fix
+  if (document.activeElement) {
+    document.activeElement.blur();
+  }
+
+  document.body.style.overflow = "";
+}
+
+
 
   function setBadge(kind, txt){
     stepBadge.classList.remove("ok","bad","warn");
