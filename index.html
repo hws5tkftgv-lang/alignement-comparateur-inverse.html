@@ -949,66 +949,11 @@ function closeInfo(){
   const btnCloseInfo = el("btnCloseInfo");
   const infoSelect = el("infoSelect");
   const infoText   = el("infoText");
-  document.querySelector(".infoBox")
-  .addEventListener("pointerdown", e => e.stopPropagation());
-  
-function closeInfoModal(e){
-  if (e) {
-    e.preventDefault();
-    e.stopPropagation();
-  }
+  const infoBox = document.querySelector(".infoBox");
+["pointerdown","touchstart","click"].forEach(evt=>{
+  infoBox.addEventListener(evt, (e)=>e.stopPropagation(), { passive:false });
+});
 
-  infoModal.classList.add("hidden");
-  document.body.style.overflow = "";
-
-  if (document.activeElement && document.activeElement.blur) {
-    document.activeElement.blur();
-  }
-}
-  const INFO = {
-    principe:
-`Ordre obligatoire (le plus important) :
-1) Voilage
-2) Pied boiteux (4 pattes)
-3) Angularité verticale
-4) Parallélisme vertical
-5) Angularité horizontale
-6) Parallélisme horizontal
-
-Pourquoi ?
-• Si tu corrige le parallèle AVANT l’angulaire, tu risques de recréer un défaut.
-• Donc : angulaire d’abord, puis parallèle.`,
-    runout:
-`Voilage (runout) :
-• C’est le “faux-rond”.
-• Si c’est trop haut, tes lectures d’alignement vont mentir.
-But : être sous la tolérance avant de continuer.`,
-    softfoot:
-`Pied boiteux (soft foot) :
-• Une patte ne touche pas bien → quand tu serres, le bâti se tord.
-Règle débutant :
-• Corriger ~80% de la valeur avec des cales
-• Resserrer et re-mesurer.`,
-    angV:
-`Angularité verticale :
-• Vue de profil (haut/bas).
-• C’est une inclinaison : l’avant et l’arrière ne sont pas au même niveau.
-On corrige AVANT le parallèle vertical.`,
-    parV:
-`Parallélisme vertical :
-• Vue de profil (haut/bas).
-• C’est un décalage “tout le moteur est trop haut ou trop bas”.
-On corrige APRÈS l’angulaire vertical.`,
-    angH:
-`Angularité horizontale :
-• Vue de dessus (gauche/droite).
-• Dans l’app, gauche/droite est montré par un mouvement haut/bas (plus clair).
-On corrige AVANT le parallèle horizontal.`,
-    parH:
-`Parallélisme horizontal :
-• Vue de dessus.
-• Décalage gauche/droite uniforme (tout le moteur se déplace).`
-  };
 
   function updateInfoText(){
     const key = infoSelect.value || "principe";
@@ -1028,22 +973,20 @@ On corrige AVANT le parallèle horizontal.`,
   infoModal.classList.add("hidden");
   document.body.style.overflow = "";
 
-  // iOS Safari fix
   if (document.activeElement && document.activeElement.blur) {
     document.activeElement.blur();
   }
 }
-
 // bouton Fermer → PRIORITÉ tactile
-btnCloseInfo.addEventListener("pointerdown", closeInfoModal);
-btnCloseInfo.addEventListener("touchstart", closeInfoModal);
-  infoModal.addEventListener("click", (e) => {
-  if (e.target === infoModal) {
-    infoModal.classList.add("hidden");
-    document.body.style.overflow = "";
-  }
+["pointerdown","touchstart","click"].forEach(evt=>{
+  btnCloseInfo.addEventListener(evt, closeInfoModal, { passive:false });
 });
-  infoSelect.addEventListener("change", updateInfoText);
+
+["pointerdown","touchstart","click"].forEach(evt=>{
+  infoModal.addEventListener(evt, (e)=>{
+    if (e.target === infoModal) closeInfoModal(e);
+  }, { passive:false });
+});
 
   /* ===================== INIT ===================== */
   showStep(0);
