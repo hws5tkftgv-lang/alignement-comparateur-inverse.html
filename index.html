@@ -537,7 +537,14 @@ function calculPiedBoiteux(A, B, C, D){
   const diagBD = Math.abs(B - D);
 
   if(diagAC < 0.001 && diagBD < 0.001){
-    return { diagFautive:"AUCUNE", Z:0, correction80:0, repartition:{} };
+    return {
+      diagFautive: "AUCUNE",
+      Z: 0,
+      correction80: 0,
+      lettres: [],
+      pattes: [],
+      repartition: {}
+    };
   }
 
   const Z = Math.abs(diagAC - diagBD);
@@ -545,28 +552,30 @@ function calculPiedBoiteux(A, B, C, D){
 
   if(diagAC > diagBD){
     return {
-  diagFautive:"AC",
-  Z,
-  correction80,
-  lettres:["A","C"],
-  pattes:["FL","RL"],
-  repartition:{ A:correction80/2, C:correction80/2 }
-
+      diagFautive: "AC",
+      Z,
+      correction80,
+      lettres: ["A","C"],
+      pattes: ["FL","RL"],
+      repartition: {
+        A: correction80 / 2,
+        C: correction80 / 2
+      }
     };
   } else {
     return {
-      return {
-  diagFautive:"AC",
-  Z,
-  correction80,
-  lettres:["A","C"],
-  pattes:["FL","RL"],
-  repartition:{ A:correction80/2, C:correction80/2 }
-
+      diagFautive: "BD",
+      Z,
+      correction80,
+      lettres: ["B","D"],
+      pattes: ["FR","RR"],
+      repartition: {
+        B: correction80 / 2,
+        D: correction80 / 2
+      }
     };
   }
 }
-
 function calculAngulariteVerticale(diametre, distance, TIR){
   return (TIR / distance) * diametre;
 }
