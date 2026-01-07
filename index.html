@@ -448,16 +448,16 @@ function renderInputsForCurrentStep(){
         </div>
       </div>
 
-      <div class="row" style="margin-top:8px;">
-        <div>
-          <label>Patte D (bas gauche)</label>
-          <input id="in_sfD" type="number" step="0.1" value="${state.softFoot.D}">
-        </div>
-        <div>
-          <label>Patte C (bas droite)</label>
-          <input id="in_sfC" type="number" step="0.1" value="${state.softFoot.C}">
-        </div>
-      </div>
+   <div class="row" style="margin-top:8px;">
+  <div>
+    <label>Patte C (bas droite)</label>
+    <input id="in_sfC" type="number" step="0.1" value="${state.softFoot.C}">
+  </div>
+  <div>
+    <label>Patte D (bas gauche)</label>
+    <input id="in_sfD" type="number" step="0.1" value="${state.softFoot.D}">
+  </div>
+</div>
 
       <div class="row" style="margin-top:8px;">
         <div>
@@ -799,11 +799,6 @@ function renderAll(){
   drawSideView();
 }
 
-const _refresh = refreshUI;
-refreshUI = function(){
-  _refresh();
-  renderAll();
-};
 
 renderAll();
 </script>
