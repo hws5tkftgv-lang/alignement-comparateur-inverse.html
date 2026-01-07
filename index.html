@@ -517,18 +517,7 @@ canvas{ width:100%; height:260px; display:block; background:#000; }
   }
 
 
-function closeInfo(){
-  const infoModal = document.getElementById("infoModal");
 
-  infoModal.classList.add("hidden");
-
-  // iPhone fix
-  if (document.activeElement) {
-    document.activeElement.blur();
-  }
-
-  document.body.style.overflow = "";
-}
 
 
 
@@ -953,7 +942,57 @@ function closeInfo(){
 ["pointerdown","touchstart","click"].forEach(evt=>{
   infoBox.addEventListener(evt, (e)=>e.stopPropagation(), { passive:false });
 });
+const INFO = {
+  principe: `Ordre obligatoire d’alignement :
 
+1) Voilage
+2) Pied boiteux (4 pattes)
+3) Angularité verticale
+4) Parallélisme vertical
+5) Angularité horizontale
+6) Parallélisme horizontal
+
+Règle clé :
+• Toujours corriger l’angulaire AVANT le parallèle.`,
+
+  runout: `Voilage (runout) :
+• Faux-rond de l’arbre ou de l’accouplement
+• Si trop élevé → mesures fausses
+• Toujours corriger AVANT l’alignement`,
+
+  softfoot: `Pied boiteux :
+• Une patte ne touche pas
+• En serrant → on crée un défaut
+
+Méthode simple :
+• Ajouter ~80 % de la valeur mesurée en cales
+• Resserrer
+• Re-mesurer`,
+
+  angV: `Angularité verticale :
+• Vue de profil
+• Avant ≠ arrière
+• Inclinaison du moteur
+
+On corrige AVANT le parallèle vertical.`,
+
+  parV: `Parallélisme vertical :
+• Vue de profil
+• Tout le moteur est trop haut ou trop bas
+• Se corrige APRÈS l’angulaire vertical`,
+
+  angH: `Angularité horizontale :
+• Vue de dessus
+• Inclinaison gauche / droite
+• Représentée haut / bas à l’écran
+
+On corrige AVANT le parallèle horizontal.`,
+
+  parH: `Parallélisme horizontal :
+• Vue de dessus
+• Décalage gauche / droite uniforme
+• Dernière correction`
+};
 
   function updateInfoText(){
     const key = infoSelect.value || "principe";
