@@ -67,7 +67,6 @@ p{ margin:6px 0 10px; font-size:13px; color:var(--muted); line-height:1.35; }
 }
 .badge.ok{ background:rgba(76,175,80,.15); color:#bff3c1; }
 .badge.bad{ background:rgba(255,82,82,.15); color:#ffc2c2; }
-.badge.warn{ background:rgba(255,179,0,.16); color:#ffe6b0; }
 
 .step{
   border:1px solid rgba(255,255,255,.10);
@@ -94,6 +93,7 @@ input, select{
   border:none;
   outline:none;
 }
+
 .smallNote{
   margin-top:10px;
   padding:10px;
@@ -151,7 +151,6 @@ canvas{ width:100%; height:260px; display:block; background:#000; }
 .dot.bad{ background:#ff5252; }
 
 .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:12px; }
-
 .kpi{
   margin-top:10px;
   padding:10px;
@@ -216,7 +215,6 @@ canvas{ width:100%; height:260px; display:block; background:#000; }
 
           <div id="stepBody"></div>
 
-          <!-- NOTE (ici on mettra les pattes fautives à corriger) -->
           <div class="smallNote" id="stepHint">—</div>
 
           <div class="navRow">
@@ -292,7 +290,7 @@ canvas{ width:100%; height:260px; display:block; background:#000; }
         <div class="legend">
           <div><span class="dot motor"></span>Moteur (mobile)</div>
           <div><span class="dot pump"></span>Pompe (fixe)</div>
-          <div><span class="dot bad"></span>Patte “à corriger” (soft foot)</div>
+          <div><span class="dot bad"></span>Pattes à corriger (soft foot)</div>
         </div>
       </div>
 
@@ -304,15 +302,15 @@ canvas{ width:100%; height:260px; display:block; background:#000; }
   "use strict";
 
   /* ===================== ÉTAT (mils) ===================== */
+  // IMPORTANT: au démarrage, TOUT à 0 sauf les tolérances.
   const align = {
     runout: 0.0,
     runoutTol: 2.0,
 
-    // soft foot (4 pattes) -> valeurs de départ à 0
-    sf: { FL:0.0, FR:0.0, RL:0.0, RR:0.0 },
+    // soft foot (4 pattes) : A,B en haut ; D,C en bas (gauche->droite)
+    sf: { A:0.0, B:0.0, C:0.0, D:0.0 },
     sfTol: 3.0,
 
-    // ordre demandé : 3 angV, 4 parV, 5 angH, 6 parH
     angV: 0.0, angVTol: 1.0,
     parV: 0.0, parVTol: 1.0,
     angH: 0.0, angHTol: 1.0,
@@ -323,6 +321,7 @@ canvas{ width:100%; height:260px; display:block; background:#000; }
 
   const clamp = (v,a,b)=>Math.max(a, Math.min(b, v));
   const isNum = (x)=>Number.isFinite(x);
+  const EPS = 1e-9;
 
   /* ===================== DOM ===================== */
   const el = (id)=>document.getElementById(id);
@@ -346,7 +345,7 @@ canvas{ width:100%; height:260px; display:block; background:#000; }
   const sideCanvas = el("sideView");
   const sideCtx    = sideCanvas.getContext("2d", { alpha:false });
 
-  /* ===================== AIDE (FLOW) ===================== */
+  /* ===================== AIDE (FLOW, PAS MODAL) ===================== */
   const infoBtn    = el("infoBtn");
   const helpToggle = el("helpToggle");
   const helpClose  = el("helpClose");
@@ -372,34 +371,48 @@ Règle clé :
 • Si trop élevé → mesures fausses
 • Toujours corriger AVANT l’alignement`,
 
-    softfoot: `Pied boiteux (méthode diagonales) :
-• Diag AC = A + C
-• Diag BD = B + D
-• Δ = MAX − MIN
-• Ajouter 80 % de Δ en cales
-• Répartir cette valeur sur les 2 pattes de la diagonale MAX (la plus haute)
+    softfoot: `Pied boiteux :
+• Une patte ne touche pas
+• En serrant → on crée un défaut
+
+Repérage (sur le dessin) :
+Haut : A (gauche) – B (droite)
+Bas  : D (gauche) – C (droite)
+
+Diagonales :
+• AC (A + C)
+• BD (B + D)
+
+Méthode :
+• Δ = (diagonale MAX) − (diagonale MIN)
+• Mettre ~80 % de Δ en cales
+• Mettre ces cales SOUS les 2 pattes de la diagonale la plus grande
+• Répartir la valeur entre ces 2 pattes (proportionnel aux lectures)
 • Resserrer et re-vérifier`,
 
     angV: `Angularité verticale :
 • Vue de profil
 • Avant ≠ arrière
 • Inclinaison du moteur
+
 On corrige AVANT le parallèle vertical.`,
 
     parV: `Parallélisme vertical :
 • Vue de profil
-• Tout le moteur monte/descend
-Se corrige APRÈS l’angulaire vertical`,
+• Tout le moteur est trop haut ou trop bas
+• Se corrige APRÈS l’angulaire vertical`,
 
     angH: `Angularité horizontale :
 • Vue de dessus
 • Inclinaison gauche / droite
+• Représentée haut / bas à l’écran
+
 On corrige AVANT le parallèle horizontal.`,
 
     parH: `Parallélisme horizontal :
 • Vue de dessus
 • Décalage gauche / droite uniforme
-Dernière correction`
+• Dernière correction`
   };
 
   function updateHelpText(){
@@ -450,27 +463,35 @@ Dernière correction`
       id:"softfoot",
       title:"2) Pied boiteux (soft foot) – 4 pattes",
       desc:"But : les 4 pattes doivent toucher la base. Si une patte “flotte”, tu vas créer des défauts quand tu serres les boulons.",
-      hint:"—",
+      hint:
+`Règle :
+• Δ = (diagonale MAX) − (diagonale MIN)
+• Mettre ~80 % de Δ sous les 2 pattes de la diagonale la plus grande
+• Répartir la valeur entre ces 2 pattes
+
+Sur les dessins (à cette étape seulement) :
+• Les 2 pattes à caler deviennent rouges
+• La valeur de shim (+x.x mil) apparaît à côté de chaque patte`,
       render(){
         return `
           <div class="row">
             <div>
-              <label>Patte A (Avant gauche)</label>
-              <input id="sfFL" type="number" inputmode="decimal" step="0.1" value="${align.sf.FL}">
+              <label>Patte A (haut gauche)</label>
+              <input id="sfA" type="number" inputmode="decimal" step="0.1" value="${align.sf.A}">
             </div>
             <div>
-              <label>Patte B (Avant droite)</label>
-              <input id="sfFR" type="number" inputmode="decimal" step="0.1" value="${align.sf.FR}">
+              <label>Patte B (haut droite)</label>
+              <input id="sfB" type="number" inputmode="decimal" step="0.1" value="${align.sf.B}">
             </div>
           </div>
           <div class="row" style="margin-top:8px;">
             <div>
-              <label>Patte C (Arrière gauche)</label>
-              <input id="sfRL" type="number" inputmode="decimal" step="0.1" value="${align.sf.RL}">
+              <label>Patte D (bas gauche)</label>
+              <input id="sfD" type="number" inputmode="decimal" step="0.1" value="${align.sf.D}">
             </div>
             <div>
-              <label>Patte D (Arrière droite)</label>
-              <input id="sfRR" type="number" inputmode="decimal" step="0.1" value="${align.sf.RR}">
+              <label>Patte C (bas droite)</label>
+              <input id="sfC" type="number" inputmode="decimal" step="0.1" value="${align.sf.C}">
             </div>
           </div>
           <div class="row" style="margin-top:8px;">
@@ -479,8 +500,8 @@ Dernière correction`
               <input id="sfTol" type="number" inputmode="decimal" step="0.1" value="${align.sfTol}">
             </div>
             <div>
-              <label>Note</label>
-              <input disabled value="Les pattes à corriger seront rouges + shim affiché sur le dessin">
+              <label>Info</label>
+              <input disabled value="Diagonales : AC (A+C) et BD (B+D)">
             </div>
           </div>
         `;
@@ -490,7 +511,7 @@ Dernière correction`
       id:"angV",
       title:"3) Angularité verticale (vue de profil)",
       desc:"But : corriger l’inclinaison (avant vs arrière). On corrige l’angulaire AVANT le parallèle.",
-      hint:"Lecture simple :\n• + = le nez du moteur monte\n• − = le nez du moteur descend\nOn veut revenir proche de 0 (dans la tolérance).",
+      hint:"Lecture simple :\n• + = le nez du moteur monte\n• − = le nez du moteur descend\n\nOn veut revenir proche de 0 (dans la tolérance).",
       render(){
         return `
           <div class="row">
@@ -510,7 +531,7 @@ Dernière correction`
       id:"parV",
       title:"4) Parallélisme vertical (vue de profil)",
       desc:"But : corriger le décalage “tout le moteur monte/descend” (les deux paires de pattes ensemble).",
-      hint:"Lecture simple :\n• + = le moteur est trop haut\n• − = le moteur est trop bas",
+      hint:"Lecture simple :\n• + = le moteur est trop haut (en général)\n• − = le moteur est trop bas",
       render(){
         return `
           <div class="row">
@@ -530,7 +551,7 @@ Dernière correction`
       id:"angH",
       title:"5) Angularité horizontale (vue de dessus)",
       desc:"But : inclinaison gauche/droite (avant vs arrière). On corrige l’angulaire AVANT le parallèle.",
-      hint:"Sur le dessin (vue de dessus) :\n• On représente gauche/droite par un mouvement haut/bas.\n• + = le nez va “à droite” (représenté par un déplacement).",
+      hint:"Sur le dessin (vue de dessus) :\n• On représente gauche/droite par un mouvement HAUT/BAS (plus clair visuellement).\n• + = le nez du moteur va “à droite” (sur l’écran ça bouge).",
       render(){
         return `
           <div class="row">
@@ -550,7 +571,7 @@ Dernière correction`
       id:"parH",
       title:"6) Parallélisme horizontal (vue de dessus)",
       desc:"But : décalage gauche/droite uniforme (tout le moteur se déplace latéralement).",
-      hint:"Sur le dessin (vue de dessus) :\n• + = moteur va “à droite”\n• − = moteur va “à gauche”",
+      hint:"Sur le dessin (vue de dessus) :\n• + = moteur “va à droite”\n• − = moteur “va à gauche”",
       render(){
         return `
           <div class="row">
@@ -576,55 +597,70 @@ Dernière correction`
   }
 
   function setBadge(kind, txt){
-    stepBadge.classList.remove("ok","bad","warn");
+    stepBadge.classList.remove("ok","bad");
     stepBadge.classList.add(kind);
     stepBadge.textContent = txt;
   }
 
-  const FOOT_LABEL = { FL:"A", FR:"B", RL:"C", RR:"D" };
+  // Layout demandé:
+  // Haut : A (gauche) — B (droite)
+  // Bas  : D (gauche) — C (droite)
+  const FOOT = {
+    TL:"A", TR:"B", BL:"D", BR:"C"
+  };
 
-  // EXACT doc : diag MAX -> shims sur ses 2 pattes
-  function computeSoftFoot(sf){
-    const A = sf.FL, B = sf.FR, C = sf.RL, D = sf.RR;
+  function computeSoftFootCorrection(sf){
+    // valeurs (mils) - toujours positives
+    const A = Math.abs(sf.A);
+    const B = Math.abs(sf.B);
+    const C = Math.abs(sf.C);
+    const D = Math.abs(sf.D);
+
     const diagAC = A + C;
     const diagBD = B + D;
 
-    const max = Math.max(diagAC, diagBD);
-    const min = Math.min(diagAC, diagBD);
+    const maxDiag = Math.max(diagAC, diagBD);
+    const minDiag = Math.min(diagAC, diagBD);
 
-    const delta = max - min;
-    const correction = delta * 0.8;
+    const delta = maxDiag - minDiag;     // IMPORTANT: (MAX - MIN) (pas une formule fixe)
+    const correction = delta * 0.8;      // 80 %
 
-    const faultyDiagonal = (diagAC >= diagBD) ? "AC" : "BD";
+    const res = {
+      A,B,C,D,
+      diagAC, diagBD,
+      maxDiag, minDiag,
+      delta, correction,
+      maxName: (diagAC > diagBD + EPS) ? "AC" : (diagBD > diagAC + EPS) ? "BD" : null,
+      shims: { A:0, B:0, C:0, D:0 }
+    };
 
-    let shims = { FL:0, FR:0, RL:0, RR:0 };
-
-    // Répartition proportionnelle (plus pédagogique que 50/50 quand A≠C ou B≠D)
-    if(faultyDiagonal === "AC" && diagAC > 0){
-      shims.FL = correction * (A / diagAC);
-      shims.RL = correction * (C / diagAC);
+    // On met les cales SOUS les 2 pattes de la diagonale la plus grande.
+    // Répartition proportionnelle aux lectures sur cette diagonale.
+    if(res.maxName === "AC" && (diagAC > EPS)){
+      res.shims.A = correction * (A / diagAC);
+      res.shims.C = correction * (C / diagAC);
+    } else if(res.maxName === "BD" && (diagBD > EPS)){
+      res.shims.B = correction * (B / diagBD);
+      res.shims.D = correction * (D / diagBD);
     }
-    if(faultyDiagonal === "BD" && diagBD > 0){
-      shims.FR = correction * (B / diagBD);
-      shims.RR = correction * (D / diagBD);
-    }
 
-    return { diagAC, diagBD, max, min, delta, correction, faultyDiagonal, shims };
+    return res;
   }
 
-  function isSoftFootStep(){ return STEPS[stepIndex].id === "softfoot"; }
-
-  function isFaultyFoot(footKey, sfCalc){
-    if(sfCalc.faultyDiagonal === "AC") return (footKey === "FL" || footKey === "RL");
-    if(sfCalc.faultyDiagonal === "BD") return (footKey === "FR" || footKey === "RR");
-    return false;
+  function softFootFaultyFeet(sfCalc){
+    const out = [];
+    if(sfCalc.shims.A > EPS) out.push("A");
+    if(sfCalc.shims.B > EPS) out.push("B");
+    if(sfCalc.shims.C > EPS) out.push("C");
+    if(sfCalc.shims.D > EPS) out.push("D");
+    return out;
   }
 
   function stepOk(idx){
     switch(idx){
       case 0: return Math.abs(align.runout) <= align.runoutTol;
       case 1: {
-        const sfCalc = computeSoftFoot(align.sf);
+        const sfCalc = computeSoftFootCorrection(align.sf);
         return sfCalc.delta <= align.sfTol;
       }
       case 2: return Math.abs(align.angV) <= align.angVTol;
@@ -648,10 +684,10 @@ Dernière correction`
     }
 
     if(id==="softfoot"){
-      align.sf.FL = Math.abs(readFloat(el("sfFL"), align.sf.FL));
-      align.sf.FR = Math.abs(readFloat(el("sfFR"), align.sf.FR));
-      align.sf.RL = Math.abs(readFloat(el("sfRL"), align.sf.RL));
-      align.sf.RR = Math.abs(readFloat(el("sfRR"), align.sf.RR));
+      align.sf.A = Math.abs(readFloat(el("sfA"), align.sf.A));
+      align.sf.B = Math.abs(readFloat(el("sfB"), align.sf.B));
+      align.sf.C = Math.abs(readFloat(el("sfC"), align.sf.C));
+      align.sf.D = Math.abs(readFloat(el("sfD"), align.sf.D));
       align.sfTol = Math.max(0, readFloat(el("sfTol"), align.sfTol));
     }
 
@@ -710,35 +746,52 @@ Dernière correction`
     ctx.beginPath(); ctx.arc(x,y,r*0.55,0,Math.PI*2); ctx.stroke();
   }
 
-  function drawFoot(ctx, x, y, w, h, isBad=false){
-    const prev = ctx.fillStyle;
-    if(isBad) ctx.fillStyle = "#ff5252";
+  function drawFoot(ctx, x, y, w, h, color){
+    ctx.fillStyle = color;
     ctx.fillRect(x,y,w,h);
-    ctx.fillStyle = prev;
   }
 
-  function drawLabel(ctx, text, x, y){
-    ctx.fillStyle="#eaf1ff";
-    ctx.font="12px Arial";
-    ctx.textAlign="center";
+  function drawText(ctx, text, x, y, opts={}){
+    const { size=12, color="#eaf1ff", align="center", bold=false } = opts;
+    ctx.fillStyle=color;
+    ctx.font = `${bold ? "900" : "400"} ${size}px Arial`;
+    ctx.textAlign = align;
+    ctx.textBaseline = "alphabetic";
     ctx.fillText(text, x, y);
   }
 
-  function drawShimText(ctx, text, x, y){
-    ctx.fillStyle="#ff5252";
-    ctx.font="11px Arial";
-    ctx.textAlign="center";
-    ctx.fillText(text, x, y);
+  function shouldShowSoftFootVisuals(sfCalc){
+    // demandé: diag max + shims + rouge = seulement à l’étape softfoot
+    if(stepIndex !== 1) return { show:false, out:false };
+    const out = (sfCalc.delta > align.sfTol + EPS);
+    return { show:true, out };
+  }
+
+  function drawMotorLabels(ctx, motorX, motorY, motorW, motorH){
+    // IMPORTANT: textes plus hauts pour ne pas chevaucher A/B
+    drawText(ctx, "Moteur (mobile)", motorX + motorW/2, motorY - motorH/2 - 34, { size:14, color:"rgba(234,241,255,.92)" });
+
+    // demandé: "Arrière" et "Avant" sur les PETITS côtés (gauche/droite)
+    drawText(ctx, "Arrière", motorX - 18, motorY + 5, { size:14, align:"right", color:"rgba(234,241,255,.78)", bold:true });
+    drawText(ctx, "Avant",  motorX + motorW + 18, motorY + 5, { size:14, align:"left",  color:"rgba(234,241,255,.78)", bold:true });
+  }
+
+  function drawPumpLabel(ctx, pumpX, pumpY, pumpW, pumpH){
+    // IMPORTANT: plus haut aussi
+    drawText(ctx, "Pompe (fixe)", pumpX + pumpW/2, pumpY - pumpH/2 - 34, { size:14, color:"rgba(234,241,255,.92)" });
   }
 
   function drawTopView(){
+    const sfCalc = computeSoftFootCorrection(align.sf);
+    const softVis = shouldShowSoftFootVisuals(sfCalc);
+
     const { W, H } = resizeCanvas(topCanvas, topCtx);
     clear(topCtx, W, H);
     drawGrid(topCtx, W, H);
 
     const baseY = H * 0.58;
     const baseX = 34;
-    const unitLen = Math.min(165, (W - 110) * 0.46);
+    const unitLen = Math.min(175, (W - 110) * 0.48);
     const gap = Math.min(96,  (W - 110) * 0.20);
 
     const motorW = unitLen, motorH = 44;
@@ -751,30 +804,21 @@ Dernière correction`
     const motorY0 = baseY;
 
     const g = align.gain;
-
     const dyPar = -(align.parH * g);
     const ang = (align.angH * 0.0025);
 
-    // Softfoot info seulement si étape softfoot
-    const softActive = isSoftFootStep();
-    const sfCalc = computeSoftFoot(align.sf);
-    const markBad = (footKey)=> softActive && isFaultyFoot(footKey, sfCalc) && sfCalc.delta > 0;
-
-    // Pompe
+    // POMPE
     topCtx.fillStyle="#ff9800";
     topCtx.fillRect(pumpX, pumpY - pumpH/2, pumpW, pumpH);
-
     topCtx.fillStyle="#d98200";
-    const fw=16, fh=8;
-    drawFoot(topCtx, pumpX+10,         pumpY - pumpH/2 - fh - 2, fw, fh, false);
-    drawFoot(topCtx, pumpX+pumpW-26,   pumpY - pumpH/2 - fh - 2, fw, fh, false);
-    drawFoot(topCtx, pumpX+10,         pumpY + pumpH/2 + 2,      fw, fh, false);
-    drawFoot(topCtx, pumpX+pumpW-26,   pumpY + pumpH/2 + 2,      fw, fh, false);
+    const fwP=16, fhP=8;
+    drawFoot(topCtx, pumpX+10,         pumpY - pumpH/2 - fhP - 2, fwP, fhP, "#d98200");
+    drawFoot(topCtx, pumpX+pumpW-26,   pumpY - pumpH/2 - fhP - 2, fwP, fhP, "#d98200");
+    drawFoot(topCtx, pumpX+10,         pumpY + pumpH/2 + 2,      fwP, fhP, "#d98200");
+    drawFoot(topCtx, pumpX+pumpW-26,   pumpY + pumpH/2 + 2,      fwP, fhP, "#d98200");
+    drawPumpLabel(topCtx, pumpX, pumpY, pumpW, pumpH);
 
-    // Labels remontés (ne chevauche plus A/B)
-    drawLabel(topCtx, "Pompe (fixe)", pumpX + pumpW/2, pumpY - pumpH/2 - 38);
-
-    // Moteur
+    // MOTEUR (rotation autour du centre)
     const cx = motorX0 + motorW/2;
     const cy = motorY0 + dyPar;
 
@@ -786,34 +830,49 @@ Dernière correction`
     topCtx.fillStyle="#00a2ff";
     topCtx.fillRect(motorX0, motorY0 - motorH/2, motorW, motorH);
 
-    topCtx.fillStyle="#0086d6";
+    // pieds moteur (positions demandées)
+    const fw=18, fh=9;
 
-    // pieds moteur + rouge softfoot
-    drawFoot(topCtx, motorX0+10,        motorY0 - motorH/2 - fh - 2, fw, fh, markBad("FL"));
-    drawFoot(topCtx, motorX0+motorW-26, motorY0 - motorH/2 - fh - 2, fw, fh, markBad("FR"));
-    drawFoot(topCtx, motorX0+10,        motorY0 + motorH/2 + 2,      fw, fh, markBad("RL"));
-    drawFoot(topCtx, motorX0+motorW-26, motorY0 + motorH/2 + 2,      fw, fh, markBad("RR"));
+    // coords des 4 pieds (A,B,D,C)
+    const pos = {
+      A: { x: motorX0+10,        y: motorY0 - motorH/2 - fh - 2 }, // haut gauche
+      B: { x: motorX0+motorW-28, y: motorY0 - motorH/2 - fh - 2 }, // haut droite
+      D: { x: motorX0+10,        y: motorY0 + motorH/2 + 2 },      // bas gauche
+      C: { x: motorX0+motorW-28, y: motorY0 + motorH/2 + 2 }       // bas droite
+    };
 
-    // lettres pattes
-    drawLabel(topCtx, "A", motorX0+18,        motorY0 - motorH/2 - 18);
-    drawLabel(topCtx, "B", motorX0+motorW-18, motorY0 - motorH/2 - 18);
-    drawLabel(topCtx, "C", motorX0+18,        motorY0 + motorH/2 + 26);
-    drawLabel(topCtx, "D", motorX0+motorW-18, motorY0 + motorH/2 + 26);
+    const shimColor = "#ff5252";
+    const footBlue  = "#0086d6";
 
-    // shims visibles sur le dessin (SEULEMENT étape softfoot)
-    if(softActive && sfCalc.delta > 0){
-      const shimA = sfCalc.shims.FL;
-      const shimB = sfCalc.shims.FR;
-      const shimC = sfCalc.shims.RL;
-      const shimD = sfCalc.shims.RR;
-
-      if(shimA > 0) drawShimText(topCtx, `+${shimA.toFixed(1)} mil`, motorX0+18, motorY0 - motorH/2 - 34);
-      if(shimB > 0) drawShimText(topCtx, `+${shimB.toFixed(1)} mil`, motorX0+motorW-18, motorY0 - motorH/2 - 34);
-      if(shimC > 0) drawShimText(topCtx, `+${shimC.toFixed(1)} mil`, motorX0+18, motorY0 + motorH/2 + 44);
-      if(shimD > 0) drawShimText(topCtx, `+${shimD.toFixed(1)} mil`, motorX0+motorW-18, motorY0 + motorH/2 + 44);
+    // couleur des pattes : ROUGE seulement à l’étape softfoot ET si hors tolérance
+    function footColor(letter){
+      if(!softVis.show) return footBlue;
+      if(!softVis.out)  return footBlue;
+      return (sfCalc.shims[letter] > EPS) ? shimColor : footBlue;
     }
 
-    // ligne + accouplement
+    Object.keys(pos).forEach(letter=>{
+      drawFoot(topCtx, pos[letter].x, pos[letter].y, fw, fh, footColor(letter));
+    });
+
+    // lettres (sans chevauchement)
+    drawText(topCtx, "A", pos.A.x + fw/2, pos.A.y - 10, { size:14, bold:true });
+    drawText(topCtx, "B", pos.B.x + fw/2, pos.B.y - 10, { size:14, bold:true });
+    drawText(topCtx, "D", pos.D.x + fw/2, pos.D.y + fh + 18, { size:14, bold:true });
+    drawText(topCtx, "C", pos.C.x + fw/2, pos.C.y + fh + 18, { size:14, bold:true });
+
+    // shims (+x.x mil) à côté des pattes (SEULEMENT étape softfoot ET hors tolérance)
+    if(softVis.show && softVis.out){
+      // placé pour ne pas chevaucher les lettres
+      const sA = sfCalc.shims.A, sB = sfCalc.shims.B, sC = sfCalc.shims.C, sD = sfCalc.shims.D;
+
+      if(sA > EPS) drawText(topCtx, `+${sA.toFixed(1)} mil`, pos.A.x - 6, pos.A.y - 22, { size:13, color:"#ff7d7d", align:"right", bold:true });
+      if(sB > EPS) drawText(topCtx, `+${sB.toFixed(1)} mil`, pos.B.x + fw + 6, pos.B.y - 22, { size:13, color:"#ff7d7d", align:"left",  bold:true });
+      if(sD > EPS) drawText(topCtx, `+${sD.toFixed(1)} mil`, pos.D.x - 6, pos.D.y + fh + 30, { size:13, color:"#ff7d7d", align:"right", bold:true });
+      if(sC > EPS) drawText(topCtx, `+${sC.toFixed(1)} mil`, pos.C.x + fw + 6, pos.C.y + fh + 30, { size:13, color:"#ff7d7d", align:"left",  bold:true });
+    }
+
+    // ligne d’accouplement
     topCtx.strokeStyle="rgba(255,255,255,.55)";
     topCtx.lineWidth=3;
     topCtx.beginPath();
@@ -821,29 +880,33 @@ Dernière correction`
     topCtx.lineTo(pumpX, pumpY);
     topCtx.stroke();
 
-    const coupX = motorX0 + motorW + gap/2;
-    const coupY = motorY0;
-    drawCoupling(topCtx, coupX, coupY, 12);
+    drawCoupling(topCtx, motorX0 + motorW + gap/2, motorY0, 12);
 
-    drawLabel(topCtx, "Moteur (mobile)", motorX0 + motorW/2, motorY0 - motorH/2 - 38
-      );
+    // labels moteur/pompe + avant/arrière (sans chevauchement)
+    drawMotorLabels(topCtx, motorX0, motorY0, motorW, motorH);
 
     topCtx.restore();
 
-    topCtx.fillStyle="rgba(255,255,255,.80)";
-    topCtx.font="12px Arial";
-    topCtx.textAlign="left";
-    topCtx.fillText(`H: ang=${align.angH.toFixed(1)} mil, par=${align.parH.toFixed(1)} mil (vue de dessus = mouvement haut/bas)`, 10, H-12);
+    // bas de canvas
+    drawText(topCtx, `H: ang=${align.angH.toFixed(1)} mil, par=${align.parH.toFixed(1)} mil`, 10, H-12, { align:"left", color:"rgba(255,255,255,.80)" });
+
+    // diagonale MAX affichée SEULEMENT étape softfoot
+    if(stepIndex === 1){
+      const maxTxt = (sfCalc.maxName ? `Diagonale MAX : ${sfCalc.maxName}` : `Diagonales égales`);
+      drawText(topCtx, maxTxt, W-10, H-12, { align:"right", color:"rgba(255,255,255,.80)", bold:true });
+    }
   }
 
   function drawSideView(){
+    // Vue de profil : on garde le même moteur/pompe, MAIS sans pieds softfoot + shims
+    // (softfoot est un concept de contact de patte sur la base; la visualisation est surtout utile en vue de dessus)
     const { W, H } = resizeCanvas(sideCanvas, sideCtx);
     clear(sideCtx, W, H);
     drawGrid(sideCtx, W, H);
 
     const baseY = H * 0.62;
     const baseX = 34;
-    const unitLen = Math.min(165, (W - 110) * 0.46);
+    const unitLen = Math.min(175, (W - 110) * 0.48);
     const gap = Math.min(96,  (W - 110) * 0.20);
 
     const motorW = unitLen, motorH = 44;
@@ -856,23 +919,19 @@ Dernière correction`
     const motorY0 = baseY;
 
     const g = align.gain;
-
     const dyPar = -(align.parV * g);
     const ang = -(align.angV * 0.0025);
 
-    // Pompe
+    // POMPE
     sideCtx.fillStyle="#ff9800";
     sideCtx.fillRect(pumpX, pumpY - pumpH/2, pumpW, pumpH);
-
     sideCtx.fillStyle="#d98200";
     const fw=20, fh=10;
-    drawFoot(sideCtx, pumpX+16,        pumpY + pumpH/2 + 2, fw, fh, false);
-    drawFoot(sideCtx, pumpX+pumpW-36,  pumpY + pumpH/2 + 2, fw, fh, false);
+    drawFoot(sideCtx, pumpX+16,        pumpY + pumpH/2 + 2, fw, fh, "#d98200");
+    drawFoot(sideCtx, pumpX+pumpW-36,  pumpY + pumpH/2 + 2, fw, fh, "#d98200");
+    drawPumpLabel(sideCtx, pumpX, pumpY, pumpW, pumpH);
 
-    // Labels remontés
-    drawLabel(sideCtx, "Pompe (fixe)", pumpX + pumpW/2, pumpY - pumpH/2 - 26);
-
-    // Moteur
+    // MOTEUR
     const cx = motorX0 + motorW/2;
     const cy = motorY0 + dyPar;
 
@@ -884,7 +943,7 @@ Dernière correction`
     sideCtx.fillStyle="#00a2ff";
     sideCtx.fillRect(motorX0, motorY0 - motorH/2, motorW, motorH);
 
-    // ligne + accouplement
+    // ligne d’accouplement
     sideCtx.strokeStyle="rgba(255,255,255,.55)";
     sideCtx.lineWidth=3;
     sideCtx.beginPath();
@@ -892,57 +951,51 @@ Dernière correction`
     sideCtx.lineTo(pumpX, pumpY);
     sideCtx.stroke();
 
-    const coupX = motorX0 + motorW + gap/2;
-    const coupY = motorY0;
-    drawCoupling(sideCtx, coupX, coupY, 12);
+    drawCoupling(sideCtx, motorX0 + motorW + gap/2, motorY0, 12);
 
-    drawLabel(sideCtx, "Moteur (mobile)", motorX0 + motorW/2, motorY0 - motorH/2 - 26);
+    // labels moteur + avant/arrière (sur petits côtés)
+    drawMotorLabels(sideCtx, motorX0, motorY0, motorW, motorH);
 
     sideCtx.restore();
 
-    sideCtx.fillStyle="rgba(255,255,255,.80)";
-    sideCtx.font="12px Arial";
-    sideCtx.textAlign="left";
-    sideCtx.fillText(`V: ang=${align.angV.toFixed(1)} mil, par=${align.parV.toFixed(1)} mil`, 10, H-28);
+    drawText(sideCtx, `V: ang=${align.angV.toFixed(1)} mil, par=${align.parV.toFixed(1)} mil`, 10, H-12, { align:"left", color:"rgba(255,255,255,.80)" });
   }
 
-  /* ===================== KPI + NOTE ===================== */
+  /* ===================== KPI (texte) ===================== */
   function buildKpi(){
     const ok = stepOk(stepIndex);
     const lines = [];
+
     lines.push(`Étape actuelle : ${STEPS[stepIndex].title}`);
     lines.push(ok ? `État : OK (dans la tolérance)` : `⚠️ État : À corriger (hors tolérance)`);
     lines.push("");
 
-    lines.push("Résumé (simple) :");
+    lines.push("Résumé :");
     lines.push(`1 Voilage : ${align.runout.toFixed(1)} / tol ${align.runoutTol.toFixed(1)} mil`);
 
-    // Diagonales & shims : SEULEMENT softfoot
-    if(isSoftFootStep()){
-      const sfCalc = computeSoftFoot(align.sf);
+    // Softfoot: afficher les diagonales + pattes fautives SEULEMENT à l’étape softfoot
+    if(stepIndex === 1){
+      const sfCalc = computeSoftFootCorrection(align.sf);
+      const faulty = softFootFaultyFeet(sfCalc);
+
       lines.push(`2 Soft foot :`);
-      lines.push(`   Diag AC = ${sfCalc.diagAC.toFixed(1)} mil`);
-      lines.push(`   Diag BD = ${sfCalc.diagBD.toFixed(1)} mil`);
-      lines.push(`   Δ = (MAX−MIN) = ${sfCalc.delta.toFixed(1)} mil`);
-      lines.push(`   80 % de Δ = ${sfCalc.correction.toFixed(1)} mil`);
-      lines.push(`   Diagonale la plus haute (MAX) = ${sfCalc.faultyDiagonal}`);
-      lines.push("");
-      lines.push("Répartition des cales (sur la diagonale MAX) :");
+      lines.push(`   AC (A+C) = ${sfCalc.diagAC.toFixed(1)} mil`);
+      lines.push(`   BD (B+D) = ${sfCalc.diagBD.toFixed(1)} mil`);
+      lines.push(`   Δ = (MAX − MIN) = ${sfCalc.delta.toFixed(1)} mil`);
+      lines.push(`   80 % → ${sfCalc.correction.toFixed(1)} mil`);
+      lines.push(`   Diagonale MAX : ${sfCalc.maxName ?? "—"}`);
 
-      const faultyFeet = [];
-      Object.entries(sfCalc.shims).forEach(([k,v])=>{
-        if(v > 0){
-          faultyFeet.push(`${FOOT_LABEL[k]} ≈ ${v.toFixed(1)} mil`);
-        }
-      });
-
-      if(faultyFeet.length){
-        faultyFeet.forEach(t=>lines.push(`• Patte ${t}`));
+      if(sfCalc.delta > align.sfTol + EPS){
+        lines.push("");
+        lines.push(`Pattes à corriger (rouges) : ${faulty.length ? faulty.join(" & ") : "—"}`);
+        lines.push("Répartition des cales :");
+        faulty.forEach(letter=>{
+          lines.push(`• Patte ${letter} ≈ ${sfCalc.shims[letter].toFixed(1)} mil`);
+        });
       }else{
-        lines.push("• Aucune cale recommandée (Δ = 0)");
+        lines.push("");
+        lines.push("Soft foot : dans la tolérance → pas de pattes en rouge, pas de shims affichés.");
       }
-    }else{
-      lines.push(`2 Soft foot : (détails affichés seulement à l’étape 2)`);
     }
 
     lines.push(`3 Ang V : ${align.angV.toFixed(1)} / tol ${align.angVTol.toFixed(1)} mil`);
@@ -951,34 +1004,6 @@ Dernière correction`
     lines.push(`6 Par H : ${align.parH.toFixed(1)} / tol ${align.parHTol.toFixed(1)} mil`);
 
     return lines.join("\n");
-  }
-
-  function updateHint(){
-    const id = STEPS[stepIndex].id;
-
-    if(id !== "softfoot"){
-      stepHint.textContent = STEPS[stepIndex].hint;
-      return;
-    }
-
-    const sfCalc = computeSoftFoot(align.sf);
-    const diag = sfCalc.faultyDiagonal;
-    const feet = (diag === "AC") ? "A et C" : "B et D";
-
-    // NOTE: doit afficher les pattes fautives à corriger (comme tu l’as demandé)
-    stepHint.textContent =
-`Règle (doc) :
-• Diag AC = A + C
-• Diag BD = B + D
-• Δ = MAX − MIN
-• On met 80 % de Δ en cales sur la diagonale MAX
-
-Résultat :
-• Diagonale la plus haute (MAX) : ${diag}
-• Pattes à corriger (en rouge) : ${feet}
-
-Astuce :
-• Les shims à ajouter sont affichés en rouge directement sur le dessin.`;
   }
 
   /* ===================== RENDER STEP UI ===================== */
@@ -996,6 +1021,7 @@ Astuce :
     const s = STEPS[stepIndex];
     stepTitle.textContent = s.title;
     stepDesc.textContent  = s.desc;
+    stepHint.textContent  = s.hint;
 
     stepBody.innerHTML = s.render();
     wireStepInputs();
@@ -1020,11 +1046,11 @@ Astuce :
     if(stepIndex > 0) showStep(stepIndex-1);
   }
 
-  /* ===================== RESET (valeurs à 0 sauf tolérances) ===================== */
+  /* ===================== RESET ===================== */
   function resetAll(){
+    // TOUT à 0 sauf tolérances
     align.runout = 0.0; align.runoutTol = 2.0;
-    align.sf = { FL:0.0, FR:0.0, RL:0.0, RR:0.0 }; align.sfTol = 3.0;
-
+    align.sf = { A:0.0, B:0.0, C:0.0, D:0.0 }; align.sfTol = 3.0;
     align.angV = 0.0; align.angVTol = 1.0;
     align.parV = 0.0; align.parVTol = 1.0;
     align.angH = 0.0; align.angHTol = 1.0;
@@ -1032,8 +1058,10 @@ Astuce :
 
     align.gain = 25;
     gainEl.value = "25";
+
     helpSelect.value = "principe";
     updateHelpText();
+
     showStep(0);
   }
 
@@ -1045,7 +1073,6 @@ Astuce :
     const ok = stepOk(stepIndex);
     setBadge(ok ? "ok" : "bad", ok ? "OK" : "⚠️ À corriger");
 
-    updateHint();
     kpiText.textContent = buildKpi();
 
     drawTopView();
@@ -1069,15 +1096,13 @@ Astuce :
     window.visualViewport.addEventListener("resize", () => renderAll(true));
   }
 
+  /* ===================== AIDE EVENTS ===================== */
   helpSelect.addEventListener("change", () => { updateHelpText(); renderAll(true); });
-
   helpToggle.addEventListener("click", () => {
     const open = helpPanel.classList.contains("hidden");
     setHelpOpen(open);
   });
-
   helpClose.addEventListener("click", () => setHelpOpen(false));
-
   infoBtn.addEventListener("click", () => {
     const open = helpPanel.classList.contains("hidden");
     setHelpOpen(open);
