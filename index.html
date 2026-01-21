@@ -857,10 +857,10 @@ topCtx.fillText("C", P.C.x, P.C.y + 28);
   topCtx.fillText("MOTEUR (mobile)", cx, cy-110);
 topCtx.fillText("POMPE (fixe)",    cx+200, cy-110);
 
-  // softfoot seulement : afficher la PLUS GRANDE diagonale + shims près des pattes
-if(STEPS[state.step].id === "softfoot"){
+  if(STEPS[state.step].id === "softfoot"){
   const sf = computeSoftFoot();
 
+  // === 1) Diagonale fautive (UNE SEULE) ===
   topCtx.strokeStyle = "#ff5252";
   topCtx.lineWidth = 2;
   topCtx.beginPath();
@@ -876,35 +876,35 @@ if(STEPS[state.step].id === "softfoot"){
   }
 
   topCtx.stroke();
-}
-  // 2) valeur des cales (répartition simple et lisible : 50/50 sur les 2 pattes fautives)
-  // Si diagAC plus grande => pattes à corriger = A et C
-  // Si diagBD plus grande => pattes à corriger = B et D
+
+  // === 2) Répartition 80 % sur la diagonale fautive ===
   const shimEach = sf.correction / 2;
   const shim = { A:0, B:0, C:0, D:0 };
 
-  if(sf.diagAC > sf.diagBD){ shim.A = shimEach; shim.C = shimEach; }
-  else if(sf.diagBD > sf.diagAC){ shim.B = shimEach; shim.D = shimEach; }
+  if(sf.diagAC > sf.diagBD){
+    shim.A = shimEach;
+    shim.C = shimEach;
+  }
+  else if(sf.diagBD > sf.diagAC){
+    shim.B = shimEach;
+    shim.D = shimEach;
+  }
 
-  // helper: écrire valeur proche de la patte
+  // === 3) Affichage des valeurs près des pattes ===
   function drawShimText(letter, x, y){
     const v = shim[letter];
     if(v <= 0) return;
     topCtx.fillStyle = "#ff5252";
-    topCtx.font = "12px Arial";
-    topCtx.textAlign = "left";
     topCtx.font = blinkPhase ? "bold 13px Arial" : "12px Arial";
+    topCtx.textAlign = "left";
     topCtx.fillText(`+${v.toFixed(1)} mil`, x + 14, y + 4);
   }
 
-  // positions coin -> texte
-  drawShimText("A", cx-70, cy-30);
-  drawShimText("B", cx+70, cy-30);
-  drawShimText("D", cx-70, cy+30);
-  drawShimText("C", cx+70, cy+30);
+  drawShimText("A", P.A.x, P.A.y);
+  drawShimText("B", P.B.x, P.B.y);
+  drawShimText("C", P.C.x, P.C.y);
+  drawShimText("D", P.D.x, P.D.y);
 }
-}
-
 /* =====================================================
    SIDE VIEW
 ===================================================== */
