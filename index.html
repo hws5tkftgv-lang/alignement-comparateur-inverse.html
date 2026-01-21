@@ -847,6 +847,16 @@ function clear(ctx,w,h){
   ctx.fillStyle="#000";
   ctx.fillRect(0,0,w,h);
 }
+
+function drawShimValue(ctx, x, y, value){
+  if(value <= 0) return;
+
+  ctx.fillStyle = "#ff5252";
+  ctx.font = blinkPhase ? "bold 13px Arial" : "12px Arial";
+  ctx.textAlign = "left";
+  ctx.fillText(`+${value.toFixed(2)} mil`, x + 14, y + 4);
+}
+
 function isBlinking(){
   return blinkPhase ? "#ff5252" : "#000";
 }
@@ -1043,6 +1053,30 @@ drawFoot(sideCtx, cx-70, cy+40, "D");
 // C = bas droite (côté pompe)
 drawFoot(sideCtx, cx+70, cy+40, "C");
 
+// ===============================
+// SHIMS — ANGULARITÉ VERTICALE
+// ===============================
+if(STEPS[state.step].id === "angV"){
+  const r = computeAngularVertical();
+  if(r){
+    const shims = computeAngularShimsVertical();
+
+    const front = shims.front;
+    const rear  = shims.rear;
+
+    // AVANT = patte côté accouplement → C
+    // ARRIÈRE = patte côté moteur → D
+    if(r.pair.includes("B") || r.pair.includes("C")){
+      drawShimValue(sideCtx, cx+70, cy+40, front);
+    }
+
+    if(r.pair.includes("A") || r.pair.includes("D")){
+      drawShimValue(sideCtx, cx-70, cy+40, rear);
+    }
+  }
+}
+
+
 // ===== AFFICHAGE DES CALES (SIDE VIEW) =====
 const stepId = STEPS[state.step].id;
 
@@ -1087,6 +1121,30 @@ if(
   sideCtx.textAlign="center";
   sideCtx.fillText("MOTEUR (mobile)", cx,     cy-92);
 sideCtx.fillText("POMPE (fixe)",    cx+200, cy-92);
+// ===============================
+// SHIMS — ANGULARITÉ HORIZONTALE
+// ===============================
+if(STEPS[state.step].id === "angH"){
+  const r = computeAngularHorizontal();
+  if(r){
+    const shims = computeAngularShimsHorizontal();
+
+    const front = shims.front;
+    const rear  = shims.rear;
+
+    // AVANT = A + B
+    if(r.pair.includes("A")){
+      drawShimValue(topCtx, P.A.x, P.A.y, front);
+      drawShimValue(topCtx, P.B.x, P.B.y, front);
+    }
+
+    // ARRIÈRE = C + D
+    if(r.pair.includes("C")){
+      drawShimValue(topCtx, P.C.x, P.C.y, rear);
+      drawShimValue(topCtx, P.D.x, P.D.y, rear);
+    }
+  }
+}
 }
 
 /* =====================================================
