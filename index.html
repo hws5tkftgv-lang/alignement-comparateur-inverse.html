@@ -393,6 +393,35 @@ function computeAngularShimH(){
   return (B * C) / A;
 }
 
+
+
+function computeAngularShimsVertical(){
+  const A = geometry.couplingDiameter;
+  const B = geometry.distDialToFront;
+  const D = geometry.distFrontToRear;
+  const C = Math.abs(state.angV);
+
+  if(A <= 0) return { front:0, rear:0 };
+
+  return {
+    front: (B * C) / A,
+    rear: ((B + D) * C) / A
+  };
+}
+
+function computeAngularShimsHorizontal(){
+  const A = geometry.couplingDiameter;
+  const B = geometry.distDialToFront;
+  const D = geometry.distFrontToRear;
+  const C = Math.abs(state.angH);
+
+  if(A <= 0) return { front:0, rear:0 };
+
+  return {
+    front: (B * C) / A,
+    rear: ((B + D) * C) / A
+  };
+}
 /* =====================================================
    VALIDATION PAR ÉTAPE
 ===================================================== */
@@ -471,20 +500,28 @@ function buildCorrectionMessage(){
   }
 
   // ---------- ANGULARITÉ VERTICALE ----------
-  if(stepId === "angV"){
-    if(ok(state.angV, state.angVTol)){
-      return "✔️ Angularité verticale conforme.";
-    }
-
-    const r = computeAngularVertical();
-    const shim = computeAngularShim().toFixed(2);
-
-msg += "📐 Angularité verticale\n\n";
-msg += `➕ Ajouter **${shim} mil** sous :\n`;
-msg += `👉 ${r.pair.join(" + ")}\n`;
-msg += `(${r.direction})`;
-    return msg;
+  // ---------- ANGULARITÉ VERTICALE ----------
+if(stepId === "angV"){
+  if(ok(state.angV, state.angVTol)){
+    return "✔️ Angularité verticale conforme.";
   }
+
+  const r = computeAngularVertical();
+  const shims = computeAngularShimsVertical();
+
+  const front = shims.front.toFixed(2);
+  const rear  = shims.rear.toFixed(2);
+
+  msg += "📐 Angularité verticale\n\n";
+  msg += "➕ Ajouter des cales :\n";
+  msg += `• AVANT : **${front} mil**\n`;
+  msg += `• ARRIÈRE : **${rear} mil**\n\n`;
+  msg += "Sous les pattes :\n";
+  msg += `👉 ${r.pair.join(" + ")}\n`;
+  msg += `(${r.direction})`;
+
+  return msg;
+}
 
   // ---------- PARALLÉLISME VERTICAL ----------
   if(stepId === "parV"){
@@ -506,14 +543,20 @@ msg += `(${r.direction})`;
     }
 
     const r = computeAngularHorizontal();
-    const shim = computeAngularShimH().toFixed(2);
+const shims = computeAngularShimsHorizontal();
+
+const front = shims.front.toFixed(2);
+const rear  = shims.rear.toFixed(2);
 
 msg += "↔️ Angularité horizontale\n\n";
-msg += `➕ Déplacer **${shim} mil** côté :\n`;
+msg += `• AVANT : **${front} mil**\n`;
+msg += `• ARRIÈRE : **${rear} mil**\n\n`;
+msg += "Côté :\n";
 msg += `👉 ${r.pair.join(" + ")}\n`;
 msg += `(${r.direction})`;
-    return msg;
-  }
+
+return msg;
+
 
   // ---------- PARALLÉLISME HORIZONTAL ----------
   if(stepId === "parH"){
