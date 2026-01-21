@@ -595,25 +595,7 @@ function renderInputsForCurrentStep(){
     return;
   }
 
-  if(id === "angV"){
-    ui.inputsArea.innerHTML = `
-      <div class="row">
-        <div>
-          <label>Angularité verticale (mils)</label>
-          <input id="in_angV" type="number" step="0.1" value="${state.angV}">
-        </div>
-        <div>
-          <label>Tolérance (mils)</label>
-          <input id="in_angVTol" type="number" step="0.1" value="${state.angVTol}">
-        </div>
-      </div>
-    `;
-    wireInputs([
-      ["in_angV", v => state.angV = v],
-      ["in_angVTol", v => state.angVTol = Math.max(0, v)],
-    ]);
-    return;
-  }
+  
 
   if(id === "angV"){
   ui.inputsArea.innerHTML = `
