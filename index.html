@@ -268,6 +268,15 @@ const state = {
   parH: 0,
   parHTol: 1
 };
+/* =====================================================
+   PARAMÈTRES GÉOMÉTRIQUES (pouces)
+===================================================== */
+const geometry = {
+  couplingDiameter: 3,   // Ø accouplement (A)
+  distDialToFront: 6,    // cadran → patte avant (B)
+  distFrontToRear: 10    // patte avant → patte arrière
+};
+
 
 /* =====================================================
    DÉFINITION DES ÉTAPES
@@ -361,7 +370,19 @@ function computeParallelHorizontal(){
   }
   return null;
 }
+/* =====================================================
+   CALCUL CORRECTION ANGULAIRE (mils réels)
+   B × C / A
+===================================================== */
+function computeAngularShim(){
+  const A = geometry.couplingDiameter;
+  const B = geometry.distDialToFront;
+  const C = Math.abs(state.angV); // lecture cadran (mils)
 
+  if(A <= 0) return 0;
+
+  return (B * C) / A;
+}
 /* =====================================================
    VALIDATION PAR ÉTAPE
 ===================================================== */
@@ -446,10 +467,12 @@ function buildCorrectionMessage(){
     }
 
     const r = computeAngularVertical();
-    msg += "📐 Angularité verticale\n\n";
-    msg += `➕ Ajouter des cales sous :\n`;
-    msg += `👉 ${r.pair.join(" + ")}\n`;
-    msg += `(${r.direction})`;
+    const shim = computeAngularShim().toFixed(2);
+
+msg += "📐 Angularité verticale\n\n";
+msg += `➕ Ajouter **${shim} mil** sous :\n`;
+msg += `👉 ${r.pair.join(" + ")}\n`;
+msg += `(${r.direction})`;
     return msg;
   }
 
@@ -592,25 +615,51 @@ function renderInputsForCurrentStep(){
     return;
   }
 
-  if(id === "parV"){
-    ui.inputsArea.innerHTML = `
-      <div class="row">
-        <div>
-          <label>Parallélisme vertical (mils)</label>
-          <input id="in_parV" type="number" step="0.1" value="${state.parV}">
-        </div>
-        <div>
-          <label>Tolérance (mils)</label>
-          <input id="in_parVTol" type="number" step="0.1" value="${state.parVTol}">
-        </div>
+  if(id === "angV"){
+  ui.inputsArea.innerHTML = `
+    <div class="row">
+      <div>
+        <label>Lecture cadran 12–6 (mils)</label>
+        <input id="in_angV" type="number" step="0.1" value="${state.angV}">
       </div>
-    `;
-    wireInputs([
-      ["in_parV", v => state.parV = v],
-      ["in_parVTol", v => state.parVTol = Math.max(0, v)],
-    ]);
-    return;
-  }
+      <div>
+        <label>Tolérance (mils)</label>
+        <input id="in_angVTol" type="number" step="0.1" value="${state.angVTol}">
+      </div>
+    </div>
+
+    <div class="row" style="margin-top:8px;">
+      <div>
+        <label>Ø accouplement (po)</label>
+        <input id="in_diam" type="number" step="0.1" value="${geometry.couplingDiameter}">
+      </div>
+      <div>
+        <label>Cadran → patte avant (po)</label>
+        <input id="in_distFront" type="number" step="0.1" value="${geometry.distDialToFront}">
+      </div>
+    </div>
+
+    <div class="row" style="margin-top:8px;">
+      <div>
+        <label>Patte avant → arrière (po)</label>
+        <input id="in_distRear" type="number" step="0.1" value="${geometry.distFrontToRear}">
+      </div>
+      <div>
+        <label>Note</label>
+        <input disabled value="Correction réelle aux pattes (mils)">
+      </div>
+    </div>
+  `;
+
+  wireInputs([
+    ["in_angV", v => state.angV = v],
+    ["in_angVTol", v => state.angVTol = Math.max(0, v)],
+    ["in_diam", v => geometry.couplingDiameter = Math.max(0.1, v)],
+    ["in_distFront", v => geometry.distDialToFront = Math.max(0.1, v)],
+    ["in_distRear", v => geometry.distFrontToRear = Math.max(0.1, v)],
+  ]);
+  return;
+}
 
   if(id === "angH"){
     ui.inputsArea.innerHTML = `
