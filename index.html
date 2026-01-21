@@ -1043,6 +1043,41 @@ drawFoot(sideCtx, cx-70, cy+40, "D");
 // C = bas droite (côté pompe)
 drawFoot(sideCtx, cx+70, cy+40, "C");
 
+// ===== AFFICHAGE DES CALES (SIDE VIEW) =====
+const stepId = STEPS[state.step].id;
+
+// Angularité verticale ou horizontale
+if(
+  (stepId === "angV" && !ok(state.angV, state.angVTol)) ||
+  (stepId === "angH" && !ok(state.angH, state.angHTol))
+){
+  const shims =
+    stepId === "angV"
+      ? computeAngularShimsVertical()
+      : computeAngularShimsHorizontal();
+
+  const front = shims.front.toFixed(2);
+  const rear  = shims.rear.toFixed(2);
+
+  sideCtx.fillStyle = isBlinking();
+  sideCtx.font = blinkPhase ? "bold 14px Arial" : "13px Arial";
+  sideCtx.textAlign = "center";
+
+  // AVANT (côté accouplement / patte C)
+  sideCtx.fillText(
+    `+${front} mil`,
+    cx + 70,
+    cy + 70
+  );
+
+  // ARRIÈRE (patte D)
+  sideCtx.fillText(
+    `+${rear} mil`,
+    cx - 70,
+    cy + 70
+  );
+}
+
   // pompe
   sideCtx.fillStyle="#ff9800";
   sideCtx.fillRect(cx+120,cy-30,160,60);
