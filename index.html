@@ -383,6 +383,16 @@ function computeAngularShim(){
 
   return (B * C) / A;
 }
+
+function computeAngularShimH(){
+  const A = geometry.couplingDiameter;
+  const B = geometry.distDialToFront;
+  const C = Math.abs(state.angH); // lecture cadran horizontale (mils)
+
+  if(A <= 0) return 0;
+  return (B * C) / A;
+}
+
 /* =====================================================
    VALIDATION PAR ÉTAPE
 ===================================================== */
@@ -496,10 +506,12 @@ msg += `(${r.direction})`;
     }
 
     const r = computeAngularHorizontal();
-    msg += "↔️ Angularité horizontale\n\n";
-    msg += "➕ Déplacer / caler côté :\n";
-    msg += `👉 ${r.pair.join(" + ")}\n`;
-    msg += `(${r.direction})`;
+    const shim = computeAngularShimH().toFixed(2);
+
+msg += "↔️ Angularité horizontale\n\n";
+msg += `➕ Déplacer **${shim} mil** côté :\n`;
+msg += `👉 ${r.pair.join(" + ")}\n`;
+msg += `(${r.direction})`;
     return msg;
   }
 
@@ -644,25 +656,50 @@ function renderInputsForCurrentStep(){
 }
 
   if(id === "angH"){
-    ui.inputsArea.innerHTML = `
-      <div class="row">
-        <div>
-          <label>Angularité horizontale (mils)</label>
-          <input id="in_angH" type="number" step="0.1" value="${state.angH}">
-        </div>
-        <div>
-          <label>Tolérance (mils)</label>
-          <input id="in_angHTol" type="number" step="0.1" value="${state.angHTol}">
-        </div>
+  ui.inputsArea.innerHTML = `
+    <div class="row">
+      <div>
+        <label>Lecture cadran 3–9 (mils)</label>
+        <input id="in_angH" type="number" step="0.1" value="${state.angH}">
       </div>
-    `;
-    wireInputs([
-      ["in_angH", v => state.angH = v],
-      ["in_angHTol", v => state.angHTol = Math.max(0, v)],
-    ]);
-    return;
-  }
+      <div>
+        <label>Tolérance (mils)</label>
+        <input id="in_angHTol" type="number" step="0.1" value="${state.angHTol}">
+      </div>
+    </div>
 
+    <div class="row" style="margin-top:8px;">
+      <div>
+        <label>Ø accouplement (po)</label>
+        <input id="in_diam" type="number" step="0.1" value="${geometry.couplingDiameter}">
+      </div>
+      <div>
+        <label>Cadran → patte avant (po)</label>
+        <input id="in_distFront" type="number" step="0.1" value="${geometry.distDialToFront}">
+      </div>
+    </div>
+
+    <div class="row" style="margin-top:8px;">
+      <div>
+        <label>Patte avant → arrière (po)</label>
+        <input id="in_distRear" type="number" step="0.1" value="${geometry.distFrontToRear}">
+      </div>
+      <div>
+        <label>Note</label>
+        <input disabled value="Correction réelle aux pattes (mils)">
+      </div>
+    </div>
+  `;
+
+  wireInputs([
+    ["in_angH", v => state.angH = v],
+    ["in_angHTol", v => state.angHTol = Math.max(0, v)],
+    ["in_diam", v => geometry.couplingDiameter = Math.max(0.1, v)],
+    ["in_distFront", v => geometry.distDialToFront = Math.max(0.1, v)],
+    ["in_distRear", v => geometry.distFrontToRear = Math.max(0.1, v)],
+  ]);
+  return;
+}
   if(id === "parH"){
     ui.inputsArea.innerHTML = `
       <div class="row">
