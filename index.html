@@ -1006,6 +1006,56 @@ function drawFoot(ctx,x,y,label){
   ctx.textAlign="center";
   ctx.fillText(label,x,y+18);
 }
+function drawDimLine(ctx, x1, x2, y, label){
+  const left = Math.min(x1, x2);
+  const right = Math.max(x1, x2);
+
+  ctx.save();
+  ctx.strokeStyle = "rgba(255,255,255,.85)";
+  ctx.fillStyle   = "rgba(255,255,255,.90)";
+  ctx.lineWidth = 2;
+
+  // ligne principale
+  ctx.beginPath();
+  ctx.moveTo(left, y);
+  ctx.lineTo(right, y);
+  ctx.stroke();
+
+  // "ticks" aux extrémités
+  ctx.beginPath();
+  ctx.moveTo(left, y-8);  ctx.lineTo(left, y+8);
+  ctx.moveTo(right, y-8); ctx.lineTo(right, y+8);
+  ctx.stroke();
+
+  // texte centré
+  ctx.font = "12px Arial";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "bottom";
+  ctx.fillText(label, (left + right)/2, y - 10);
+
+  ctx.restore();
+}
+
+function drawCouplingDiameter(ctx, cx, cy, diam){
+  ctx.save();
+  ctx.strokeStyle = "rgba(255,255,255,.85)";
+  ctx.lineWidth = 2;
+
+  // petit cercle indicatif (pas à l'échelle)
+  ctx.beginPath();
+  ctx.arc(cx, cy, 18, 0, Math.PI*2);
+  ctx.stroke();
+
+  ctx.fillStyle = "rgba(255,255,255,.90)";
+  ctx.font = "12px Arial";
+  ctx.textAlign = "left";
+  ctx.textBaseline = "middle";
+  ctx.fillText(`Ø = ${diam} po`, cx + 24, cy);
+
+  ctx.restore();
+}
+
+
 
 /* =====================================================
    TOP VIEW
@@ -1256,49 +1306,56 @@ if(
   sideCtx.textAlign="center";
   sideCtx.fillText("MOTEUR (mobile)", cx,     cy-92);
 sideCtx.fillText("POMPE (fixe)",    cx+200, cy-92);
-  // =====================================================
+    // =====================================================
   // MESURES GÉOMÉTRIQUES — MOTEUR SEULEMENT
-  // Affichage à partir de l'étape 3 (angV)
+  // Affichage à partir de l’étape 3 (angV)
   // =====================================================
   if(state.step >= 2){
 
-    const couplingX = cx + 110;   // centre accouplement
-    const frontFeetX = cx + 70;   // patte AVANT moteur (C)
-    const rearFeetX  = cx - 70;   // patte ARRIÈRE moteur (D)
+    // mêmes positions que tes pattes D et C
+    const rearFeetX  = cx - 70;  // D (arrière moteur)
+    const frontFeetX = cx + 70;  // C (avant moteur)
 
-    const y0 = cy + 95;
+    // centre de l’accouplement (entre moteur et pompe)
+    const motorRight = cx + 80;
+    const pumpLeft   = cx + 120;
+    const couplingX  = (motorRight + pumpLeft) / 2;
+
+    // Y des cotes : toujours DANS le canvas (mobile-safe)
+    const y1 = Math.min(h - 70, cy + 95);
+    const y2 = y1 + 28;
+    const y3 = y2 + 28;
 
     // Ø accouplement
     drawCouplingDiameter(sideCtx, couplingX, cy - 5, geometry.couplingDiameter);
 
-    // Centre → patte AVANT
+    // Centre → AVANT
     drawDimLine(
       sideCtx,
       couplingX,
       frontFeetX,
-      y0,
-      `Centre → patte AVANT = ${geometry.centerToFrontFeet} po`
+      y1,
+      `Centre → pattes AVANT = ${geometry.centerToFrontFeet} po`
     );
 
-    // Patte AVANT → ARRIÈRE
+    // AVANT → ARRIÈRE
     drawDimLine(
       sideCtx,
       frontFeetX,
       rearFeetX,
-      y0 + 35,
+      y2,
       `AVANT → ARRIÈRE = ${geometry.frontToRearFeet} po`
     );
 
-    // Centre → patte ARRIÈRE
-    const centerToRear =
-      geometry.centerToFrontFeet + geometry.frontToRearFeet;
+    // Centre → ARRIÈRE (calculé)
+    const centerToRear = geometry.centerToFrontFeet + geometry.frontToRearFeet;
 
     drawDimLine(
       sideCtx,
       couplingX,
       rearFeetX,
-      y0 + 70,
-      `Centre → patte ARRIÈRE = ${centerToRear} po`
+      y3,
+      `Centre → pattes ARRIÈRE = ${centerToRear} po`
     );
   }
 // ===============================
