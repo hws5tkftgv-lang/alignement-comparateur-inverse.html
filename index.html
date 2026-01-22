@@ -312,10 +312,13 @@ const geometry = {
 const STEPS = [
   { id:"runout",  label:"1 — Voilage" },
   { id:"softfoot",label:"2 — Pied boiteux" },
-  { id:"measures",label:"3 — Mesures géométriques" },   // ← AJOUT
+  { id:"measures",label:"3 — Mesures géométriques" },
+
   { id:"angV",    label:"4 — Angularité verticale" },
-  { id:"angH",    label:"5 — Angularité horizontale" },
-  { id:"parH",    label:"6 — Parallélisme horizontal" }
+  { id:"parV",    label:"5 — Parallélisme vertical" },
+
+  { id:"angH",    label:"6 — Angularité horizontale" },
+  { id:"parH",    label:"7 — Parallélisme horizontal" }
 ];
 /* =====================================================
    UTILITAIRES
@@ -801,6 +804,37 @@ if(id === "measures"){
   ]);
   return;
 }
+
+if(id === "parV"){
+  ui.inputsArea.innerHTML = `
+    <div class="row">
+      <div>
+        <label>Parallélisme vertical (mils)</label>
+        <input id="in_parV" type="number" step="0.1" value="${state.parV}">
+      </div>
+      <div>
+        <label>Tolérance (mils)</label>
+        <input id="in_parVTol" type="number" step="0.1" value="${state.parVTol}">
+      </div>
+    </div>
+
+    <div class="row" style="margin-top:10px;">
+      <div>
+        <label>Note</label>
+        <div class="noteBox">
+          Correction uniforme sur les 4 pattes
+        </div>
+      </div>
+    </div>
+  `;
+
+  wireInputs([
+    ["in_parV", v => state.parV = v],
+    ["in_parVTol", v => state.parVTol = Math.max(0, v)]
+  ]);
+  return;
+}
+
 
   // =====================================================
   // ANGULARITÉ HORIZONTALE
