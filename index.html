@@ -1391,6 +1391,16 @@ function drawSideView(){
   // pattes moteur
   ctx.fillRect(rearFootX - footW/2,  cy + motorH/2 - 2, footW, footH);
   ctx.fillRect(frontFootX - footW/2, cy + motorH/2 - 2, footW, footH);
+  // --- Lettres C et D ---
+ctx.fillStyle = "#fff";
+ctx.font = "14px Arial";
+ctx.textAlign = "center";
+
+// C = patte avant
+ctx.fillText("C", cx + motorW/2 - footW/2, cy + motorH/2 + 24);
+
+// D = patte arrière
+ctx.fillText("D", cx - motorW/2 + footW/2, cy + motorH/2 + 24);
 
   // ===============================
   //   POMPE
