@@ -792,11 +792,10 @@ function wireInputs(pairs){
 function refreshUI(){
   ui.stepTitle.textContent = `Étape ${STEPS[state.step].label}`;
 
-  const okNow = isStepOK(state.step);
-  ui.stepBadge.textContent = okNow ? "OK" : "⚠️ À corriger";
+    const okNow = isStepOK(state.step);
+  ui.stepBadge.textContent = okNow ? "OK" : "NOT OK";
   ui.stepBadge.classList.toggle("ok", okNow);
   ui.stepBadge.classList.toggle("bad", !okNow);
-
   renderInputsForCurrentStep();
   ui.infoBox.textContent =
   buildMessage() + "\n\n" + buildCorrectionMessage();
