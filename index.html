@@ -1358,12 +1358,10 @@ function drawCouplingDiameter(ctx, x, y, d){
 function drawSideView(){
 
   const canvas = sideCanvas;
-const ctx = sideCtx;
+  const ctx = sideCtx;
 
-  const w = canvas.width;
-  const h = canvas.height;
-
-  ctx.clearRect(0,0,w,h);
+  const {w,h} = resizeCanvas(canvas,ctx);
+  clear(ctx,w,h);
 
   const cx = w * 0.40;
   const cy = h * 0.50;
@@ -1386,7 +1384,6 @@ const ctx = sideCtx;
   ctx.fillStyle="#00a2ff";
   ctx.fillRect(cx-motorLength/2, cy-motorHeight/2, motorLength, motorHeight);
 
-  // pattes moteur
   ctx.fillRect(frontFootX-14, cy+motorHeight/2, 28, 10);
   ctx.fillRect(rearFootX-14,  cy+motorHeight/2, 28, 10);
 
@@ -1397,16 +1394,7 @@ const ctx = sideCtx;
   ctx.fillRect(pumpLeft, cy-pumpHeight/2, pumpLength, pumpHeight);
 
   // ==============================
-  // ACCOUPLEMENT
-  // ==============================
-  ctx.strokeStyle="#ffffff";
-  ctx.lineWidth=2;
-  ctx.beginPath();
-  ctx.arc(couplingX, cy, 22, 0, Math.PI*2);
-  ctx.stroke();
-
-  // ==============================
-  // TEXTE DE BASE
+  // TEXTE FIXE
   // ==============================
   ctx.fillStyle="#ffffff";
   ctx.font="13px Arial";
@@ -1415,45 +1403,48 @@ const ctx = sideCtx;
   ctx.fillText("POMPE (fixe)", pumpLeft+pumpLength/2, cy-pumpHeight/2-12);
 
   // =====================================================
-  // MODE NORMAL → PAS L'ÉTAPE MESURES
+  // MODE NORMAL (pas étape mesures)
   // =====================================================
   if(STEPS[state.step].id !== "measures"){
 
     ctx.strokeStyle="rgba(255,255,255,0.35)";
     ctx.lineWidth=1;
 
-    drawDimOnly(ctx, couplingX, frontFootX, cy+85);
-    drawDimOnly(ctx, frontFootX, rearFootX,  cy+105);
+    drawDimOnly(ctx, couplingX, frontFootX, cy+90);
+    drawDimOnly(ctx, frontFootX, rearFootX,  cy+110);
 
     return;
   }
 
   // =====================================================
-  // MODE MESURES GUIDÉES — UNE SEULE COTE
+  // MODE MESURES GUIDÉES — UNE SEULE COTE VISIBLE
   // =====================================================
+
   ctx.lineWidth = 3;
 
-  // 0 = Ø accouplement (BLEU)
+  // --- Ø accouplement ---
   if(state.measureStep === 0){
     ctx.strokeStyle = "#00a2ff";
     ctx.beginPath();
     ctx.arc(couplingX, cy, 24, 0, Math.PI*2);
     ctx.stroke();
+    return;
   }
 
-  // 1 = Centre → pattes AVANT (VERT)
+  // --- Centre → pattes AVANT ---
   if(state.measureStep === 1){
     ctx.strokeStyle = "#4caf50";
-    drawDimOnly(ctx, couplingX, frontFootX, cy+95);
+    drawDimOnly(ctx, couplingX, frontFootX, cy+100);
+    return;
   }
 
-  // 2 = Pattes AVANT → ARRIÈRE (ORANGE)
+  // --- Pattes AVANT → ARRIÈRE ---
   if(state.measureStep === 2){
     ctx.strokeStyle = "#ff9800";
-    drawDimOnly(ctx, frontFootX, rearFootX, cy+95);
+    drawDimOnly(ctx, frontFootX, rearFootX, cy+100);
+    return;
   }
 }
-
 /* =====================================================
    RENDER GLOBAL
 ===================================================== */
