@@ -773,10 +773,21 @@ function wireInputs(pairs){
     if(!input) return;
 
     const read = () => {
-  const v = parseFloat(input.value);
+  const raw = input.value;
+
+  // Autoriser champ vide pendant la saisie
+  if(raw === ""){
+    setter(0);
+    refreshUI();
+    drawTopView();
+    drawSideView();
+    return;
+  }
+
+  const v = parseFloat(raw);
   setter(Number.isFinite(v) ? v : 0);
 
-  refreshUI();      // 👈 met à jour OK / NOT OK en direct
+  refreshUI();
   drawTopView();
   drawSideView();
 };
