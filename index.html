@@ -492,6 +492,7 @@ const ui = {
   infoBox: document.getElementById("infoBox"),
   btnPrev: document.getElementById("btnPrev"),
   btnNext: document.getElementById("btnNext"),
+    formulaBox: document.getElementById("formulaBox"),
 };
 
 /* =====================================================
@@ -781,6 +782,55 @@ function renderInputsForCurrentStep(){
   }
 }
 
+
+function buildFormulaSoftFoot(){
+  const sf = computeSoftFoot();
+
+  // Valeurs entrées
+  const A = state.softFoot.A;
+  const B = state.softFoot.B;
+  const C = state.softFoot.C;
+  const D = state.softFoot.D;
+
+  // Calculs
+  const diagAC = sf.diagAC;
+  const diagBD = sf.diagBD;
+  const delta  = sf.delta;
+
+  const corr   = sf.correction;      // 80% du delta
+  const each   = corr / 2;           // réparti sur 2 pattes
+
+  // Quelle diagonale est fautive?
+  let faultyTxt = "Aucune (diagonales égales)";
+  if(sf.faulty) faultyTxt = sf.faulty.join(" + ");
+
+  return (
+`Pied boiteux — Diagonales
+
+Diag AC = A + C
+       = ${A} + ${C}
+       = ${diagAC.toFixed(2)} mil
+
+Diag BD = B + D
+       = ${B} + ${D}
+       = ${diagBD.toFixed(2)} mil
+
+Δ = |Diag AC − Diag BD|
+  = |${diagAC.toFixed(2)} − ${diagBD.toFixed(2)}|
+  = ${delta.toFixed(2)} mil
+
+Correction ≈ 0.8 × Δ
+          = 0.8 × ${delta.toFixed(2)}
+          = ${corr.toFixed(2)} mil
+
+Par patte (2 pattes) = Correction / 2
+                     = ${corr.toFixed(2)} / 2
+                     = ${each.toFixed(2)} mil
+
+Pattes à corriger : ${faultyTxt}`
+  );
+}
+
 /* =====================================================
    Wire inputs (lecture -> state -> redraw)
 ===================================================== */
@@ -825,15 +875,25 @@ function wireInputs(pairs){
 function refreshUI(){
   ui.stepTitle.textContent = `Étape ${STEPS[state.step].label}`;
 
-    const okNow = isStepOK(state.step);
+  const okNow = isStepOK(state.step);
   ui.stepBadge.textContent = okNow ? "OK" : "NOT OK";
   ui.stepBadge.classList.toggle("ok", okNow);
   ui.stepBadge.classList.toggle("bad", !okNow);
-  renderInputsForCurrentStep();
-  ui.infoBox.textContent =
-  buildMessage() + "\n\n" + buildCorrectionMessage();
-}
 
+  renderInputsForCurrentStep();
+
+  ui.infoBox.textContent =
+    buildMessage() + "\n\n" + buildCorrectionMessage();
+
+  // ===== FORMULES (PC) — ÉTAPE 2 SEULEMENT =====
+  if(ui.formulaBox){
+    if(STEPS[state.step].id === "softfoot"){
+      ui.formulaBox.textContent = buildFormulaSoftFoot();
+    }else{
+      ui.formulaBox.textContent = "";
+    }
+  }
+}
 /* =====================================================
    Navigation
 ===================================================== */
