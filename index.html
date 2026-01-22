@@ -1119,6 +1119,47 @@ topCtx.fillText("POMPE (fixe)",    cx+200, cy-110);
   drawShimText("D", P.D.x, P.D.y);
 }
 }
+
+function drawDimLine(ctx, x1, x2, y, label){
+  ctx.strokeStyle = "rgba(255,255,255,.8)";
+  ctx.lineWidth = 1.5;
+
+  // ligne principale
+  ctx.beginPath();
+  ctx.moveTo(x1, y);
+  ctx.lineTo(x2, y);
+  ctx.stroke();
+
+  // traits verticaux
+  ctx.beginPath();
+  ctx.moveTo(x1, y-6); ctx.lineTo(x1, y+6);
+  ctx.moveTo(x2, y-6); ctx.lineTo(x2, y+6);
+  ctx.stroke();
+
+  // texte
+  ctx.fillStyle = "#fff";
+  ctx.font = "12px Arial";
+  ctx.textAlign = "center";
+  ctx.fillText(label, (x1+x2)/2, y-10);
+}
+
+function drawCouplingDiameter(ctx, x, y, d){
+  const r = 18;
+  ctx.strokeStyle = "rgba(255,255,255,.8)";
+  ctx.lineWidth = 1.5;
+
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI*2);
+  ctx.stroke();
+
+  ctx.fillStyle = "#fff";
+  ctx.font = "12px Arial";
+  ctx.textAlign = "left";
+  ctx.fillText(`Ø = ${d} po`, x + 26, y + 4);
+}
+
+
+
 /* =====================================================
    SIDE VIEW
 ===================================================== */
@@ -1213,6 +1254,51 @@ if(
   sideCtx.textAlign="center";
   sideCtx.fillText("MOTEUR (mobile)", cx,     cy-92);
 sideCtx.fillText("POMPE (fixe)",    cx+200, cy-92);
+  // =====================================================
+  // MESURES GÉOMÉTRIQUES — MOTEUR SEULEMENT
+  // Affichage à partir de l'étape 3 (angV)
+  // =====================================================
+  if(state.step >= 2){
+
+    const couplingX = cx + 110;   // centre accouplement
+    const frontFeetX = cx + 70;   // patte AVANT moteur (C)
+    const rearFeetX  = cx - 70;   // patte ARRIÈRE moteur (D)
+
+    const y0 = cy + 95;
+
+    // Ø accouplement
+    drawCouplingDiameter(sideCtx, couplingX, cy - 5, geometry.couplingDiameter);
+
+    // Centre → patte AVANT
+    drawDimLine(
+      sideCtx,
+      couplingX,
+      frontFeetX,
+      y0,
+      `Centre → patte AVANT = ${geometry.centerToFrontFeet} po`
+    );
+
+    // Patte AVANT → ARRIÈRE
+    drawDimLine(
+      sideCtx,
+      frontFeetX,
+      rearFeetX,
+      y0 + 35,
+      `AVANT → ARRIÈRE = ${geometry.frontToRearFeet} po`
+    );
+
+    // Centre → patte ARRIÈRE
+    const centerToRear =
+      geometry.centerToFrontFeet + geometry.frontToRearFeet;
+
+    drawDimLine(
+      sideCtx,
+      couplingX,
+      rearFeetX,
+      y0 + 70,
+      `Centre → patte ARRIÈRE = ${centerToRear} po`
+    );
+  }
 // ===============================
 // SHIMS — ANGULARITÉ HORIZONTALE
 // ===============================
