@@ -191,6 +191,12 @@ canvas{
   .formulaBox{ display:block; } /* visible PC */
 }
 
+.c-blue{ border:2px solid #00a2ff !important; }
+.c-green{ border:2px solid #4caf50 !important; }
+.c-orange{ border:2px solid #ff9800 !important; }
+
+
+
 </style>
 </head>
 
@@ -298,14 +304,13 @@ const geometry = {
    DÉFINITION DES ÉTAPES
 ===================================================== */
 const STEPS = [
-  { id:"runout", label:"1 — Voilage" },
-  { id:"softfoot", label:"2 — Pied boiteux" },
-  { id:"angV", label:"3 — Angularité verticale" },
-  { id:"parV", label:"4 — Parallélisme vertical" },
-  { id:"angH", label:"5 — Angularité horizontale" },
-  { id:"parH", label:"6 — Parallélisme horizontal" }
+  { id:"runout",  label:"1 — Voilage" },
+  { id:"softfoot",label:"2 — Pied boiteux" },
+  { id:"measures",label:"3 — Mesures géométriques" },   // ← AJOUT
+  { id:"angV",    label:"4 — Angularité verticale" },
+  { id:"angH",    label:"5 — Angularité horizontale" },
+  { id:"parH",    label:"6 — Parallélisme horizontal" }
 ];
-
 /* =====================================================
    UTILITAIRES
 ===================================================== */
@@ -666,6 +671,48 @@ function renderInputsForCurrentStep(){
     ]);
     return;
   }
+
+if(id === "measures"){
+
+  ui.inputsArea.innerHTML = `
+    <div class="row">
+      <div>
+        <label style="color:#00a2ff;">Ø accouplement (po)</label>
+        <input id="in_diam" class="c-blue" type="number" step="0.1" value="${geometry.couplingDiameter}">
+      </div>
+    </div>
+
+    <div class="row" style="margin-top:8px;">
+      <div>
+        <label style="color:#4caf50;">Centre → pattes AVANT (po)</label>
+        <input id="in_centerFront" class="c-green" type="number" step="0.1" value="${geometry.centerToFrontFeet}">
+      </div>
+    </div>
+
+    <div class="row" style="margin-top:8px;">
+      <div>
+        <label style="color:#ff9800;">Pattes AVANT → ARRIÈRE (po)</label>
+        <input id="in_frontRear" class="c-orange" type="number" step="0.1" value="${geometry.frontToRearFeet}">
+      </div>
+    </div>
+
+    <div class="row" style="margin-top:10px;">
+      <div>
+        <label>Note</label>
+        <input disabled value="Ces mesures sont fixes pour tout l’alignement">
+      </div>
+    </div>
+  `;
+
+  wireInputs([
+    ["in_diam", v => geometry.couplingDiameter = Math.max(0.1, v)],
+    ["in_centerFront", v => geometry.centerToFrontFeet = Math.max(0.1, v)],
+    ["in_frontRear", v => geometry.frontToRearFeet = Math.max(0.1, v)],
+  ]);
+  return;
+}
+
+
 
   // =====================================================
   // ANGULARITÉ VERTICALE
@@ -1306,6 +1353,44 @@ if(
   sideCtx.textAlign="center";
   sideCtx.fillText("MOTEUR (mobile)", cx,     cy-92);
 sideCtx.fillText("POMPE (fixe)",    cx+200, cy-92);
+
+
+  // =====================================================
+  // MESURES GÉOMÉTRIQUES — ÉTAPE 3
+  // =====================================================
+  if(STEPS[state.step].id === "measures"){
+
+    const rearFeetX  = cx - 70;
+    const frontFeetX = cx + 70;
+
+    const motorRight = cx + 80;
+    const pumpLeft   = cx + 120;
+    const couplingX  = (motorRight + pumpLeft) / 2;
+
+    const y = cy + 90;
+
+    // Ø accouplement
+    drawCouplingDiameter(sideCtx, couplingX, cy - 5, geometry.couplingDiameter);
+
+    // Centre → AVANT
+    drawDimLine(
+      sideCtx,
+      couplingX,
+      frontFeetX,
+      y,
+      `Centre → AVANT = ${geometry.centerToFrontFeet} po`
+    );
+
+    // AVANT → ARRIÈRE
+    drawDimLine(
+      sideCtx,
+      frontFeetX,
+      rearFeetX,
+      y + 35,
+      `AVANT → ARRIÈRE = ${geometry.frontToRearFeet} po`
+    );
+  }
+
     // =====================================================
   // MESURES GÉOMÉTRIQUES — MOTEUR SEULEMENT
   // Affichage à partir de l’étape 3 (angV)
