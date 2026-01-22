@@ -772,36 +772,33 @@ function wireInputs(pairs){
     const input = document.getElementById(inputId);
     if(!input) return;
 
+    // Autoriser la saisie libre sans calcul immédiat
     input.addEventListener("input", () => {
-      const raw = input.value;
+      // Ne rien faire ici → saisie fluide
+    });
 
-      // Autoriser champ vide pendant saisie
-      if(raw === ""){
-        setter(0);
-        refreshUI();
-        drawTopView();
-        drawSideView();
-        return;
-      }
-
-      const v = parseFloat(raw);
-      if(Number.isFinite(v)){
-        setter(v);
-        refreshUI();
-        drawTopView();
-        drawSideView();
+    // Validation sur ENTER
+    input.addEventListener("keydown", (e) => {
+      if(e.key === "Enter"){
+        input.blur();   // force validation
       }
     });
 
-    // Sécurité quand on quitte le champ
+    // Validation finale quand on quitte le champ
     input.addEventListener("blur", () => {
-      if(input.value === ""){
+      let raw = input.value.trim();
+
+      if(raw === ""){
+        raw = "0";
         input.value = "0";
-        setter(0);
-        refreshUI();
-        drawTopView();
-        drawSideView();
       }
+
+      const v = parseFloat(raw);
+      setter(Number.isFinite(v) ? v : 0);
+
+      refreshUI();
+      drawTopView();
+      drawSideView();
     });
   });
 }
