@@ -773,102 +773,67 @@ if(id === "measures"){
   // ANGULARITÉ VERTICALE
   // =====================================================
   if(id === "angV"){
-    ui.inputsArea.innerHTML = `
-      <div class="row">
-        <div>
-          <label>Lecture cadran 12–6 (mils)</label>
-          <input id="in_angV" type="number" step="0.1" value="${state.angV}">
-        </div>
-        <div>
-          <label>Tolérance (mils)</label>
-          <input id="in_angVTol" type="number" step="0.1" value="${state.angVTol}">
+  ui.inputsArea.innerHTML = `
+    <div class="row">
+      <div>
+        <label>Lecture cadran 12–6 (mils)</label>
+        <input id="in_angV" type="number" step="0.1" value="${state.angV}">
+      </div>
+      <div>
+        <label>Tolérance (mils)</label>
+        <input id="in_angVTol" type="number" step="0.1" value="${state.angVTol}">
+      </div>
+    </div>
+
+    <div class="row" style="margin-top:10px;">
+      <div>
+        <label>Note</label>
+        <div class="noteBox">
+          Les distances géométriques proviennent de l’étape 3
         </div>
       </div>
+    </div>
+  `;
 
-      <div class="row" style="margin-top:8px;">
-        <div>
-          <label>Ø accouplement (po)</label>
-          <input id="in_diam" type="number" step="0.1" value="${geometry.couplingDiameter}">
-        </div>
-        <div>
-          <label>Centre → pattes AVANT (po)</label>
-          <input id="in_centerFront" type="number" step="0.1" value="${geometry.centerToFrontFeet}">
-        </div>
-      </div>
-
-      <div class="row" style="margin-top:8px;">
-        <div>
-          <label>Pattes AVANT → ARRIÈRE (po)</label>
-          <input id="in_frontRear" type="number" step="0.1" value="${geometry.frontToRearFeet}">
-        </div>
-        <div>
-          <label>Note</label>
-          <div class="noteBox">Correction réelle aux pattes (mils)
-        </div>
-      </div>
-        </div>
-    `;
-
-    wireInputs([
-      ["in_angV", v => state.angV = v],
-      ["in_angVTol", v => state.angVTol = Math.max(0, v)],
-      ["in_diam", v => geometry.couplingDiameter = Math.max(0.1, v)],
-      ["in_centerFront", v => geometry.centerToFrontFeet = Math.max(0.1, v)],
-      ["in_frontRear", v => geometry.frontToRearFeet = Math.max(0.1, v)],
-    ]);
-    return;
-  }
+  wireInputs([
+    ["in_angV", v => state.angV = v],
+    ["in_angVTol", v => state.angVTol = Math.max(0, v)]
+  ]);
+  return;
+}
 
   // =====================================================
   // ANGULARITÉ HORIZONTALE
   // =====================================================
   if(id === "angH"){
-    ui.inputsArea.innerHTML = `
-      <div class="row">
-        <div>
-          <label>Lecture cadran 3–9 (mils)</label>
-          <input id="in_angH" type="number" step="0.1" value="${state.angH}">
-        </div>
-        <div>
-          <label>Tolérance (mils)</label>
-          <input id="in_angHTol" type="number" step="0.1" value="${state.angHTol}">
+  ui.inputsArea.innerHTML = `
+    <div class="row">
+      <div>
+        <label>Lecture cadran 3–9 (mils)</label>
+        <input id="in_angH" type="number" step="0.1" value="${state.angH}">
+      </div>
+      <div>
+        <label>Tolérance (mils)</label>
+        <input id="in_angHTol" type="number" step="0.1" value="${state.angHTol}">
+      </div>
+    </div>
+
+    <div class="row" style="margin-top:10px;">
+      <div>
+        <label>Note</label>
+        <div class="noteBox">
+          Les distances géométriques proviennent de l’étape 3
         </div>
       </div>
+    </div>
+  `;
 
-      <div class="row" style="margin-top:8px;">
-        <div>
-          <label>Ø accouplement (po)</label>
-          <input id="in_diam" type="number" step="0.1" value="${geometry.couplingDiameter}">
-        </div>
-        <div>
-          <label>Centre → pattes AVANT (po)</label>
-          <input id="in_centerFront" type="number" step="0.1" value="${geometry.centerToFrontFeet}">
-        </div>
-      </div>
-
-      <div class="row" style="margin-top:8px;">
-        <div>
-          <label>Pattes AVANT → ARRIÈRE (po)</label>
-          <input id="in_frontRear" type="number" step="0.1" value="${geometry.frontToRearFeet}">
-        </div>
-        <div>
-          <label>Note</label>
-          <div class="noteBox">Correction réelle aux pattes (mils)
-        </div>
-      </div>
-        </div>
-    `;
-
-    wireInputs([
-      ["in_angH", v => state.angH = v],
-      ["in_angHTol", v => state.angHTol = Math.max(0, v)],
-      ["in_diam", v => geometry.couplingDiameter = Math.max(0.1, v)],
-      ["in_centerFront", v => geometry.centerToFrontFeet = Math.max(0.1, v)],
-      ["in_frontRear", v => geometry.frontToRearFeet = Math.max(0.1, v)],
-    ]);
-    return;
-  }
-
+  wireInputs([
+    ["in_angH", v => state.angH = v],
+    ["in_angHTol", v => state.angHTol = Math.max(0, v)]
+  ]);
+  return;
+}
   if(id === "parH"){
     ui.inputsArea.innerHTML = `
       <div class="row">
