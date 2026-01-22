@@ -195,7 +195,15 @@ canvas{
 .c-green{ border:2px solid #4caf50 !important; }
 .c-orange{ border:2px solid #ff9800 !important; }
 
-
+.noteBox{
+  background: rgba(255,255,255,.10);
+  border-radius:12px;
+  padding:10px 12px;
+  font-size:13px;
+  color:#fff;
+  line-height:1.4;
+  min-height:44px;
+}
 
 </style>
 </head>
@@ -664,8 +672,9 @@ function renderInputsForCurrentStep(){
         </div>
         <div>
           <label>Note</label>
-          <input disabled value="La plus grande diagonale est affichée (soft foot seulement)">
+          <div class="noteBox"> ="La plus grande diagonale est affichée (soft foot seulement)">
         </div>
+      </div>
       </div>
     `;
     wireInputs([
@@ -696,9 +705,10 @@ if(id === "measures"){
       <div class="row" style="margin-top:10px;">
         <div>
           <label>Instruction</label>
-          <input disabled value="Mesurer le diamètre extérieur de l’accouplement">
+          <div class="noteBox"> ="Mesurer le diamètre extérieur de l’accouplement">
         </div>
       </div>
+        </div>
     `;
   }
 
@@ -716,9 +726,10 @@ if(id === "measures"){
       <div class="row" style="margin-top:10px;">
         <div>
           <label>Instruction</label>
-          <input disabled value="Mesurer du centre de l’accouplement jusqu’aux pattes avant du moteur">
+          <div class="noteBox"> ="Mesurer du centre de l’accouplement jusqu’aux pattes avant du moteur">
         </div>
       </div>
+        </div>
     `;
   }
 
@@ -736,9 +747,10 @@ if(id === "measures"){
       <div class="row" style="margin-top:10px;">
         <div>
           <label>Instruction</label>
-          <input disabled value="Mesurer la distance entre pattes avant et arrière du moteur">
+          <div class="noteBox"> ="Mesurer la distance entre pattes avant et arrière du moteur">
         </div>
       </div>
+        </div>
     `;
   }
 
@@ -793,9 +805,10 @@ if(id === "measures"){
         </div>
         <div>
           <label>Note</label>
-          <input disabled value="Correction réelle aux pattes (mils)">
+          <div class="noteBox"> ="Correction réelle aux pattes (mils)">
         </div>
       </div>
+        </div>
     `;
 
     wireInputs([
@@ -842,9 +855,10 @@ if(id === "measures"){
         </div>
         <div>
           <label>Note</label>
-          <input disabled value="Correction réelle aux pattes (mils)">
+          <div class="noteBox"> ="Correction réelle aux pattes (mils)">
         </div>
       </div>
+        </div>
     `;
 
     wireInputs([
