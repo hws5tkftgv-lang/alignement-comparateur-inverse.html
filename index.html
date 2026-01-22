@@ -1357,8 +1357,8 @@ function drawCouplingDiameter(ctx, x, y, d){
 ===================================================== */
 function drawSideView(){
 
-  const canvas = ui.sideCanvas;
-  const ctx = canvas.getContext("2d");
+  const canvas = sideCanvas;
+  const ctx = sideCtx;
 
   const w = canvas.width;
   const h = canvas.height;
@@ -1398,7 +1398,7 @@ function drawSideView(){
   ctx.fillStyle = "#ff9800";
   ctx.fillRect(pumpX, cy - pumpH/2, pumpW, pumpH);
 
-  // Titre
+  // Titres
   ctx.fillStyle="#fff";
   ctx.font="14px Arial";
   ctx.textAlign="center";
@@ -1410,7 +1410,7 @@ function drawSideView(){
   // ===============================
   if(STEPS[state.step].id === "measures"){
 
-    const sub = state.measureSubStep; // 0,1,2
+    const sub = state.measureStep;   // ✅ CORRIGÉ
 
     const color = ["#00a2ff","#4caf50","#ff9800"][sub];
     ctx.strokeStyle = color;
@@ -1422,13 +1422,11 @@ function drawSideView(){
       const r = 28;
       const x = cx + motorW/2 + gap/2;
 
-      // Cote verticale uniquement
       ctx.beginPath();
       ctx.moveTo(x + r + 12, cy - r);
       ctx.lineTo(x + r + 12, cy + r);
       ctx.stroke();
 
-      // traits haut/bas
       ctx.beginPath();
       ctx.moveTo(x + r + 6, cy - r);
       ctx.lineTo(x + r + 18, cy - r);
@@ -1449,7 +1447,6 @@ function drawSideView(){
       ctx.lineTo(x2, y);
       ctx.stroke();
 
-      // traits verticaux
       ctx.beginPath();
       ctx.moveTo(x1, y - 8);
       ctx.lineTo(x1, y + 8);
@@ -1470,7 +1467,6 @@ function drawSideView(){
       ctx.lineTo(x2, y);
       ctx.stroke();
 
-      // traits verticaux
       ctx.beginPath();
       ctx.moveTo(x1, y - 8);
       ctx.lineTo(x1, y + 8);
