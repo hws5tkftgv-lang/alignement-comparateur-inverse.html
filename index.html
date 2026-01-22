@@ -772,7 +772,6 @@ function wireInputs(pairs){
     const input = document.getElementById(inputId);
     if(!input) return;
 
-    // === Saisie fluide ===
     input.addEventListener("input", () => {
       const raw = input.value;
 
@@ -792,9 +791,9 @@ function wireInputs(pairs){
         drawTopView();
         drawSideView();
       }
-    }, { passive:true });
+    });
 
-    // === Sécurité quand on quitte le champ ===
+    // Sécurité quand on quitte le champ
     input.addEventListener("blur", () => {
       if(input.value === ""){
         input.value = "0";
@@ -806,7 +805,6 @@ function wireInputs(pairs){
     });
   });
 }
-
 /* =====================================================
    UI sync
 ===================================================== */
