@@ -776,11 +776,10 @@ function wireInputs(pairs){
   const v = parseFloat(input.value);
   setter(Number.isFinite(v) ? v : 0);
 
-  // ⚠️ redraw SEULEMENT les dessins, PAS l’UI
+  refreshUI();      // 👈 met à jour OK / NOT OK en direct
   drawTopView();
   drawSideView();
 };
-
     input.addEventListener("input", read, { passive:true });
     input.addEventListener("change", read, { passive:true });
   });
