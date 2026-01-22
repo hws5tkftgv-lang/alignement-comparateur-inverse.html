@@ -1357,48 +1357,52 @@ function drawCouplingDiameter(ctx, x, y, d){
 ===================================================== */
 function drawSideView(){
 
-  const canvas = sideCanvas;
+  currentView = "side";
+
+  const {w,h} = resizeCanvas(sideCanvas, sideCtx);
+  clear(sideCtx,w,h);
+
   const ctx = sideCtx;
 
-  const w = canvas.width;
-  const h = canvas.height;
-
-  ctx.clearRect(0,0,w,h);
-
-  // Fond
-  ctx.fillStyle = "#000";
-  ctx.fillRect(0,0,w,h);
-
-  // Centre général
+  // ===============================
+  //   GÉOMÉTRIE DE BASE
+  // ===============================
   const cy = h * 0.55;
-  const cx = w * 0.38;
+  const cx = w * 0.35;
 
-  // Dimensions moteur
   const motorW = 200;
   const motorH = 70;
   const footH  = 12;
   const footW  = 40;
 
-  // Pompe
   const pumpW = 130;
   const pumpH = 70;
-  const gap   = 55;
+  const gap   = 60;
 
-  // --- MOTEUR ---
+  const frontFootX = cx + motorW/2 - footW/2;
+  const rearFootX  = cx - motorW/2 + footW/2;
+
+  // ===============================
+  //   MOTEUR
+  // ===============================
   ctx.fillStyle = "#00a2ff";
   ctx.fillRect(cx - motorW/2, cy - motorH/2, motorW, motorH);
 
   // pattes moteur
-  ctx.fillRect(cx - motorW/2, cy + motorH/2 - 2, footW, footH);
-  ctx.fillRect(cx + motorW/2 - footW, cy + motorH/2 - 2, footW, footH);
+  ctx.fillRect(rearFootX - footW/2,  cy + motorH/2 - 2, footW, footH);
+  ctx.fillRect(frontFootX - footW/2, cy + motorH/2 - 2, footW, footH);
 
-  // --- POMPE ---
+  // ===============================
+  //   POMPE
+  // ===============================
   const pumpX = cx + motorW/2 + gap;
 
   ctx.fillStyle = "#ff9800";
   ctx.fillRect(pumpX, cy - pumpH/2, pumpW, pumpH);
 
-  // Titres
+  // ===============================
+  //   TITRES
+  // ===============================
   ctx.fillStyle="#fff";
   ctx.font="14px Arial";
   ctx.textAlign="center";
@@ -1408,72 +1412,85 @@ function drawSideView(){
   // ===============================
   //   MESURES GÉOMÉTRIQUES
   // ===============================
-  if(STEPS[state.step].id === "measures"){
+  if(STEPS[state.step].id !== "measures") return;
 
-    const sub = state.measureStep;   // ✅ CORRIGÉ
+  const sub = state.measureStep;
+  const color = ["#00a2ff","#4caf50","#ff9800"][sub];
 
-    const color = ["#00a2ff","#4caf50","#ff9800"][sub];
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 3;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 3;
 
-    // ===== 0 → Ø ACCOUPLEMENT =====
-    if(sub === 0){
+  // ===========================================
+  //   0 → Ø ACCOUPLEMENT (COTE VERTICALE PURE)
+  // ===========================================
+  if(sub === 0){
 
-      const r = 28;
-      const x = cx + motorW/2 + gap/2;
+    const r = 26;
+    const x = cx + motorW/2 + gap/2;
 
-      ctx.beginPath();
-      ctx.moveTo(x + r + 12, cy - r);
-      ctx.lineTo(x + r + 12, cy + r);
-      ctx.stroke();
+    // ligne verticale
+    ctx.beginPath();
+    ctx.moveTo(x, cy - r);
+    ctx.lineTo(x, cy + r);
+    ctx.stroke();
 
-      ctx.beginPath();
-      ctx.moveTo(x + r + 6, cy - r);
-      ctx.lineTo(x + r + 18, cy - r);
-      ctx.moveTo(x + r + 6, cy + r);
-      ctx.lineTo(x + r + 18, cy + r);
-      ctx.stroke();
-    }
+    // ticks haut/bas
+    ctx.beginPath();
+    ctx.moveTo(x - 8, cy - r);
+    ctx.lineTo(x + 8, cy - r);
+    ctx.moveTo(x - 8, cy + r);
+    ctx.lineTo(x + 8, cy + r);
+    ctx.stroke();
 
-    // ===== 1 → CENTRE → PATTES AVANT =====
-    if(sub === 1){
+    return;
+  }
 
-      const x1 = cx;
-      const x2 = cx + motorW/2 - footW/2;
-      const y  = cy + motorH/2 + 28;
+  // ===========================================
+  //   1 → CENTRE → PATTES AVANT
+  // ===========================================
+  if(sub === 1){
 
-      ctx.beginPath();
-      ctx.moveTo(x1, y);
-      ctx.lineTo(x2, y);
-      ctx.stroke();
+    const x1 = cx;
+    const x2 = frontFootX;
+    const y  = cy + motorH/2 + 30;
 
-      ctx.beginPath();
-      ctx.moveTo(x1, y - 8);
-      ctx.lineTo(x1, y + 8);
-      ctx.moveTo(x2, y - 8);
-      ctx.lineTo(x2, y + 8);
-      ctx.stroke();
-    }
+    ctx.beginPath();
+    ctx.moveTo(x1, y);
+    ctx.lineTo(x2, y);
+    ctx.stroke();
 
-    // ===== 2 → PATTES AVANT → ARRIÈRE =====
-    if(sub === 2){
+    ctx.beginPath();
+    ctx.moveTo(x1, y - 8);
+    ctx.lineTo(x1, y + 8);
+    ctx.moveTo(x2, y - 8);
+    ctx.lineTo(x2, y + 8);
+    ctx.stroke();
 
-      const x1 = cx - motorW/2 + footW/2;
-      const x2 = cx + motorW/2 - footW/2;
-      const y  = cy + motorH/2 + 48;
+    return;
+  }
 
-      ctx.beginPath();
-      ctx.moveTo(x1, y);
-      ctx.lineTo(x2, y);
-      ctx.stroke();
+  // ===========================================
+  //   2 → PATTES AVANT → ARRIÈRE
+  // ===========================================
+  if(sub === 2){
 
-      ctx.beginPath();
-      ctx.moveTo(x1, y - 8);
-      ctx.lineTo(x1, y + 8);
-      ctx.moveTo(x2, y - 8);
-      ctx.lineTo(x2, y + 8);
-      ctx.stroke();
-    }
+    const x1 = rearFootX;
+    const x2 = frontFootX;
+    const y  = cy + motorH/2 + 52;
+
+    ctx.beginPath();
+    ctx.moveTo(x1, y);
+    ctx.lineTo(x2, y);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(x1, y - 8);
+    ctx.lineTo(x1, y + 8);
+    ctx.moveTo(x2, y - 8);
+    ctx.lineTo(x2, y + 8);
+    ctx.stroke();
+
+    return;
   }
 }
 /* =====================================================
