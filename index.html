@@ -772,27 +772,38 @@ function wireInputs(pairs){
     const input = document.getElementById(inputId);
     if(!input) return;
 
-    const read = () => {
-  const raw = input.value;
+    // === Saisie fluide ===
+    input.addEventListener("input", () => {
+      const raw = input.value;
 
-  // Autoriser champ vide pendant la saisie
-  if(raw === ""){
-    setter(0);
-    refreshUI();
-    drawTopView();
-    drawSideView();
-    return;
-  }
+      // Autoriser champ vide pendant saisie
+      if(raw === ""){
+        setter(0);
+        refreshUI();
+        drawTopView();
+        drawSideView();
+        return;
+      }
 
-  const v = parseFloat(raw);
-  setter(Number.isFinite(v) ? v : 0);
+      const v = parseFloat(raw);
+      if(Number.isFinite(v)){
+        setter(v);
+        refreshUI();
+        drawTopView();
+        drawSideView();
+      }
+    }, { passive:true });
 
-  refreshUI();
-  drawTopView();
-  drawSideView();
-};
-    input.addEventListener("input", read, { passive:true });
-    input.addEventListener("change", read, { passive:true });
+    // === Sécurité quand on quitte le champ ===
+    input.addEventListener("blur", () => {
+      if(input.value === ""){
+        input.value = "0";
+        setter(0);
+        refreshUI();
+        drawTopView();
+        drawSideView();
+      }
+    });
   });
 }
 
