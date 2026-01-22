@@ -447,6 +447,13 @@ function computeAngularShimsHorizontal(){
    VALIDATION PAR ÉTAPE
 ===================================================== */
 function isStepOK(step){
+  const id = STEPS[step].id;
+
+  if(id === "measures"){
+    // toujours OK (ou tu peux exiger valeurs > 0)
+    return geometry.couplingDiameter > 0 && geometry.centerToFrontFeet > 0 && geometry.frontToRearFeet > 0;
+  }
+
   switch(step){
     case 0: return ok(state.runout, state.runoutTol);
     case 1: return computeSoftFoot().delta <= state.softFootTol;
@@ -457,7 +464,6 @@ function isStepOK(step){
     default: return true;
   }
 }
-
 /* =====================================================
    MESSAGE TEXTE (ZONE INFO)
 ===================================================== */
@@ -986,15 +992,17 @@ function refreshUI(){
    Navigation
 ===================================================== */
 function nextStep(){
-
-  // Gestion spéciale de l'étape "measures"
+  // Sous-étapes de "measures"
   if(STEPS[state.step].id === "measures"){
     if(state.measureStep < 2){
       state.measureStep++;
       renderAll();
       return;
-    } else {
-      state.measureStep = 0;  // reset avant de passer à l'étape suivante
+    }else{
+      state.measureStep = 0;
+      state.step++;
+      renderAll();
+      return;
     }
   }
 
@@ -1003,13 +1011,27 @@ function nextStep(){
     renderAll();
   }
 }
+
 function prevStep(){
+  // Sous-étapes de "measures"
+  if(STEPS[state.step].id === "measures"){
+    if(state.measureStep > 0){
+      state.measureStep--;
+      renderAll();
+      return;
+    }else{
+      // revenir à l'étape précédente
+      state.step--;
+      renderAll();
+      return;
+    }
+  }
+
   if(state.step > 0){
     state.step--;
     renderAll();
   }
 }
-
 ui.btnPrev.addEventListener("click", prevStep);
 ui.btnNext.addEventListener("click", nextStep);
 /* =====================================================
@@ -1039,6 +1061,26 @@ function clear(ctx,w,h){
   ctx.fillStyle="#000";
   ctx.fillRect(0,0,w,h);
 }
+
+function drawDimOnly(ctx, x1, x2, y){
+  ctx.beginPath();
+  ctx.moveTo(x1, y);
+  ctx.lineTo(x2, y);
+  ctx.stroke();
+
+  // petites barres aux extrémités
+  ctx.beginPath();
+  ctx.moveTo(x1, y - 8);
+  ctx.lineTo(x1, y + 8);
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.moveTo(x2, y - 8);
+  ctx.lineTo(x2, y + 8);
+  ctx.stroke();
+}
+
+
 
 function drawShimValue(ctx, x, y, value){
   if(value <= 0) return;
@@ -1314,210 +1356,102 @@ function drawCouplingDiameter(ctx, x, y, d){
    SIDE VIEW
 ===================================================== */
 function drawSideView(){
-  currentView = "side";
-  const {w,h} = resizeCanvas(sideCanvas,sideCtx);
-  clear(sideCtx,w,h);
 
-  const cx = w*0.35;
-  const cy = h*0.55;
+  const canvas = ui.sideCanvas;
+  const ctx = canvas.getContext("2d");
 
-  // moteur
-  sideCtx.fillStyle="#00a2ff";
-  sideCtx.fillRect(cx-80,cy-30,160,60);
+  const w = canvas.width;
+  const h = canvas.height;
 
-  // pattes
-  
-  // Pattes visibles en vue de profil (Side View)
-// A et B sont cachées derrière
+  ctx.clearRect(0,0,w,h);
 
-// D = bas gauche (arrière moteur)
-drawFoot(sideCtx, cx-70, cy+40, "D");
+  const cx = w * 0.40;
+  const cy = h * 0.50;
 
-// C = bas droite (côté pompe)
-drawFoot(sideCtx, cx+70, cy+40, "C");
+  const motorLength = 160;
+  const motorHeight = 60;
+  const pumpLength  = 110;
+  const pumpHeight  = 60;
 
-// ===============================
-// SHIMS — ANGULARITÉ VERTICALE
-// ===============================
-if(STEPS[state.step].id === "angV"){
-  const r = computeAngularVertical();
-  if(r){
-    const shims = computeAngularShimsVertical();
+  const frontFootX = cx + 70;
+  const rearFootX  = cx - 70;
 
-    const front = shims.front;
-    const rear  = shims.rear;
+  const motorRight = cx + motorLength/2;
+  const pumpLeft   = motorRight + 40;
+  const couplingX  = (motorRight + pumpLeft) / 2;
 
-    // AVANT = patte côté accouplement → C
-    // ARRIÈRE = patte côté moteur → D
-    if(r.pair.includes("B") || r.pair.includes("C")){
-      drawShimValue(sideCtx, cx+70, cy+40, front);
-    }
+  // ==============================
+  // MOTEUR
+  // ==============================
+  ctx.fillStyle="#00a2ff";
+  ctx.fillRect(cx-motorLength/2, cy-motorHeight/2, motorLength, motorHeight);
 
-    if(r.pair.includes("A") || r.pair.includes("D")){
-      drawShimValue(sideCtx, cx-70, cy+40, rear);
-    }
-  }
-}
+  // pattes moteur
+  ctx.fillRect(frontFootX-14, cy+motorHeight/2, 28, 10);
+  ctx.fillRect(rearFootX-14,  cy+motorHeight/2, 28, 10);
 
+  // ==============================
+  // POMPE
+  // ==============================
+  ctx.fillStyle="#ff9800";
+  ctx.fillRect(pumpLeft, cy-pumpHeight/2, pumpLength, pumpHeight);
 
-// ===== AFFICHAGE DES CALES (SIDE VIEW) =====
-const stepId = STEPS[state.step].id;
+  // ==============================
+  // ACCOUPLEMENT
+  // ==============================
+  ctx.strokeStyle="#ffffff";
+  ctx.lineWidth=2;
+  ctx.beginPath();
+  ctx.arc(couplingX, cy, 22, 0, Math.PI*2);
+  ctx.stroke();
 
-// Angularité verticale ou horizontale
-if(
-  (stepId === "angV" && !ok(state.angV, state.angVTol)) ||
-  (stepId === "angH" && !ok(state.angH, state.angHTol))
-){
-  const shims =
-    stepId === "angV"
-      ? computeAngularShimsVertical()
-      : computeAngularShimsHorizontal();
-
-  const front = shims.front.toFixed(2);
-  const rear  = shims.rear.toFixed(2);
-
-  sideCtx.fillStyle = isBlinking();
-  sideCtx.font = blinkPhase ? "bold 14px Arial" : "13px Arial";
-  sideCtx.textAlign = "center";
-
-  // AVANT (côté accouplement / patte C)
-  sideCtx.fillText(
-    `+${front} mil`,
-    cx + 70,
-    cy + 70
-  );
-
-  // ARRIÈRE (patte D)
-  sideCtx.fillText(
-    `+${rear} mil`,
-    cx - 70,
-    cy + 70
-  );
-}
-
-  // pompe
-  sideCtx.fillStyle="#ff9800";
-  sideCtx.fillRect(cx+120,cy-30,160,60);
-
-  sideCtx.fillStyle="#fff";
-  sideCtx.font="13px Arial";
-  sideCtx.textAlign="center";
-  sideCtx.fillText("MOTEUR (mobile)", cx,     cy-92);
-sideCtx.fillText("POMPE (fixe)",    cx+200, cy-92);
-
+  // ==============================
+  // TEXTE DE BASE
+  // ==============================
+  ctx.fillStyle="#ffffff";
+  ctx.font="13px Arial";
+  ctx.textAlign="center";
+  ctx.fillText("MOTEUR (mobile)", cx, cy-motorHeight/2-12);
+  ctx.fillText("POMPE (fixe)", pumpLeft+pumpLength/2, cy-pumpHeight/2-12);
 
   // =====================================================
-  // MESURES GÉOMÉTRIQUES — ÉTAPE 3
+  // MODE NORMAL → PAS L'ÉTAPE MESURES
   // =====================================================
-  if(STEPS[state.step].id === "measures"){
+  if(STEPS[state.step].id !== "measures"){
 
-    const rearFeetX  = cx - 70;
-    const frontFeetX = cx + 70;
+    ctx.strokeStyle="rgba(255,255,255,0.35)";
+    ctx.lineWidth=1;
 
-    const motorRight = cx + 80;
-    const pumpLeft   = cx + 120;
-    const couplingX  = (motorRight + pumpLeft) / 2;
+    drawDimOnly(ctx, couplingX, frontFootX, cy+85);
+    drawDimOnly(ctx, frontFootX, rearFootX,  cy+105);
 
-    const y = cy + 90;
-
-    // Ø accouplement
-    drawCouplingDiameter(sideCtx, couplingX, cy - 5, geometry.couplingDiameter);
-
-    // Centre → AVANT
-    drawDimLine(
-      sideCtx,
-      couplingX,
-      frontFeetX,
-      y,
-      `Centre → AVANT = ${geometry.centerToFrontFeet} po`
-    );
-
-    // AVANT → ARRIÈRE
-    drawDimLine(
-      sideCtx,
-      frontFeetX,
-      rearFeetX,
-      y + 35,
-      `AVANT → ARRIÈRE = ${geometry.frontToRearFeet} po`
-    );
+    return;
   }
 
-    // =====================================================
-  // MESURES GÉOMÉTRIQUES — MOTEUR SEULEMENT
-  // Affichage à partir de l’étape 3 (angV)
   // =====================================================
-  if(state.step >= 2){
+  // MODE MESURES GUIDÉES — UNE SEULE COTE
+  // =====================================================
+  ctx.lineWidth = 3;
 
-    // mêmes positions que tes pattes D et C
-    const rearFeetX  = cx - 70;  // D (arrière moteur)
-    const frontFeetX = cx + 70;  // C (avant moteur)
-
-    // centre de l’accouplement (entre moteur et pompe)
-    const motorRight = cx + 80;
-    const pumpLeft   = cx + 120;
-    const couplingX  = (motorRight + pumpLeft) / 2;
-
-    // Y des cotes : toujours DANS le canvas (mobile-safe)
-    const y1 = Math.min(h - 70, cy + 95);
-    const y2 = y1 + 28;
-    const y3 = y2 + 28;
-
-    // Ø accouplement
-    drawCouplingDiameter(sideCtx, couplingX, cy - 5, geometry.couplingDiameter);
-
-    // Centre → AVANT
-    drawDimLine(
-      sideCtx,
-      couplingX,
-      frontFeetX,
-      y1,
-      `Centre → pattes AVANT = ${geometry.centerToFrontFeet} po`
-    );
-
-    // AVANT → ARRIÈRE
-    drawDimLine(
-      sideCtx,
-      frontFeetX,
-      rearFeetX,
-      y2,
-      `AVANT → ARRIÈRE = ${geometry.frontToRearFeet} po`
-    );
-
-    // Centre → ARRIÈRE (calculé)
-    const centerToRear = geometry.centerToFrontFeet + geometry.frontToRearFeet;
-
-    drawDimLine(
-      sideCtx,
-      couplingX,
-      rearFeetX,
-      y3,
-      `Centre → pattes ARRIÈRE = ${centerToRear} po`
-    );
+  // 0 = Ø accouplement (BLEU)
+  if(state.measureStep === 0){
+    ctx.strokeStyle = "#00a2ff";
+    ctx.beginPath();
+    ctx.arc(couplingX, cy, 24, 0, Math.PI*2);
+    ctx.stroke();
   }
-// ===============================
-// SHIMS — ANGULARITÉ HORIZONTALE
-// ===============================
-if(STEPS[state.step].id === "angH"){
-  const r = computeAngularHorizontal();
-  if(r){
-    const shims = computeAngularShimsHorizontal();
 
-    const front = shims.front;
-    const rear  = shims.rear;
-
-    // AVANT = A + B
-    if(r.pair.includes("A")){
-      drawShimValue(topCtx, P.A.x, P.A.y, front);
-      drawShimValue(topCtx, P.B.x, P.B.y, front);
-    }
-
-    // ARRIÈRE = C + D
-    if(r.pair.includes("C")){
-      drawShimValue(topCtx, P.C.x, P.C.y, rear);
-      drawShimValue(topCtx, P.D.x, P.D.y, rear);
-    }
+  // 1 = Centre → pattes AVANT (VERT)
+  if(state.measureStep === 1){
+    ctx.strokeStyle = "#4caf50";
+    drawDimOnly(ctx, couplingX, frontFootX, cy+95);
   }
-}
+
+  // 2 = Pattes AVANT → ARRIÈRE (ORANGE)
+  if(state.measureStep === 2){
+    ctx.strokeStyle = "#ff9800";
+    drawDimOnly(ctx, frontFootX, rearFootX, cy+95);
+  }
 }
 
 /* =====================================================
