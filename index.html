@@ -1445,30 +1445,32 @@ function drawSideView(){
     return;
   }
 
-  // ===========================================
-  //   1 → CENTRE → PATTES AVANT
-  // ===========================================
-  if(sub === 1){
+// ===========================================
+//   1 → CENTRE ACCOUPLEMENT → PATTES AVANT
+// ===========================================
+if(sub === 1){
 
-    const x1 = cx;
-    const x2 = frontFootX;
-    const y  = cy + motorH/2 + 30;
+  // centre réel de l'accouplement
+  const couplingCenterX = cx + motorW/2 + gap/2;
 
-    ctx.beginPath();
-    ctx.moveTo(x1, y);
-    ctx.lineTo(x2, y);
-    ctx.stroke();
+  const x1 = couplingCenterX;
+  const x2 = frontFootX;
+  const y  = cy + motorH/2 + 30;
 
-    ctx.beginPath();
-    ctx.moveTo(x1, y - 8);
-    ctx.lineTo(x1, y + 8);
-    ctx.moveTo(x2, y - 8);
-    ctx.lineTo(x2, y + 8);
-    ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(x1, y);
+  ctx.lineTo(x2, y);
+  ctx.stroke();
 
-    return;
-  }
+  ctx.beginPath();
+  ctx.moveTo(x1, y - 8);
+  ctx.lineTo(x1, y + 8);
+  ctx.moveTo(x2, y - 8);
+  ctx.lineTo(x2, y + 8);
+  ctx.stroke();
 
+  return;
+}
   // ===========================================
   //   2 → PATTES AVANT → ARRIÈRE
   // ===========================================
