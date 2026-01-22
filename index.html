@@ -272,7 +272,8 @@ setInterval(() => {
 ===================================================== */
 const state = {
   step: 0,
-
+  measureStep: 0,
+  
   runout: 0,
   runoutTol: 2,
 
@@ -295,11 +296,10 @@ const state = {
    PARAMÈTRES GÉOMÉTRIQUES (pouces)
 ===================================================== */
 const geometry = {
-  couplingDiameter: 3,        // Ø accouplement
-  centerToFrontFeet: 6,       // Centre accouplement → pattes AVANT
-  frontToRearFeet: 10         // Distance pattes AVANT → pattes ARRIÈRE
+  couplingDiameter: 3,      // Ø accouplement
+  centerToFrontFeet: 6,    // Centre → pattes AVANT
+  frontToRearFeet: 10      // Pattes AVANT → ARRIÈRE
 };
-
 /* =====================================================
    DÉFINITION DES ÉTAPES
 ===================================================== */
@@ -674,45 +674,84 @@ function renderInputsForCurrentStep(){
 
 if(id === "measures"){
 
-  ui.inputsArea.innerHTML = `
-    <div class="row">
-      <div>
-        <label style="color:#00a2ff;">Ø accouplement (po)</label>
-        <input id="in_diam" class="c-blue" type="number" step="0.1" value="${geometry.couplingDiameter}">
-      </div>
-    </div>
+  let html = "";
 
-    <div class="row" style="margin-top:8px;">
-      <div>
-        <label style="color:#4caf50;">Centre → pattes AVANT (po)</label>
-        <input id="in_centerFront" class="c-green" type="number" step="0.1" value="${geometry.centerToFrontFeet}">
+  // ===== SOUS-ÉTAPE 1 — Ø ACCOUPLEMENT =====
+  if(state.measureStep === 0){
+    html = `
+      <div class="row">
+        <div>
+          <label style="color:#00a2ff;">Ø accouplement (po)</label>
+          <input id="in_diam" class="c-blue" type="number" step="0.1"
+                 value="${geometry.couplingDiameter}">
+        </div>
       </div>
-    </div>
 
-    <div class="row" style="margin-top:8px;">
-      <div>
-        <label style="color:#ff9800;">Pattes AVANT → ARRIÈRE (po)</label>
-        <input id="in_frontRear" class="c-orange" type="number" step="0.1" value="${geometry.frontToRearFeet}">
+      <div class="row" style="margin-top:10px;">
+        <div>
+          <label>Instruction</label>
+          <input disabled value="Mesurer le diamètre extérieur de l’accouplement">
+        </div>
       </div>
-    </div>
+    `;
+  }
 
-    <div class="row" style="margin-top:10px;">
-      <div>
-        <label>Note</label>
-        <input disabled value="Ces mesures sont fixes pour tout l’alignement">
+  // ===== SOUS-ÉTAPE 2 — CENTRE → AVANT =====
+  if(state.measureStep === 1){
+    html = `
+      <div class="row">
+        <div>
+          <label style="color:#4caf50;">Centre → pattes AVANT (po)</label>
+          <input id="in_centerFront" class="c-green" type="number" step="0.1"
+                 value="${geometry.centerToFrontFeet}">
+        </div>
       </div>
-    </div>
-  `;
 
-  wireInputs([
-    ["in_diam", v => geometry.couplingDiameter = Math.max(0.1, v)],
-    ["in_centerFront", v => geometry.centerToFrontFeet = Math.max(0.1, v)],
-    ["in_frontRear", v => geometry.frontToRearFeet = Math.max(0.1, v)],
-  ]);
+      <div class="row" style="margin-top:10px;">
+        <div>
+          <label>Instruction</label>
+          <input disabled value="Mesurer du centre de l’accouplement jusqu’aux pattes avant du moteur">
+        </div>
+      </div>
+    `;
+  }
+
+  // ===== SOUS-ÉTAPE 3 — AVANT → ARRIÈRE =====
+  if(state.measureStep === 2){
+    html = `
+      <div class="row">
+        <div>
+          <label style="color:#ff9800;">Pattes AVANT → ARRIÈRE (po)</label>
+          <input id="in_frontRear" class="c-orange" type="number" step="0.1"
+                 value="${geometry.frontToRearFeet}">
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:10px;">
+        <div>
+          <label>Instruction</label>
+          <input disabled value="Mesurer la distance entre pattes avant et arrière du moteur">
+        </div>
+      </div>
+    `;
+  }
+
+  ui.inputsArea.innerHTML = html;
+
+  if(state.measureStep === 0){
+    wireInputs([["in_diam", v => geometry.couplingDiameter = Math.max(0.1, v)]]);
+  }
+
+  if(state.measureStep === 1){
+    wireInputs([["in_centerFront", v => geometry.centerToFrontFeet = Math.max(0.1, v)]]);
+  }
+
+  if(state.measureStep === 2){
+    wireInputs([["in_frontRear", v => geometry.frontToRearFeet = Math.max(0.1, v)]]);
+  }
+
   return;
 }
-
-
 
   // =====================================================
   // ANGULARITÉ VERTICALE
@@ -947,6 +986,18 @@ function refreshUI(){
    Navigation
 ===================================================== */
 function nextStep(){
+
+  // Gestion spéciale de l'étape "measures"
+  if(STEPS[state.step].id === "measures"){
+    if(state.measureStep < 2){
+      state.measureStep++;
+      renderAll();
+      return;
+    } else {
+      state.measureStep = 0;  // reset avant de passer à l'étape suivante
+    }
+  }
+
   if(isStepOK(state.step) && state.step < STEPS.length - 1){
     state.step++;
     renderAll();
