@@ -175,6 +175,22 @@ canvas{
   font-size:12px;
   white-space:pre-line;
 }
+/* ===== FORMULES (PC seulement) ===== */
+.formulaBox{
+  margin-top:10px;
+  padding:10px;
+  border-radius:12px;
+  background:rgba(0,0,0,.25);
+  font-size:13px;
+  font-family:Consolas, monospace;
+  line-height:1.45;
+  white-space:pre-line;
+  display:none; /* caché par défaut (mobile) */
+}
+@media (min-width:900px){
+  .formulaBox{ display:block; } /* visible PC */
+}
+
 </style>
 </head>
 
@@ -199,6 +215,7 @@ canvas{
 
   <!-- Inputs générés par JS selon l'étape -->
   <div id="inputsArea"></div>
+  <div id="formulaBox" class="formulaBox"></div>
 
   <div class="navRow">
     <button class="secondary" id="btnPrev" type="button">◀ Précédent</button>
