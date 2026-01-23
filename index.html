@@ -1488,7 +1488,7 @@ const rotGain = visualGain * 0.00035;
   let baseCy = h * 0.55;
   let baseCx = w * 0.35;
 
-  let cy = baseCy - state.parV * scale;
+  let cy = baseCy + state.parV * scale;
   let cx = baseCx + state.parH * scale;
 
   const motorW = 200;
