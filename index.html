@@ -234,9 +234,25 @@ canvas{
     <button id="cwBtn" class="btnActive">CW +</button>
     <button id="ccwBtn">CW −</button>
   </div>
+  
+  
 
   <p style="opacity:.7;font-size:12px;margin-top:6px;">
     CW = sens horaire du cadran
+  </p>
+</div>
+
+
+<div class="card" style="margin-bottom:12px;">
+  <h2>Méthode de correction terrain</h2>
+
+  <div style="display:flex; gap:10px;">
+    <button id="addBtn" class="btnActive">➕ Ajouter</button>
+    <button id="removeBtn">➖ Enlever</button>
+  </div>
+
+  <p style="opacity:.7;font-size:12px;margin-top:6px;">
+    Deux méthodes mécaniques équivalentes
   </p>
 </div>
 
@@ -296,6 +312,7 @@ Les pattes A / B / C / D seront affichées ici.
 <script>
 "use strict";
 let dialSign = 1;   // +1 = CW normal,  -1 = CW inversé
+let correctionMode = "add";  // "add" | "remove"
 let currentView = "top"; // "top" | "side"
 let blinkPhase = true;
 let visualGain = 6;
@@ -398,16 +415,40 @@ function computeSoftFoot(){
 ===================================================== */
 function computeAngularVertical(){
 
-  // Convention terrain validée :
-  // + angV  → ARRIÈRE trop bas → cales sous A + D
-  // - angV  → ARRIÈRE trop haut → cales sous B + C
+  const v = state.angV * dialSign;
 
-  if(state.angV * dialSign > 0){
-    return { pair:["A","D"], direction:"ARRIÈRE trop bas" };
+  // POSITIF → ARRIÈRE trop bas
+  if(v > 0){
+
+    if(correctionMode === "add"){
+      return {
+        pair:["A","D"],
+        direction:"ARRIÈRE trop bas — AJOUTER sous A + D"
+      };
+    }else{
+      return {
+        pair:["B","C"],
+        direction:"ARRIÈRE trop bas — ENLEVER sous B + C"
+      };
+    }
+
   }
 
-  if(state.angV * dialSign < 0){
-    return { pair:["B","C"], direction:"ARRIÈRE trop haut" };
+  // NÉGATIF → AVANT trop bas
+  if(v < 0){
+
+    if(correctionMode === "add"){
+      return {
+        pair:["B","C"],
+        direction:"AVANT trop bas — AJOUTER sous B + C"
+      };
+    }else{
+      return {
+        pair:["A","D"],
+        direction:"AVANT trop bas — ENLEVER sous A + D"
+      };
+    }
+
   }
 
   return null;
@@ -1615,6 +1656,32 @@ if(cwBtn && ccwBtn){
   };
 
 }
+
+// ===============================
+//   MODE CORRECTION — AJOUT / RETRAIT
+// ===============================
+
+const addBtn    = document.getElementById("addBtn");
+const removeBtn = document.getElementById("removeBtn");
+
+if(addBtn && removeBtn){
+
+  addBtn.onclick = () => {
+    correctionMode = "add";
+    addBtn.classList.add("btnActive");
+    removeBtn.classList.remove("btnActive");
+    renderAll();
+  };
+
+  removeBtn.onclick = () => {
+    correctionMode = "remove";
+    removeBtn.classList.add("btnActive");
+    addBtn.classList.remove("btnActive");
+    renderAll();
+  };
+
+}
+
 
 function renderAll(){
   refreshUI();
