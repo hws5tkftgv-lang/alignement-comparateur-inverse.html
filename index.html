@@ -203,6 +203,13 @@ canvas{
   color:rgba(234,241,255,.9);
   line-height:1.4;
 }
+
+.btnActive{
+  background:#00a2ff !important;
+  color:white !important;
+}
+
+
 </style>
 </head>
 
@@ -218,6 +225,20 @@ canvas{
     <!-- ===== ÉTAPES ===== -->
     <div class="card">
       <h2>Étapes d’alignement</h2>
+      <div class="card" style="margin-bottom:12px;">
+  <h2>Sens du comparateur</h2>
+
+  <label>Sens de lecture :</label>
+
+  <div style="display:flex; gap:10px;">
+    <button id="cwBtn" class="btnActive">CW +</button>
+    <button id="ccwBtn">CW −</button>
+  </div>
+
+  <p style="opacity:.7;font-size:12px;margin-top:6px;">
+    CW = sens horaire du cadran
+  </p>
+</div>
 
       <div class="step" id="stepCard">
   <div class="stepHead">
