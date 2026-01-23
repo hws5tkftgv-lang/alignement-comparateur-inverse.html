@@ -400,10 +400,10 @@ function computeAngularVertical(){
   // Convention validée:
   // angV > 0 => AVANT (B+C) trop bas
   // angV < 0 => ARRIÈRE (A+D) trop bas
-  if(state.angV > 0){
+  if(state.angV * dialSign > 0){
     return { pair:["B","C"], direction:"AVANT trop bas" };
   }
-  if(state.angV < 0){
+  if(state.angV * dialSign < 0){
     return { pair:["A","D"], direction:"ARRIÈRE trop bas" };
   }
   return null;
@@ -424,10 +424,10 @@ function computeParallelVertical(){
    ANGULARITÉ HORIZONTALE — TOP VIEW
 ===================================================== */
 function computeAngularHorizontal(){
-  if(state.angH > 0){
+  if(state.angH * dialSign > 0){
     return { pair:["B","D"], direction:"Incliné droite" };
   }
-  if(state.angH < 0){
+  if(state.angH * dialSign < 0){
     return { pair:["A","C"], direction:"Incliné gauche" };
   }
   return null;
@@ -474,7 +474,7 @@ function computeAngularShimsVertical(){
   const A = geometry.couplingDiameter;
   const B = geometry.centerToFrontFeet;
   const D = geometry.frontToRearFeet;
-  const C = Math.abs(state.angV);
+  const C = Math.abs(state.angV * dialSign);
 
   if(A <= 0) return { front:0, rear:0 };
 
@@ -488,7 +488,7 @@ function computeAngularShimsHorizontal(){
   const A = geometry.couplingDiameter;
   const B = geometry.centerToFrontFeet;
   const D = geometry.frontToRearFeet;
-  const C = Math.abs(state.angH);
+  const C = Math.abs(state.angH * dialSign);
 
   if(A <= 0) return { front:0, rear:0 };
 
@@ -1457,7 +1457,7 @@ const rotGain = visualGain * 0.00035;
   const rearFootX  = cx - motorW/2 + footW/2;   // ARRIÈRE = gauche
 const frontFootX = cx + motorW/2 - footW/2;   // AVANT   = droite
 
-  const ang = -state.angV * rotGain; // sens visuel corrigé
+  const ang = -state.angV * dialSign * rotGain;
 
   // ===============================
   //   TRANSFORMATION ANGULAIRE
