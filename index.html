@@ -397,15 +397,19 @@ function computeSoftFoot(){
    Arrière = AD
 ===================================================== */
 function computeAngularVertical(){
-  // Convention validée:
-  // angV > 0 => AVANT (B+C) trop bas
-  // angV < 0 => ARRIÈRE (A+D) trop bas
+
+  // Convention terrain validée :
+  // + angV  → ARRIÈRE trop bas → cales sous A + D
+  // - angV  → ARRIÈRE trop haut → cales sous B + C
+
   if(state.angV * dialSign > 0){
-    return { pair:["B","C"], direction:"AVANT trop bas" };
-  }
-  if(state.angV * dialSign < 0){
     return { pair:["A","D"], direction:"ARRIÈRE trop bas" };
   }
+
+  if(state.angV * dialSign < 0){
+    return { pair:["B","C"], direction:"ARRIÈRE trop haut" };
+  }
+
   return null;
 }
 /* =====================================================
