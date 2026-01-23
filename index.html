@@ -260,11 +260,30 @@ Les pattes A / B / C / D seront affichées ici.
 
   </div>
 </div>
+<div class="card" style="margin-top:12px;">
+  <h2>Amplification du dessin</h2>
+
+  <label>Effet visuel :</label>
+  <input id="gainSlider" type="range" min="1" max="20" value="6" step="1" style="width:100%">
+
+  <div style="display:flex; justify-content:space-between; font-size:12px; opacity:.8;">
+    <span>Réaliste</span>
+    <span>Pédagogique</span>
+  </div>
+</div>
 
 <script>
 "use strict";
 let currentView = "top"; // "top" | "side"
 let blinkPhase = true;
+let visualGain = 6;
+
+const gainSlider = document.getElementById("gainSlider");
+gainSlider.addEventListener("input", () => {
+  visualGain = parseFloat(gainSlider.value);
+  drawSideView();
+  drawTopView();
+});
 setInterval(() => {
   blinkPhase = !blinkPhase;
 
@@ -455,23 +474,25 @@ function computeAngularShimsHorizontal(){
 /* =====================================================
    VALIDATION PAR ÉTAPE
 ===================================================== */
-function isStepOK(step){
-  const id = STEPS[step].id;
+function isStepOK(stepIndex){
+  const id = STEPS[stepIndex].id;
 
   if(id === "measures"){
-    // toujours OK (ou tu peux exiger valeurs > 0)
-    return geometry.couplingDiameter > 0 && geometry.centerToFrontFeet > 0 && geometry.frontToRearFeet > 0;
+    return geometry.couplingDiameter > 0 &&
+           geometry.centerToFrontFeet > 0 &&
+           geometry.frontToRearFeet > 0;
   }
 
-  switch(step){
-    case 0: return ok(state.runout, state.runoutTol);
-    case 1: return computeSoftFoot().delta <= state.softFootTol;
-    case 2: return ok(state.angV, state.angVTol);
-    case 3: return ok(state.parV, state.parVTol);
-    case 4: return ok(state.angH, state.angHTol);
-    case 5: return ok(state.parH, state.parHTol);
-    default: return true;
-  }
+  if(id === "runout")  return ok(state.runout, state.runoutTol);
+  if(id === "softfoot")return computeSoftFoot().delta <= state.softFootTol;
+
+  if(id === "angV")    return ok(state.angV, state.angVTol);
+  if(id === "parV")    return ok(state.parV, state.parVTol);
+
+  if(id === "angH")    return ok(state.angH, state.angHTol);
+  if(id === "parH")    return ok(state.parH, state.parHTol);
+
+  return true;
 }
 /* =====================================================
    MESSAGE TEXTE (ZONE INFO)
@@ -1379,8 +1400,8 @@ function drawSideView(){
   //   PARAMÈTRES VISUELS
   // ===============================
 
-  const scale = 4;     // 1 mil = 4 px (pédagogique)
-  const rotGain = 0.002; // facteur rotation angularité
+  const scale = visualGain;
+const rotGain = visualGain * 0.00035;
 
   // ===============================
   //   GÉOMÉTRIE DE BASE
@@ -1401,8 +1422,8 @@ function drawSideView(){
   const pumpH = 70;
   const gap   = 60;
 
-  const frontFootX = cx - motorW/2 + footW/2;
-const rearFootX  = cx + motorW/2 - footW/2;
+  const rearFootX  = cx - motorW/2 + footW/2;   // ARRIÈRE = gauche
+const frontFootX = cx + motorW/2 - footW/2;   // AVANT   = droite
 
   const ang = state.angV * rotGain;
 
