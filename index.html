@@ -635,7 +635,6 @@ if(stepId === "angV"){
     return "✔️ Angularité verticale conforme.";
   }
 
-  const r = computeAngularVertical();
   const shims = computeAngularShimsVertical();
 
   const front = shims.front.toFixed(2);
@@ -643,16 +642,26 @@ if(stepId === "angV"){
 
   msg += "📐 Angularité verticale\n\n";
 
-msg += "Correction géométrique équivalente :\n";
-msg += `• AVANT : ${front} mil\n`;
-msg += `• ARRIÈRE : ${rear} mil\n\n`;
+  msg += "Correction géométrique équivalente :\n";
+  msg += `• AVANT : ${front} mil\n`;
+  msg += `• ARRIÈRE : ${rear} mil\n\n`;
 
-msg += "👉 Action mécanique terrain :\n";
-msg += `➕ Ajouter **${rear} mil** sous : ${r.pair.join(" + ")}\n`;
-msg += `(${r.direction})`;
+  msg += "👉 Action mécanique terrain :\n";
+
+  if(state.angV * dialSign > 0){
+    // arrière trop bas
+    msg += `➕ Ajouter **${rear} mil** sous : A + D\n`;
+    msg += `🔁 Alternative : Enlever **${rear} mil** sous : B + C\n`;
+    msg += "(Arrière trop bas)";
+  }else{
+    // avant trop bas
+    msg += `➕ Ajouter **${rear} mil** sous : B + C\n`;
+    msg += `🔁 Alternative : Enlever **${rear} mil** sous : A + D\n`;
+    msg += "(Avant trop bas)";
+  }
+
   return msg;
 }
-
   // ---------- PARALLÉLISME VERTICAL ----------
   if(stepId === "parV"){
   const r = computeParallelVertical();
