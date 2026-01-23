@@ -1376,10 +1376,21 @@ function drawSideView(){
   const ctx = sideCtx;
 
   // ===============================
+  //   PARAMÈTRES VISUELS
+  // ===============================
+
+  const scale = 4;     // 1 mil = 4 px (pédagogique)
+  const rotGain = 0.002; // facteur rotation angularité
+
+  // ===============================
   //   GÉOMÉTRIE DE BASE
   // ===============================
-  const cy = h * 0.55;
-  const cx = w * 0.35;
+
+  let baseCy = h * 0.55;
+  let baseCx = w * 0.35;
+
+  let cy = baseCy - state.parV * scale;
+  let cx = baseCx + state.parH * scale;
 
   const motorW = 200;
   const motorH = 70;
@@ -1393,6 +1404,16 @@ function drawSideView(){
   const frontFootX = cx + motorW/2 - footW/2;
   const rearFootX  = cx - motorW/2 + footW/2;
 
+  const ang = state.angV * rotGain;
+
+  // ===============================
+  //   TRANSFORMATION ANGULAIRE
+  // ===============================
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(ang);
+  ctx.translate(-cx, -cy);
+
   // ===============================
   //   MOTEUR
   // ===============================
@@ -1402,24 +1423,23 @@ function drawSideView(){
   // pattes moteur
   ctx.fillRect(rearFootX - footW/2,  cy + motorH/2 - 2, footW, footH);
   ctx.fillRect(frontFootX - footW/2, cy + motorH/2 - 2, footW, footH);
-  // --- Lettres C et D ---
-ctx.fillStyle = "#fff";
-ctx.font = "14px Arial";
-ctx.textAlign = "center";
 
-// C = patte avant
-ctx.fillText("C", cx + motorW/2 - footW/2, cy + motorH/2 + 24);
+  // lettres C et D
+  ctx.fillStyle = "#fff";
+  ctx.font = "14px Arial";
+  ctx.textAlign = "center";
+  ctx.fillText("D", rearFootX,  cy + motorH/2 + 24);
+  ctx.fillText("C", frontFootX, cy + motorH/2 + 24);
 
-// D = patte arrière
-ctx.fillText("D", cx - motorW/2 + footW/2, cy + motorH/2 + 24);
+  ctx.restore();
 
   // ===============================
-  //   POMPE
+  //   POMPE (FIXE)
   // ===============================
-  const pumpX = cx + motorW/2 + gap;
+  const pumpX = baseCx + motorW/2 + gap;
 
   ctx.fillStyle = "#ff9800";
-  ctx.fillRect(pumpX, cy - pumpH/2, pumpW, pumpH);
+  ctx.fillRect(pumpX, baseCy - pumpH/2, pumpW, pumpH);
 
   // ===============================
   //   TITRES
@@ -1428,7 +1448,7 @@ ctx.fillText("D", cx - motorW/2 + footW/2, cy + motorH/2 + 24);
   ctx.font="14px Arial";
   ctx.textAlign="center";
   ctx.fillText("MOTEUR (mobile)", cx, cy - motorH/2 - 14);
-  ctx.fillText("POMPE (fixe)", pumpX + pumpW/2, cy - pumpH/2 - 14);
+  ctx.fillText("POMPE (fixe)", pumpX + pumpW/2, baseCy - pumpH/2 - 14);
 
   // ===============================
   //   MESURES GÉOMÉTRIQUES
@@ -1441,60 +1461,54 @@ ctx.fillText("D", cx - motorW/2 + footW/2, cy + motorH/2 + 24);
   ctx.strokeStyle = color;
   ctx.lineWidth = 3;
 
-  // ===========================================
-  //   0 → Ø ACCOUPLEMENT (COTE VERTICALE PURE)
-  // ===========================================
+  // ===========================
+  // 0 → Ø ACCOUPLEMENT
+  // ===========================
   if(sub === 0){
-
     const r = 26;
-    const x = cx + motorW/2 + gap/2;
+    const x = baseCx + motorW/2 + gap/2;
 
-    // ligne verticale
     ctx.beginPath();
-    ctx.moveTo(x, cy - r);
-    ctx.lineTo(x, cy + r);
+    ctx.moveTo(x, baseCy - r);
+    ctx.lineTo(x, baseCy + r);
     ctx.stroke();
 
-    // ticks haut/bas
     ctx.beginPath();
-    ctx.moveTo(x - 8, cy - r);
-    ctx.lineTo(x + 8, cy - r);
-    ctx.moveTo(x - 8, cy + r);
-    ctx.lineTo(x + 8, cy + r);
+    ctx.moveTo(x - 8, baseCy - r);
+    ctx.lineTo(x + 8, baseCy - r);
+    ctx.moveTo(x - 8, baseCy + r);
+    ctx.lineTo(x + 8, baseCy + r);
     ctx.stroke();
-
     return;
   }
 
-// ===========================================
-//   1 → CENTRE ACCOUPLEMENT → PATTES AVANT
-// ===========================================
-if(sub === 1){
+  // ===========================
+  // 1 → CENTRE → PATTES AVANT
+  // ===========================
+  if(sub === 1){
 
-  // centre réel de l'accouplement
-  const couplingCenterX = cx + motorW/2 + gap/2;
+    const couplingCenterX = baseCx + motorW/2 + gap/2;
+    const x1 = couplingCenterX;
+    const x2 = frontFootX;
+    const y  = cy + motorH/2 + 30;
 
-  const x1 = couplingCenterX;
-  const x2 = frontFootX;
-  const y  = cy + motorH/2 + 30;
+    ctx.beginPath();
+    ctx.moveTo(x1, y);
+    ctx.lineTo(x2, y);
+    ctx.stroke();
 
-  ctx.beginPath();
-  ctx.moveTo(x1, y);
-  ctx.lineTo(x2, y);
-  ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x1, y - 8);
+    ctx.lineTo(x1, y + 8);
+    ctx.moveTo(x2, y - 8);
+    ctx.lineTo(x2, y + 8);
+    ctx.stroke();
+    return;
+  }
 
-  ctx.beginPath();
-  ctx.moveTo(x1, y - 8);
-  ctx.lineTo(x1, y + 8);
-  ctx.moveTo(x2, y - 8);
-  ctx.lineTo(x2, y + 8);
-  ctx.stroke();
-
-  return;
-}
-  // ===========================================
-  //   2 → PATTES AVANT → ARRIÈRE
-  // ===========================================
+  // ===========================
+  // 2 → AVANT → ARRIÈRE
+  // ===========================
   if(sub === 2){
 
     const x1 = rearFootX;
@@ -1512,7 +1526,6 @@ if(sub === 1){
     ctx.moveTo(x2, y - 8);
     ctx.lineTo(x2, y + 8);
     ctx.stroke();
-
     return;
   }
 }
