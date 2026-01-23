@@ -223,24 +223,7 @@ canvas{
   <div class="grid">
 
     <!-- ===== ÉTAPES ===== -->
-    <div class="card">
-      <h2>Étapes d’alignement</h2>
-      <div class="card" style="margin-bottom:12px;">
-  <h2>Sens du comparateur</h2>
-
-  <label>Sens de lecture :</label>
-
-  <div style="display:flex; gap:10px;">
-    <button id="cwBtn" class="btnActive">CW +</button>
-    <button id="ccwBtn">CW −</button>
-  </div>
   
-  
-
-  <p style="opacity:.7;font-size:12px;margin-top:6px;">
-    CW = sens horaire du cadran
-  </p>
-</div>
 
 
 <div class="card" style="margin-bottom:12px;">
@@ -1665,26 +1648,6 @@ const frontFootX = cx + motorW/2 - footW/2;   // AVANT   = droite
 //   CW / CCW — SENS DU CADRAN
 // ===============================
 
-const cwBtn  = document.getElementById("cwBtn");
-const ccwBtn = document.getElementById("ccwBtn");
-
-if(cwBtn && ccwBtn){
-
-  cwBtn.onclick = () => {
-    dialSign = 1;
-    cwBtn.classList.add("btnActive");
-    ccwBtn.classList.remove("btnActive");
-    renderAll();
-  };
-
-  ccwBtn.onclick = () => {
-    dialSign = -1;
-    ccwBtn.classList.add("btnActive");
-    cwBtn.classList.remove("btnActive");
-    renderAll();
-  };
-
-}
 
 // ===============================
 //   MODE CORRECTION — AJOUT / RETRAIT
