@@ -1315,7 +1315,8 @@ function drawTopView(){
   const {w,h} = resizeCanvas(topCanvas,topCtx);
   clear(topCtx,w,h);
 
-  const cx = w*0.35;
+  const scale = visualGain;
+const cx = w*0.35;
 const cy = h*0.5 + state.parH * scale;
 
   // moteur
