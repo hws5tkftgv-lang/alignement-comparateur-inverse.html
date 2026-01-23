@@ -1316,7 +1316,7 @@ function drawTopView(){
   clear(topCtx,w,h);
 
   const cx = w*0.35;
-  const cy = h*0.5;
+const cy = h*0.5 + state.parH * scale;
 
   // moteur
   topCtx.fillStyle="#00a2ff";
