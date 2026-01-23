@@ -375,25 +375,29 @@ function computeSoftFoot(){
    Arrière = AD
 ===================================================== */
 function computeAngularVertical(){
+  // Convention validée:
+  // angV > 0 => AVANT (B+C) trop bas
+  // angV < 0 => ARRIÈRE (A+D) trop bas
   if(state.angV > 0){
-    return { pair:["A","D"], direction:"ARRIÈRE trop bas" };
+    return { pair:["B","C"], direction:"AVANT trop bas" };
   }
   if(state.angV < 0){
-    return { pair:["B","C"], direction:"AVANT trop bas" };
+    return { pair:["A","D"], direction:"ARRIÈRE trop bas" };
   }
   return null;
 }
-
 /* =====================================================
    PARALLÉLISME VERTICAL — 4 PATTES
 ===================================================== */
 function computeParallelVertical(){
-  if(state.parV !== 0){
+  if(state.parV > 0){
     return { pair:["A","B","C","D"], direction:"Moteur trop bas" };
+  }
+  if(state.parV < 0){
+    return { pair:["A","B","C","D"], direction:"Moteur trop haut" };
   }
   return null;
 }
-
 /* =====================================================
    ANGULARITÉ HORIZONTALE — TOP VIEW
 ===================================================== */
@@ -583,16 +587,22 @@ if(stepId === "angV"){
 
   // ---------- PARALLÉLISME VERTICAL ----------
   if(stepId === "parV"){
-    if(ok(state.parV, state.parVTol)){
-      return "✔️ Parallélisme vertical conforme.";
-    }
+  const r = computeParallelVertical();
+  if(!r) return "✔️ Parallélisme vertical conforme.";
 
-    msg += "⬆️ Parallélisme vertical\n\n";
+  msg += "⬆️ Parallélisme vertical\n\n";
+
+  if(state.parV > 0){
     msg += "➕ Ajouter des cales sous :\n";
     msg += "👉 A + B + C + D\n";
-    msg += "(montée uniforme du moteur)";
-    return msg;
+    msg += "(moteur trop bas)";
+  }else{
+    msg += "➖ Enlever des cales sous :\n";
+    msg += "👉 A + B + C + D\n";
+    msg += "(moteur trop haut)";
   }
+  return msg;
+}
 
   // ---------- ANGULARITÉ HORIZONTALE ----------
   if(stepId === "angH"){
@@ -1425,7 +1435,7 @@ const rotGain = visualGain * 0.00035;
   const rearFootX  = cx - motorW/2 + footW/2;   // ARRIÈRE = gauche
 const frontFootX = cx + motorW/2 - footW/2;   // AVANT   = droite
 
-  const ang = state.angV * rotGain;
+  const ang = -state.angV * rotGain; // sens visuel corrigé
 
   // ===============================
   //   TRANSFORMATION ANGULAIRE
