@@ -226,18 +226,6 @@ canvas{
   
 
 
-<div class="card" style="margin-bottom:12px;">
-  <h2>Méthode de correction terrain</h2>
-
-  <div style="display:flex; gap:10px;">
-    <button id="addBtn" class="btnActive">➕ Ajouter</button>
-    <button id="removeBtn">➖ Enlever</button>
-  </div>
-
-  <p style="opacity:.7;font-size:12px;margin-top:6px;">
-    Deux méthodes mécaniques équivalentes
-  </p>
-</div>
 
       <div class="step" id="stepCard">
   <div class="stepHead">
@@ -1653,26 +1641,7 @@ const frontFootX = cx + motorW/2 - footW/2;   // AVANT   = droite
 //   MODE CORRECTION — AJOUT / RETRAIT
 // ===============================
 
-const addBtn    = document.getElementById("addBtn");
-const removeBtn = document.getElementById("removeBtn");
 
-if(addBtn && removeBtn){
-
-  addBtn.onclick = () => {
-    correctionMode = "add";
-    addBtn.classList.add("btnActive");
-    removeBtn.classList.remove("btnActive");
-    renderAll();
-  };
-
-  removeBtn.onclick = () => {
-    correctionMode = "remove";
-    removeBtn.classList.add("btnActive");
-    addBtn.classList.remove("btnActive");
-    renderAll();
-  };
-
-}
 
 
 function renderAll(){
