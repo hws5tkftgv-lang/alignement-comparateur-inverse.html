@@ -630,11 +630,14 @@ function buildCorrectionMessage(){
 
   // ---------- ANGULARITÉ VERTICALE ----------
   // ---------- ANGULARITÉ VERTICALE ----------
+// ---------- ANGULARITÉ VERTICALE ----------
 if(stepId === "angV"){
+
   if(ok(state.angV, state.angVTol)){
     return "✔️ Angularité verticale conforme.";
   }
 
+  const v = state.angV * dialSign;
   const shims = computeAngularShimsVertical();
 
   const front = shims.front.toFixed(2);
@@ -646,18 +649,20 @@ if(stepId === "angV"){
   msg += `• AVANT : ${front} mil\n`;
   msg += `• ARRIÈRE : ${rear} mil\n\n`;
 
-  msg += "👉 Action mécanique terrain :\n";
+  if(v > 0){
+    msg += "Diagnostic : ARRIÈRE trop bas\n\n";
+    msg += "Solutions mécaniques possibles :\n";
+    msg += `➕ Ajouter ${rear} mil sous : A + D\n`;
+    msg += `OU\n`;
+    msg += `➖ Enlever ${front} mil sous : B + C`;
+  }
 
-  if(state.angV * dialSign > 0){
-    // arrière trop bas
-    msg += `➕ Ajouter **${rear} mil** sous : A + D\n`;
-    msg += `🔁 Alternative : Enlever **${rear} mil** sous : B + C\n`;
-    msg += "(Arrière trop bas)";
-  }else{
-    // avant trop bas
-    msg += `➕ Ajouter **${rear} mil** sous : B + C\n`;
-    msg += `🔁 Alternative : Enlever **${rear} mil** sous : A + D\n`;
-    msg += "(Avant trop bas)";
+  if(v < 0){
+    msg += "Diagnostic : AVANT trop bas\n\n";
+    msg += "Solutions mécaniques possibles :\n";
+    msg += `➕ Ajouter ${front} mil sous : B + C\n`;
+    msg += `OU\n`;
+    msg += `➖ Enlever ${rear} mil sous : A + D`;
   }
 
   return msg;
@@ -682,25 +687,40 @@ if(stepId === "angV"){
 }
 
   // ---------- ANGULARITÉ HORIZONTALE ----------
-  if(stepId === "angH"){
-    if(ok(state.angH, state.angHTol)){
-      return "✔️ Angularité horizontale conforme.";
-    }
+  // ---------- ANGULARITÉ HORIZONTALE ----------
+if(stepId === "angH"){
 
-    const r = computeAngularHorizontal();
-const shims = computeAngularShimsHorizontal();
+  if(ok(state.angH, state.angHTol)){
+    return "✔️ Angularité horizontale conforme.";
+  }
 
-const front = shims.front.toFixed(2);
-const rear  = shims.rear.toFixed(2);
+  const v = state.angH * dialSign;
+  const shims = computeAngularShimsHorizontal();
 
-msg += "↔️ Angularité horizontale\n\n";
-msg += `• AVANT : **${front} mil**\n`;
-msg += `• ARRIÈRE : **${rear} mil**\n\n`;
-msg += "Côté :\n";
-msg += `👉 ${r.pair.join(" + ")}\n`;
-msg += `(${r.direction})`;
+  const front = shims.front.toFixed(2);
+  const rear  = shims.rear.toFixed(2);
 
-return msg;
+  msg += "↔️ Angularité horizontale\n\n";
+
+  msg += "Correction géométrique équivalente :\n";
+  msg += `• AVANT : ${front} mil\n`;
+  msg += `• ARRIÈRE : ${rear} mil\n\n`;
+
+  if(v > 0){
+    msg += "Diagnostic : moteur incliné vers la DROITE\n\n";
+    msg += "Solutions mécaniques possibles :\n";
+    msg += `➡️ Déplacer le moteur vers la GAUCHE\n`;
+    msg += `(agir principalement sur : B + D)`;
+  }
+
+  if(v < 0){
+    msg += "Diagnostic : moteur incliné vers la GAUCHE\n\n";
+    msg += "Solutions mécaniques possibles :\n";
+    msg += `➡️ Déplacer le moteur vers la DROITE\n`;
+    msg += `(agir principalement sur : A + C)`;
+  }
+
+  return msg;
 }
 
   // ---------- PARALLÉLISME HORIZONTAL ----------
