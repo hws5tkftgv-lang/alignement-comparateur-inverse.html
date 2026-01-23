@@ -295,6 +295,7 @@ Les pattes A / B / C / D seront affichées ici.
 
 <script>
 "use strict";
+let dialSign = 1;   // +1 = CW normal,  -1 = CW inversé
 let currentView = "top"; // "top" | "side"
 let blinkPhase = true;
 let visualGain = 6;
@@ -1584,6 +1585,32 @@ const frontFootX = cx + motorW/2 - footW/2;   // AVANT   = droite
 /* =====================================================
    RENDER GLOBAL
 ===================================================== */
+
+// ===============================
+//   CW / CCW — SENS DU CADRAN
+// ===============================
+
+const cwBtn  = document.getElementById("cwBtn");
+const ccwBtn = document.getElementById("ccwBtn");
+
+if(cwBtn && ccwBtn){
+
+  cwBtn.onclick = () => {
+    dialSign = 1;
+    cwBtn.classList.add("btnActive");
+    ccwBtn.classList.remove("btnActive");
+    renderAll();
+  };
+
+  ccwBtn.onclick = () => {
+    dialSign = -1;
+    ccwBtn.classList.add("btnActive");
+    cwBtn.classList.remove("btnActive");
+    renderAll();
+  };
+
+}
+
 function renderAll(){
   refreshUI();
   drawTopView();
