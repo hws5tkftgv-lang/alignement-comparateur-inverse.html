@@ -601,13 +601,14 @@ if(stepId === "angV"){
   const rear  = shims.rear.toFixed(2);
 
   msg += "📐 Angularité verticale\n\n";
-  msg += "➕ Ajouter des cales :\n";
-  msg += `• AVANT : **${front} mil**\n`;
-  msg += `• ARRIÈRE : **${rear} mil**\n\n`;
-  msg += "Sous les pattes :\n";
-  msg += `👉 ${r.pair.join(" + ")}\n`;
-  msg += `(${r.direction})`;
 
+msg += "Correction géométrique équivalente :\n";
+msg += `• AVANT : ${front} mil\n`;
+msg += `• ARRIÈRE : ${rear} mil\n\n`;
+
+msg += "👉 Action mécanique terrain :\n";
+msg += `➕ Ajouter **${rear} mil** sous : ${r.pair.join(" + ")}\n`;
+msg += `(${r.direction})`;
   return msg;
 }
 
