@@ -1176,14 +1176,19 @@ const sideCtx = sideCanvas.getContext("2d");
 
 function resizeCanvas(canvas, ctx){
   const dpr = window.devicePixelRatio || 1;
-  const w = canvas.clientWidth;
-  const h = canvas.clientHeight;
-  canvas.width = w * dpr;
+
+  const rect = canvas.getBoundingClientRect();
+
+  const w = Math.max(200, rect.width);
+  const h = Math.max(200, rect.height);
+
+  canvas.width  = w * dpr;
   canvas.height = h * dpr;
+
   ctx.setTransform(dpr,0,0,dpr,0,0);
+
   return { w, h };
 }
-
 /* =====================================================
    UTILITAIRES DESSIN
 ===================================================== */
