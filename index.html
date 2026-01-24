@@ -590,6 +590,7 @@ const ui = {
 /* =====================================================
    MESSAGES DE CORRECTION PÉDAGOGIQUES
 ===================================================== */
+
 function buildCorrectionMessage(){
   const stepId = STEPS[state.step].id;
   let msg = "";
@@ -610,131 +611,130 @@ function buildCorrectionMessage(){
   }
 
   // ---------- ANGULARITÉ VERTICALE ----------
-  // ---------- ANGULARITÉ VERTICALE ----------
-// ---------- ANGULARITÉ VERTICALE ----------
-if(stepId === "angV"){
+  if(stepId === "angV"){
 
-  if(ok(state.angV, state.angVTol)){
-    return "✔️ Angularité verticale conforme.";
+    if(ok(state.angV, state.angVTol)){
+      return "✔️ Angularité verticale conforme.";
+    }
+
+    const v = state.angV * dialSign;
+    const shims = computeAngularShimsVertical();
+
+    const front = shims.front.toFixed(2);
+    const rear  = shims.rear.toFixed(2);
+
+    msg += "📐 Angularité verticale\n\n";
+    msg += "Correction géométrique équivalente :\n";
+    msg += `• AVANT : ${front} mil\n`;
+    msg += `• ARRIÈRE : ${rear} mil\n\n`;
+
+    if(v > 0){
+      msg += "Diagnostic : ARRIÈRE trop bas\n\n";
+      msg += "Solutions mécaniques possibles :\n";
+      msg += `➕ Ajouter ${rear} mil sous : A + D\n`;
+      msg += `OU\n`;
+      msg += `➖ Enlever ${front} mil sous : B + C`;
+    }
+
+    if(v < 0){
+      msg += "Diagnostic : AVANT trop bas\n\n";
+      msg += "Solutions mécaniques possibles :\n";
+      msg += `➕ Ajouter ${front} mil sous : B + C\n`;
+      msg += `OU\n`;
+      msg += `➖ Enlever ${rear} mil sous : A + D`;
+    }
+
+    return msg;
   }
 
-  const v = state.angV * dialSign;
-  const shims = computeAngularShimsVertical();
-
-  const front = shims.front.toFixed(2);
-  const rear  = shims.rear.toFixed(2);
-
-  msg += "📐 Angularité verticale\n\n";
-
-  msg += "Correction géométrique équivalente :\n";
-  msg += `• AVANT : ${front} mil\n`;
-  msg += `• ARRIÈRE : ${rear} mil\n\n`;
-
-  if(v > 0){
-    msg += "Diagnostic : ARRIÈRE trop bas\n\n";
-    msg += "Solutions mécaniques possibles :\n";
-    msg += `➕ Ajouter ${rear} mil sous : A + D\n`;
-    msg += `OU\n`;
-    msg += `➖ Enlever ${front} mil sous : B + C`;
-  }
-
-  if(v < 0){
-    msg += "Diagnostic : AVANT trop bas\n\n";
-    msg += "Solutions mécaniques possibles :\n";
-    msg += `➕ Ajouter ${front} mil sous : B + C\n`;
-    msg += `OU\n`;
-    msg += `➖ Enlever ${rear} mil sous : A + D`;
-  }
-
-  return msg;
-}
   // ---------- PARALLÉLISME VERTICAL ----------
-  // ---------- PARALLÉLISME VERTICAL ----------
-if(stepId === "parV"){
+  if(stepId === "parV"){
 
-  if(ok(state.parV, state.parVTol)){
-    return "✔️ Parallélisme vertical conforme.";
+    if(ok(state.parV, state.parVTol)){
+      return "✔️ Parallélisme vertical conforme.";
+    }
+
+    const amt = Math.abs(state.parV).toFixed(2);
+
+    msg += "⬆️ Parallélisme vertical\n\n";
+
+    if(state.parV > 0){
+      msg += "Diagnostic : moteur trop bas\n\n";
+      msg += "Correction :\n";
+      msg += `➕ Ajouter +${amt} mil sous : A + B + C + D\n`;
+      msg += "(même quantité sur les 4 pattes)";
+    }else{
+      msg += "Diagnostic : moteur trop haut\n\n";
+      msg += "Correction :\n";
+      msg += `➖ Enlever ${amt} mil sous : A + B + C + D\n`;
+      msg += "(même quantité sur les 4 pattes)";
+    }
+
+    return msg;
   }
 
-  const amt = Math.abs(state.parV).toFixed(2); // mils à corriger
-
-  let msg = "⬆️ Parallélisme vertical\n\n";
-
-  if(state.parV > 0){
-    msg += "Diagnostic : moteur trop bas\n\n";
-    msg += "Correction :\n";
-    msg += `➕ Ajouter +${amt} mil sous : A + B + C + D\n`;
-    msg += "(même quantité sur les 4 pattes)";
-  }else{
-    msg += "Diagnostic : moteur trop haut\n\n";
-    msg += "Correction :\n";
-    msg += `➖ Enlever ${amt} mil sous : A + B + C + D\n`;
-    msg += "(même quantité sur les 4 pattes)";
-  }
-
-  return msg;
-}
   // ---------- ANGULARITÉ HORIZONTALE ----------
-  // ---------- ANGULARITÉ HORIZONTALE ----------
-if(stepId === "angH"){
+  if(stepId === "angH"){
 
-  if(ok(state.angH, state.angHTol)){
-    return "✔️ Angularité horizontale conforme.";
+    if(ok(state.angH, state.angHTol)){
+      return "✔️ Angularité horizontale conforme.";
+    }
+
+    const v = state.angH * dialSign;
+    const shims = computeAngularShimsHorizontal();
+
+    const front = shims.front.toFixed(2);
+    const rear  = shims.rear.toFixed(2);
+
+    msg += "↔️ Angularité horizontale\n\n";
+    msg += "Correction géométrique équivalente :\n";
+    msg += `• AVANT : ${front} mil\n`;
+    msg += `• ARRIÈRE : ${rear} mil\n\n`;
+
+    if(v > 0){
+      msg += "Diagnostic : moteur incliné vers la DROITE\n\n";
+      msg += "Solutions mécaniques possibles :\n";
+      msg += `➡️ Déplacer le moteur vers la GAUCHE\n`;
+      msg += `(agir principalement sur : B + D)`;
+    }
+
+    if(v < 0){
+      msg += "Diagnostic : moteur incliné vers la GAUCHE\n\n";
+      msg += "Solutions mécaniques possibles :\n";
+      msg += `➡️ Déplacer le moteur vers la DROITE\n`;
+      msg += `(agir principalement sur : A + C)`;
+    }
+
+    return msg;
   }
-
-  const v = state.angH * dialSign;
-  const shims = computeAngularShimsHorizontal();
-
-  const front = shims.front.toFixed(2);
-  const rear  = shims.rear.toFixed(2);
-
-  msg += "↔️ Angularité horizontale\n\n";
-
-  msg += "Correction géométrique équivalente :\n";
-  msg += `• AVANT : ${front} mil\n`;
-  msg += `• ARRIÈRE : ${rear} mil\n\n`;
-
-  if(v > 0){
-    msg += "Diagnostic : moteur incliné vers la DROITE\n\n";
-    msg += "Solutions mécaniques possibles :\n";
-    msg += `➡️ Déplacer le moteur vers la GAUCHE\n`;
-    msg += `(agir principalement sur : B + D)`;
-  }
-
-  if(v < 0){
-    msg += "Diagnostic : moteur incliné vers la GAUCHE\n\n";
-    msg += "Solutions mécaniques possibles :\n";
-    msg += `➡️ Déplacer le moteur vers la DROITE\n`;
-    msg += `(agir principalement sur : A + C)`;
-  }
-
-  return msg;
-}
 
   // ---------- PARALLÉLISME HORIZONTAL ----------
-  // ---------- PARALLÉLISME HORIZONTAL ----------
-if(stepId === "parH"){
+  if(stepId === "parH"){
 
-  if(ok(state.parH, state.parHTol)){
-    return "✔️ Parallélisme horizontal conforme.";
+    if(ok(state.parH, state.parHTol)){
+      return "✔️ Parallélisme horizontal conforme.";
+    }
+
+    const amt = Math.abs(state.parH).toFixed(2);
+    const r = computeParallelHorizontal();
+
+    msg += "↔️ Parallélisme horizontal\n\n";
+    msg += r.direction + "\n\n";
+
+    msg += "Correction :\n";
+    msg += `➕ Déplacer le moteur de ${amt} mil côté :\n`;
+    msg += `👉 ${r.pair.join(" + ")}\n`;
+    msg += "(translation latérale pure — sans rotation)";
+
+    return msg;
   }
 
-  const amt = Math.abs(state.parH).toFixed(2);
-  const r = computeParallelHorizontal();
-
-  let msg = "↔️ Parallélisme horizontal\n\n";
-  msg += r.direction + "\n\n";
-
-  msg += "Correction :\n";
-  msg += `➕ Déplacer le moteur de ${amt} mil côté :\n`;
-  msg += `👉 ${r.pair.join(" + ")}\n`;
-  msg += "(translation latérale pure — sans rotation)";
-
-  return msg;
+  // ---------- PAR DÉFAUT ----------
+  return "";
 }
 
 
-}
+
 /* =====================================================
    UI — Inputs par étape (avec IDs)
 ===================================================== */
