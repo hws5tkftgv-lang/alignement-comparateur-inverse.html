@@ -1316,12 +1316,23 @@ function drawTopView(){
   clear(topCtx,w,h);
 
   const scale = visualGain;
-const cx = w*0.35;
-const cy = h*0.5 + state.parH * scale;
+const cx = w*0.35 + state.parH * scale;
+const cy = h*0.5;
 
-  // moteur
-  topCtx.fillStyle="#00a2ff";
-  topCtx.fillRect(cx-80,cy-40,160,80);
+const rotGain = visualGain * 0.00035;
+const ang = -state.angH * dialSign * rotGain;
+
+
+// moteur
+topCtx.fillStyle="#00a2ff";
+topCtx.save();
+topCtx.translate(cx, cy);
+topCtx.rotate(ang);
+topCtx.translate(-cx, -cy);
+
+// moteur
+topCtx.fillStyle="#00a2ff";
+topCtx.fillRect(cx-80,cy-40,160,80);
 
   // pattes (ordre demandé)
 // haut gauche -> A ; haut droite -> B ; bas gauche -> D ; bas droite -> C
