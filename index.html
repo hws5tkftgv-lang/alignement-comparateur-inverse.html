@@ -290,11 +290,14 @@ let visualGain = 6;
 const FOOT_NORMAL = "#0070c0";   // bleu foncé visible
 
 
-gainSlider.addEventListener("input", () => {
-  visualGain = parseFloat(gainSlider.value);
-  drawSideView();
-  drawTopView();
-});
+const gainSlider = document.getElementById("gainSlider");
+if(gainSlider){
+  gainSlider.addEventListener("input", () => {
+    visualGain = parseFloat(gainSlider.value) || 1;
+    drawSideView();
+    drawTopView();
+  });
+}
 setInterval(() => {
   blinkPhase = !blinkPhase;
 
@@ -731,7 +734,7 @@ if(stepId === "parH"){
 }
 
 
-
+}
 /* =====================================================
    UI — Inputs par étape (avec IDs)
 ===================================================== */
