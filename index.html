@@ -1336,59 +1336,83 @@ function drawTopView(){
 
   const ctx = topCtx;
 
-  // ===============================
-  //   PARAMÈTRES VISUELS
-  // ===============================
   const scale   = visualGain;
   const rotGain = visualGain * 0.00035;
 
-  // ===============================
-  //   GÉOMÉTRIE DE BASE
-  // ===============================
   let baseCy = h * 0.5;
-let baseCx = w * 0.35;
+  let baseCx = w * 0.35;
 
-let cy = baseCy + (
-  STEPS[state.step].id === "parH"
-  ? state.parH * scale
-  : 0
-);
-let cx = baseCx;
+  let cy = baseCy + (
+    STEPS[state.step].id === "parH"
+    ? state.parH * scale
+    : 0
+  );
+  let cx = baseCx;
 
   const motorW = 160;
   const motorH = 80;
-  const footW  = 24;
-  const footH  = 12;
 
   const pumpW = 140;
   const pumpH = 80;
   const gap   = 70;
 
   const ang =
-  STEPS[state.step].id === "angH"
-  ? state.angH * dialSign * rotGain
-  : 0;
+    STEPS[state.step].id === "angH"
+    ? state.angH * dialSign * rotGain
+    : 0;
 
-  // ===============================
-//   MOTEUR + PATTES (ROTATION)
-// ===============================
-ctx.save();
-ctx.translate(cx, cy);
-ctx.rotate(ang);
-ctx.translate(-cx, -cy);
+  // ---------- moteur + pattes (rotation) ----------
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(ang);
+  ctx.translate(-cx, -cy);
 
-// moteur
-ctx.fillStyle="#00a2ff";
-ctx.fillRect(cx - motorW/2, cy - motorH/2, motorW, motorH);
+  ctx.fillStyle="#00a2ff";
+  ctx.fillRect(cx - motorW/2, cy - motorH/2, motorW, motorH);
 
-// pattes
-const P = {
-  A:{x:cx - motorW/2 + 24, y:cy - motorH/2 + 18},
-  B:{x:cx + motorW/2 - 24, y:cy - motorH/2 + 18},
-  D:{x:cx - motorW/2 + 24, y:cy + motorH/2 - 18},
-  C:{x:cx + motorW/2 - 24, y:cy + motorH/2 - 18},
-};
+  const P = {
+    A:{x:cx - motorW/2 + 24, y:cy - motorH/2 + 18},
+    B:{x:cx + motorW/2 - 24, y:cy - motorH/2 + 18},
+    D:{x:cx - motorW/2 + 24, y:cy + motorH/2 - 18},
+    C:{x:cx + motorW/2 - 24, y:cy + motorH/2 - 18},
+  };
 
+  function drawPad(letter){
+    const {x,y} = P[letter];
+    ctx.fillStyle = footColor(letter);
+    ctx.fillRect(x-12, y-6, 24, 12);
+  }
+
+  drawPad("A");
+  drawPad("B");
+  drawPad("C");
+  drawPad("D");
+
+  ctx.restore();
+
+  // ---------- lettres ----------
+  ctx.fillStyle = "#fff";
+  ctx.font = "14px Arial";
+  ctx.textAlign = "center";
+
+  ctx.fillText("A", P.A.x, P.A.y - 14);
+  ctx.fillText("B", P.B.x, P.B.y - 14);
+  ctx.fillText("D", P.D.x, P.D.y + 22);
+  ctx.fillText("C", P.C.x, P.C.y + 22);
+
+  // ---------- pompe ----------
+  const pumpX = baseCx + motorW/2 + gap;
+
+  ctx.fillStyle="#ff9800";
+  ctx.fillRect(pumpX, baseCy - pumpH/2, pumpW, pumpH);
+
+  // ---------- titres ----------
+  ctx.fillStyle="#fff";
+  ctx.font="13px Arial";
+  ctx.textAlign="center";
+  ctx.fillText("MOTEUR (mobile)", cx, cy - motorH/2 - 18);
+  ctx.fillText("POMPE (fixe)", pumpX + pumpW/2, baseCy - pumpH/2 - 18);
+}
 function drawPad(letter){
   const {x,y} = P[letter];
   ctx.fillStyle = footColor(letter);
