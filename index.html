@@ -289,7 +289,7 @@ let blinkPhase = true;
 let visualGain = 6;
 const FOOT_NORMAL = "#0070c0";   // bleu foncé visible
 
-const gainSlider = document.getElementById("gainSlider");
+
 gainSlider.addEventListener("input", () => {
   visualGain = parseFloat(gainSlider.value);
   drawSideView();
@@ -1601,7 +1601,6 @@ const frontFootX = cx + motorW/2 - footW/2;   // AVANT   = droite
 
 
 function renderAll(){
-  refreshUI();
   drawTopView();
   drawSideView();
 }
