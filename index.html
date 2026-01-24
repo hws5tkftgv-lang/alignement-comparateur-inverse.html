@@ -1310,179 +1310,106 @@ function drawCouplingDiameter(ctx, cx, cy, diam){
 /* =====================================================
    TOP VIEW
 ===================================================== */
-// ===============================
-//   MOTEUR + PATTES (ROTATION)
-// ===============================
-topCtx.save();
-topCtx.translate(cx, cy);
-topCtx.rotate(ang);
-topCtx.translate(-cx, -cy);
 
-// moteur
-topCtx.fillStyle="#00a2ff";
-topCtx.fillRect(cx-80, cy-40, 160, 80);
+function drawTopView(){
 
-// --- PATTES TOP VIEW ---
-// haut gauche -> A ; haut droite -> B ; bas gauche -> D ; bas droite -> C
-const P = {
-  A:{x:cx-70, y:cy-30},
-  B:{x:cx+70, y:cy-30},
-  D:{x:cx-70, y:cy+30},
-  C:{x:cx+70, y:cy+30},
-};
+  currentView = "top";
 
-function drawPad(letter){
-  const {x,y} = P[letter];
-  const offsetY = (letter === "C" || letter === "D") ? 10 : -10;
-  const faulty = footColor(letter) !== "#00a2ff";
+  const {w,h} = resizeCanvas(topCanvas, topCtx);
+  clear(topCtx,w,h);
 
-  topCtx.fillStyle = footColor(letter);
-  topCtx.fillRect(
-    x - (faulty ? 14 : 12),
-    y + offsetY - (faulty ? 7 : 6),
-    faulty ? 28 : 24,
-    faulty ? 14 : 12
-  );
-}
+  const ctx = topCtx;
 
-drawPad("A");
-drawPad("B");
-drawPad("D");
-drawPad("C");
+  // ===============================
+  //   PARAMÈTRES VISUELS
+  // ===============================
+  const scale   = visualGain;
+  const rotGain = visualGain * 0.00035;
 
-// === SOFT FOOT — diagonale + valeurs (dans rotation) ===
-if(STEPS[state.step].id === "softfoot"){
-  const sf = computeSoftFoot();
+  // ===============================
+  //   GÉOMÉTRIE DE BASE
+  // ===============================
+  let baseCy = h * 0.5;
+  let baseCx = w * 0.35;
 
-  topCtx.strokeStyle = "#ff5252";
-  topCtx.lineWidth = 2;
-  topCtx.beginPath();
+  let cy = baseCy;
+  let cx = baseCx + state.parH * scale;
 
-  if(sf.diagAC >= sf.diagBD){
-    topCtx.moveTo(P.A.x, P.A.y);
-    topCtx.lineTo(P.C.x, P.C.y);
-  }else{
-    topCtx.moveTo(P.B.x, P.B.y);
-    topCtx.lineTo(P.D.x, P.D.y);
-  }
+  const motorW = 160;
+  const motorH = 80;
+  const footW  = 24;
+  const footH  = 12;
 
-  topCtx.stroke();
+  const pumpW = 140;
+  const pumpH = 80;
+  const gap   = 70;
 
-  const shimEach = sf.correction / 2;
-  const shim = { A:0, B:0, C:0, D:0 };
+  const ang = state.angH * dialSign * rotGain;
 
-  if(sf.diagAC > sf.diagBD){
-    shim.A = shimEach;
-    shim.C = shimEach;
-  }
-  else if(sf.diagBD > sf.diagAC){
-    shim.B = shimEach;
-    shim.D = shimEach;
-  }
+  // ===============================
+  //   MOTEUR + PATTES (ROTATION)
+  // ===============================
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(ang);
+  ctx.translate(-cx, -cy);
 
-  function drawShim(letter){
-    const v = shim[letter];
-    if(v <= 0) return;
+  // moteur
+  ctx.fillStyle="#00a2ff";
+  ctx.fillRect(cx - motorW/2, cy - motorH/2, motorW, motorH);
 
+  // pattes
+  const P = {
+    A:{x:cx - motorW/2 + 24, y:cy - motorH/2 + 18},
+    B:{x:cx + motorW/2 - 24, y:cy - motorH/2 + 18},
+    D:{x:cx - motorW/2 + 24, y:cy + motorH/2 - 18},
+    C:{x:cx + motorW/2 - 24, y:cy + motorH/2 - 18},
+  };
+
+  function drawPad(letter){
     const {x,y} = P[letter];
-    topCtx.fillStyle = "#ff5252";
-    topCtx.font = blinkPhase ? "bold 13px Arial" : "12px Arial";
-    topCtx.textAlign = "left";
-    topCtx.fillText(`+${v.toFixed(1)} mil`, x + 14, y + 4);
+    ctx.fillStyle = footColor(letter);
+    ctx.fillRect(x-12, y-6, 24, 12);
   }
 
-  drawShim("A");
-  drawShim("B");
-  drawShim("C");
-  drawShim("D");
-}
+  drawPad("A");
+  drawPad("B");
+  drawPad("C");
+  drawPad("D");
 
-topCtx.restore();   // <<< SORTIE DE ROTATION — TOUT CE QUI SUIT EST FIXE
+  ctx.restore();   // <<< FIN ROTATION — tout ce qui suit est FIXE
 
-
-// ===============================
-//   LETTRES (PAS ROTATIVES)
-// ===============================
-topCtx.fillStyle = "#fff";
-topCtx.font = "14px Arial";
-topCtx.textAlign = "center";
-
-topCtx.fillText("A", P.A.x, P.A.y - 18);
-topCtx.fillText("B", P.B.x, P.B.y - 18);
-topCtx.fillText("D", P.D.x, P.D.y + 28);
-topCtx.fillText("C", P.C.x, P.C.y + 28);
-
-
-// ===============================
-//   POMPE (FIXE — JAMAIS ROTATIVE)
-// ===============================
-topCtx.fillStyle="#ff9800";
-topCtx.fillRect(cx+120, cy-40, 160, 80);
-
-
-// ===============================
-//   TITRES
-// ===============================
-topCtx.fillStyle="#fff";
-topCtx.font="13px Arial";
-topCtx.textAlign="center";
-topCtx.fillText("MOTEUR (mobile)", cx,      cy-110);
-topCtx.fillText("POMPE (fixe)",    cx+200, cy-110);
-
-  // === 3) Affichage des valeurs près des pattes ===
-  function drawShimText(letter, x, y){
-    const v = shim[letter];
-    if(v <= 0) return;
-    topCtx.fillStyle = "#ff5252";
-    topCtx.font = blinkPhase ? "bold 13px Arial" : "12px Arial";
-    topCtx.textAlign = "left";
-    topCtx.fillText(`+${v.toFixed(1)} mil`, x + 14, y + 4);
-  }
-
-  drawShimText("A", P.A.x, P.A.y);
-  drawShimText("B", P.B.x, P.B.y);
-  drawShimText("C", P.C.x, P.C.y);
-  drawShimText("D", P.D.x, P.D.y);
-}
-}
-
-function drawDimLine(ctx, x1, x2, y, label){
-  ctx.strokeStyle = "rgba(255,255,255,.8)";
-  ctx.lineWidth = 1.5;
-
-  // ligne principale
-  ctx.beginPath();
-  ctx.moveTo(x1, y);
-  ctx.lineTo(x2, y);
-  ctx.stroke();
-
-  // traits verticaux
-  ctx.beginPath();
-  ctx.moveTo(x1, y-6); ctx.lineTo(x1, y+6);
-  ctx.moveTo(x2, y-6); ctx.lineTo(x2, y+6);
-  ctx.stroke();
-
-  // texte
+  // ===============================
+  //   LETTRES
+  // ===============================
   ctx.fillStyle = "#fff";
-  ctx.font = "12px Arial";
+  ctx.font = "14px Arial";
   ctx.textAlign = "center";
-  ctx.fillText(label, (x1+x2)/2, y-10);
+
+  ctx.fillText("A", P.A.x, P.A.y - 14);
+  ctx.fillText("B", P.B.x, P.B.y - 14);
+  ctx.fillText("D", P.D.x, P.D.y + 22);
+  ctx.fillText("C", P.C.x, P.C.y + 22);
+
+  // ===============================
+  //   POMPE (FIXE)
+  // ===============================
+  const pumpX = baseCx + motorW/2 + gap;
+
+  ctx.fillStyle="#ff9800";
+  ctx.fillRect(pumpX, baseCy - pumpH/2, pumpW, pumpH);
+
+  // ===============================
+  //   TITRES
+  // ===============================
+  ctx.fillStyle="#fff";
+  ctx.font="13px Arial";
+  ctx.textAlign="center";
+  ctx.fillText("MOTEUR (mobile)", cx, cy - motorH/2 - 18);
+  ctx.fillText("POMPE (fixe)", pumpX + pumpW/2, baseCy - pumpH/2 - 18);
 }
 
-function drawCouplingDiameter(ctx, x, y, d){
-  const r = 18;
-  ctx.strokeStyle = "rgba(255,255,255,.8)";
-  ctx.lineWidth = 1.5;
 
-  ctx.beginPath();
-  ctx.arc(x, y, r, 0, Math.PI*2);
-  ctx.stroke();
-
-  ctx.fillStyle = "#fff";
-  ctx.font = "12px Arial";
-  ctx.textAlign = "left";
-  ctx.fillText(`Ø = ${d} po`, x + 26, y + 4);
-}
 
 
 
