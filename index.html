@@ -454,15 +454,17 @@ function computeAngularHorizontal(){
    PARALLÉLISME HORIZONTAL — PAIRES
 ===================================================== */
 function computeParallelHorizontal(){
-  // TA CONVENTION :
-  // parH > 0  => moteur trop à droite (réel) => moteur trop bas (écran) => corriger CD
-  // parH < 0  => moteur trop à gauche (réel) => moteur trop haut (écran) => corriger AB
-
   if(state.parH > 0){
-    return { pair:["C","D"], direction:"Moteur trop à droite → corriger côté C + D (remonter à l’écran)" };
+    return {
+      pair:["C","D"],
+      direction:"Moteur trop à gauche → déplacer vers la DROITE"
+    };
   }
   if(state.parH < 0){
-    return { pair:["A","B"], direction:"Moteur trop à gauche → corriger côté A + B (descendre à l’écran)" };
+    return {
+      pair:["A","B"],
+      direction:"Moteur trop à droite → déplacer vers la GAUCHE"
+    };
   }
   return null;
 }
@@ -644,24 +646,31 @@ if(stepId === "angV"){
   return msg;
 }
   // ---------- PARALLÉLISME VERTICAL ----------
-  if(stepId === "parV"){
-  const r = computeParallelVertical();
-  if(!r) return "✔️ Parallélisme vertical conforme.";
+  // ---------- PARALLÉLISME VERTICAL ----------
+if(stepId === "parV"){
 
-  msg += "⬆️ Parallélisme vertical\n\n";
+  if(ok(state.parV, state.parVTol)){
+    return "✔️ Parallélisme vertical conforme.";
+  }
+
+  const amt = Math.abs(state.parV).toFixed(2); // mils à corriger
+
+  let msg = "⬆️ Parallélisme vertical\n\n";
 
   if(state.parV > 0){
-    msg += "➕ Ajouter des cales sous :\n";
-    msg += "👉 A + B + C + D\n";
-    msg += "(moteur trop bas)";
+    msg += "Diagnostic : moteur trop bas\n\n";
+    msg += "Correction :\n";
+    msg += `➕ Ajouter +${amt} mil sous : A + B + C + D\n`;
+    msg += "(même quantité sur les 4 pattes)";
   }else{
-    msg += "➖ Enlever des cales sous :\n";
-    msg += "👉 A + B + C + D\n";
-    msg += "(moteur trop haut)";
+    msg += "Diagnostic : moteur trop haut\n\n";
+    msg += "Correction :\n";
+    msg += `➖ Enlever ${amt} mil sous : A + B + C + D\n`;
+    msg += "(même quantité sur les 4 pattes)";
   }
+
   return msg;
 }
-
   // ---------- ANGULARITÉ HORIZONTALE ----------
   // ---------- ANGULARITÉ HORIZONTALE ----------
 if(stepId === "angH"){
@@ -700,22 +709,26 @@ if(stepId === "angH"){
 }
 
   // ---------- PARALLÉLISME HORIZONTAL ----------
-  if(stepId === "parH"){
-    if(ok(state.parH, state.parHTol)){
-      return "✔️ Parallélisme horizontal conforme.";
-    }
+  // ---------- PARALLÉLISME HORIZONTAL ----------
+if(stepId === "parH"){
 
-    const r = computeParallelHorizontal();
-    msg += "↔️ Parallélisme horizontal\n\n";
-    msg += "➕ Déplacer le moteur côté :\n";
-    msg += `👉 ${r.pair.join(" + ")}\n`;
-    msg += `(${r.direction})`;
-    return msg;
+  if(ok(state.parH, state.parHTol)){
+    return "✔️ Parallélisme horizontal conforme.";
   }
 
-  return "";
-}
+  const amt = Math.abs(state.parH).toFixed(2);
+  const r = computeParallelHorizontal();
 
+  let msg = "↔️ Parallélisme horizontal\n\n";
+  msg += r.direction + "\n\n";
+
+  msg += "Correction :\n";
+  msg += `➕ Déplacer le moteur de ${amt} mil côté :\n`;
+  msg += `👉 ${r.pair.join(" + ")}\n`;
+  msg += "(translation latérale pure — sans rotation)";
+
+  return msg;
+}
 
 
 
