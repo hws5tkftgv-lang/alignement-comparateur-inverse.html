@@ -1360,7 +1360,10 @@ let cx = baseCx;
   const pumpH = 80;
   const gap   = 70;
 
-  const ang = state.angH * dialSign * rotGain;
+  const ang =
+  STEPS[state.step].id === "angH"
+  ? state.angH * dialSign * rotGain
+  : 0;
 
   // ===============================
 //   MOTEUR + PATTES (ROTATION)
@@ -1454,7 +1457,9 @@ const rotGain = visualGain * 0.00035;
   let baseCy = h * 0.55;
   let baseCx = w * 0.35;
 
-  let cy = baseCy + state.parV * scale;
+  let cy = baseCy + (
+  STEPS[state.step].id === "parV" ? state.parV * scale : 0
+);
   let cx = baseCx;
 
   const motorW = 200;
@@ -1469,7 +1474,10 @@ const rotGain = visualGain * 0.00035;
   const rearFootX  = cx - motorW/2 + footW/2;   // ARRIÈRE = gauche
 const frontFootX = cx + motorW/2 - footW/2;   // AVANT   = droite
 
-  const ang = -state.angV * dialSign * rotGain;
+  const ang =
+  STEPS[state.step].id === "angV"
+  ? -state.angV * dialSign * rotGain
+  : 0;
 
   // ===============================
   //   TRANSFORMATION ANGULAIRE
