@@ -287,6 +287,7 @@ let correctionMode = "add";  // "add" | "remove"
 let currentView = "top"; // "top" | "side"
 let blinkPhase = true;
 let visualGain = 6;
+const FOOT_NORMAL = "#0070c0";   // bleu foncé visible
 
 const gainSlider = document.getElementById("gainSlider");
 gainSlider.addEventListener("input", () => {
@@ -1208,9 +1209,8 @@ function footColor(letter){
   const step = STEPS[state.step].id;
   const bad = !isStepOK(state.step);
 
-  // ❌ Soft foot jamais en Side View
   if(step === "softfoot" && currentView === "side"){
-    return "#00a2ff";
+    return FOOT_NORMAL;
   }
 
   if(step === "softfoot"){
@@ -1245,9 +1245,8 @@ function footColor(letter){
     }
   }
 
-  return "#00a2ff";
+  return FOOT_NORMAL;
 }
-
 function drawFoot(ctx,x,y,label){
   ctx.fillStyle = footColor(label);
   ctx.fillRect(x-10,y-5,20,10);
@@ -1466,7 +1465,7 @@ const frontFootX = cx + motorW/2 - footW/2;   // AVANT   = droite
   // ===============================
   //   MOTEUR
   // ===============================
-  ctx.fillStyle = "#00a2ff";
+  ctx.fillStyle = footColor(letter);
   ctx.fillRect(cx - motorW/2, cy - motorH/2, motorW, motorH);
 
   // pattes moteur
