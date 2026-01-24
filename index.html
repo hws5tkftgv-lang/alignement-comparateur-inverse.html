@@ -456,14 +456,14 @@ function computeAngularHorizontal(){
 function computeParallelHorizontal(){
   if(state.parH > 0){
     return {
-      pair:["C","D"],
-      direction:"Moteur trop à gauche → déplacer vers la DROITE"
+      pair:["A","B"],
+      direction:"Moteur trop à droite → déplacer vers la GAUCHE"
     };
   }
   if(state.parH < 0){
     return {
-      pair:["A","B"],
-      direction:"Moteur trop à droite → déplacer vers la GAUCHE"
+      pair:["C","D"],
+      direction:"Moteur trop à gauche → déplacer vers la DROITE"
     };
   }
   return null;
@@ -1348,7 +1348,11 @@ function drawTopView(){
   let baseCy = h * 0.5;
 let baseCx = w * 0.35;
 
-let cy = baseCy + state.parH * scale;
+let cy = baseCy + (
+  STEPS[state.step].id === "parH"
+  ? state.parH * scale
+  : 0
+);
 let cx = baseCx;
 
   const motorW = 160;
