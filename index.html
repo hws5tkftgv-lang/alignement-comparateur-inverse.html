@@ -455,10 +455,10 @@ function computeAngularHorizontal(){
 ===================================================== */
 function computeParallelHorizontal(){
   if(state.parH > 0){
-    return { pair:["A","B"], direction:"Décalé droite" };
+    return { pair:["B","C"], direction:"Moteur trop à gauche → déplacer vers la DROITE" };
   }
   if(state.parH < 0){
-    return { pair:["D","C"], direction:"Décalé gauche" };
+    return { pair:["A","D"], direction:"Moteur trop à droite → déplacer vers la GAUCHE" };
   }
   return null;
 }
