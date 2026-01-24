@@ -454,11 +454,15 @@ function computeAngularHorizontal(){
    PARALLÉLISME HORIZONTAL — PAIRES
 ===================================================== */
 function computeParallelHorizontal(){
+  // TA CONVENTION :
+  // parH > 0  => moteur trop à droite (réel) => moteur trop bas (écran) => corriger CD
+  // parH < 0  => moteur trop à gauche (réel) => moteur trop haut (écran) => corriger AB
+
   if(state.parH > 0){
-    return { pair:["B","C"], direction:"Moteur trop à gauche → déplacer vers la DROITE" };
+    return { pair:["C","D"], direction:"Moteur trop à droite → corriger côté C + D (remonter à l’écran)" };
   }
   if(state.parH < 0){
-    return { pair:["A","D"], direction:"Moteur trop à droite → déplacer vers la GAUCHE" };
+    return { pair:["A","B"], direction:"Moteur trop à gauche → corriger côté A + B (descendre à l’écran)" };
   }
   return null;
 }
