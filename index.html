@@ -1413,49 +1413,6 @@ function drawTopView(){
   ctx.fillText("MOTEUR (mobile)", cx, cy - motorH/2 - 18);
   ctx.fillText("POMPE (fixe)", pumpX + pumpW/2, baseCy - pumpH/2 - 18);
 }
-function drawPad(letter){
-  const {x,y} = P[letter];
-  ctx.fillStyle = footColor(letter);
-  ctx.fillRect(x-12, y-6, 24, 12);
-}
-
-drawPad("A");
-drawPad("B");
-drawPad("C");
-drawPad("D");
-
-ctx.restore();   // ← on sort du repère tourné
-
-// ===============================
-//   LETTRES (repère normal)
-// ===============================
-ctx.fillStyle = "#fff";
-ctx.font = "14px Arial";
-ctx.textAlign = "center";
-
-ctx.fillText("A", P.A.x, P.A.y - 14);
-ctx.fillText("B", P.B.x, P.B.y - 14);
-ctx.fillText("D", P.D.x, P.D.y + 22);
-ctx.fillText("C", P.C.x, P.C.y + 22);
-  // ===============================
-  //   POMPE (FIXE)
-  // ===============================
-  const pumpX = baseCx + motorW/2 + gap;
-
-  ctx.fillStyle="#ff9800";
-  ctx.fillRect(pumpX, baseCy - pumpH/2, pumpW, pumpH);
-
-  // ===============================
-  //   TITRES
-  // ===============================
-  ctx.fillStyle="#fff";
-  ctx.font="13px Arial";
-  ctx.textAlign="center";
-  ctx.fillText("MOTEUR (mobile)", cx, cy - motorH/2 - 18);
-  ctx.fillText("POMPE (fixe)", pumpX + pumpW/2, baseCy - pumpH/2 - 18);
-}
-
-
 
 
 
