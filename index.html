@@ -1330,10 +1330,10 @@ function drawTopView(){
   //   GÉOMÉTRIE DE BASE
   // ===============================
   let baseCy = h * 0.5;
-  let baseCx = w * 0.35;
+let baseCx = w * 0.35;
 
-  let cy = baseCy;
-  let cx = baseCx + state.parH * scale;
+let cy = baseCy + state.parH * scale;
+let cx = baseCx;
 
   const motorW = 160;
   const motorH = 80;
@@ -1347,50 +1347,49 @@ function drawTopView(){
   const ang = state.angH * dialSign * rotGain;
 
   // ===============================
-  //   MOTEUR + PATTES (ROTATION)
-  // ===============================
-  ctx.save();
-  ctx.translate(cx, cy);
-  ctx.rotate(ang);
-  ctx.translate(-cx, -cy);
+//   MOTEUR + PATTES (ROTATION)
+// ===============================
+ctx.save();
+ctx.translate(cx, cy);
+ctx.rotate(ang);
+ctx.translate(-cx, -cy);
 
-  // moteur
-  ctx.fillStyle="#00a2ff";
-  ctx.fillRect(cx - motorW/2, cy - motorH/2, motorW, motorH);
+// moteur
+ctx.fillStyle="#00a2ff";
+ctx.fillRect(cx - motorW/2, cy - motorH/2, motorW, motorH);
 
-  // pattes
-  const P = {
-    A:{x:cx - motorW/2 + 24, y:cy - motorH/2 + 18},
-    B:{x:cx + motorW/2 - 24, y:cy - motorH/2 + 18},
-    D:{x:cx - motorW/2 + 24, y:cy + motorH/2 - 18},
-    C:{x:cx + motorW/2 - 24, y:cy + motorH/2 - 18},
-  };
+// pattes
+const P = {
+  A:{x:cx - motorW/2 + 24, y:cy - motorH/2 + 18},
+  B:{x:cx + motorW/2 - 24, y:cy - motorH/2 + 18},
+  D:{x:cx - motorW/2 + 24, y:cy + motorH/2 - 18},
+  C:{x:cx + motorW/2 - 24, y:cy + motorH/2 - 18},
+};
 
-  function drawPad(letter){
-    const {x,y} = P[letter];
-    ctx.fillStyle = footColor(letter);
-    ctx.fillRect(x-12, y-6, 24, 12);
-  }
+function drawPad(letter){
+  const {x,y} = P[letter];
+  ctx.fillStyle = footColor(letter);
+  ctx.fillRect(x-12, y-6, 24, 12);
+}
 
-  drawPad("A");
-  drawPad("B");
-  drawPad("C");
-  drawPad("D");
+drawPad("A");
+drawPad("B");
+drawPad("C");
+drawPad("D");
 
-  ctx.restore();   // <<< FIN ROTATION — tout ce qui suit est FIXE
+ctx.restore();   // ← on sort du repère tourné
 
-  // ===============================
-  //   LETTRES
-  // ===============================
-  ctx.fillStyle = "#fff";
-  ctx.font = "14px Arial";
-  ctx.textAlign = "center";
+// ===============================
+//   LETTRES (repère normal)
+// ===============================
+ctx.fillStyle = "#fff";
+ctx.font = "14px Arial";
+ctx.textAlign = "center";
 
-  ctx.fillText("A", P.A.x, P.A.y - 14);
-  ctx.fillText("B", P.B.x, P.B.y - 14);
-  ctx.fillText("D", P.D.x, P.D.y + 22);
-  ctx.fillText("C", P.C.x, P.C.y + 22);
-
+ctx.fillText("A", P.A.x, P.A.y - 14);
+ctx.fillText("B", P.B.x, P.B.y - 14);
+ctx.fillText("D", P.D.x, P.D.y + 22);
+ctx.fillText("C", P.C.x, P.C.y + 22);
   // ===============================
   //   POMPE (FIXE)
   // ===============================
