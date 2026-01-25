@@ -1359,7 +1359,7 @@ function drawTopView(){
   const rotGain = visualGain * 0.00035;
 
   let baseCy = h * 0.5;
-  let baseCx = w * 0.35;
+  let baseCx = w * 0.30;
 
   let cy = baseCy + (
     STEPS[state.step].id === "parH"
@@ -1500,12 +1500,17 @@ const rotGain = visualGain * 0.00035;
   // ===============================
 
   let baseCy = h * 0.55;
-  let baseCx = w * 0.35;
+  let baseCx = w * 0.30;
 
   let cy = baseCy + (
   STEPS[state.step].id === "parV" ? state.parV * scale : 0
 );
   let cx = baseCx;
+
+const footW = 24;
+const footH = 10;
+
+
 
   const { motorW, motorH, pumpW, pumpH, gap } = GEOM;
   const rearFootX  = cx - motorW/2 + footW/2;   // ARRIÈRE = gauche
