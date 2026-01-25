@@ -1519,10 +1519,13 @@ function drawSideView(){
   const { motorW, motorH, pumpW, pumpH, gap, shaftH, coupW, coupH } = GEOM;
   // ---------- SEMELLE COMMUNE ----------
 const baseMargin = 40;
+
+const baseTop = cy + motorH/2 + footH - 2;
+
 ctx.fillStyle = "#1a235a";
 ctx.fillRect(
   cx - motorW/2 - baseMargin,
-  baseCy + motorH/2 + 6,
+  baseTop,
   motorW + gap + pumpW + baseMargin*2,
   16
 );
