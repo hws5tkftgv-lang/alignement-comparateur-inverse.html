@@ -1382,24 +1382,21 @@ ctx.fillRect(
   motorH + baseMargin*2
 );
   // ---------- LIGNE D'AXE ----------
-ctx.restore();
-
+// ---------- LIGNE D'AXE (dépend du moteur) ----------
 ctx.save();
 
 ctx.strokeStyle = "rgba(255,255,255,0.95)";
 ctx.setLineDash([14,8]);
 ctx.lineWidth = 4;
-ctx.shadowColor = "rgba(255,255,255,0.6)";
+ctx.shadowColor = "rgba(255,255,255,0.7)";
 ctx.shadowBlur = 6;
 
 ctx.beginPath();
-ctx.moveTo(cx - motorW/2 - 60, cy);
-ctx.lineTo(cx + motorW/2 + gap + pumpW + 60, cy);
+ctx.moveTo(cx - motorW/2 - 80, cy);
+ctx.lineTo(cx + motorW/2 + gap + pumpW + 80, cy);
 ctx.stroke();
 
 ctx.restore();
-
-  
   const ang =
     STEPS[state.step].id === "angH"
     ? state.angH * dialSign * rotGain
@@ -1541,24 +1538,21 @@ ctx.fillRect(
   16
 );
   
-  // ---------- LIGNE D'AXE ----------
-ctx.restore();
+  // ---------- LIGNE D'AXE (dépend du moteur) ----------
 ctx.save();
 
 ctx.strokeStyle = "rgba(255,255,255,0.95)";
 ctx.setLineDash([14,8]);
 ctx.lineWidth = 4;
-ctx.shadowColor = "rgba(255,255,255,0.6)";
+ctx.shadowColor = "rgba(255,255,255,0.7)";
 ctx.shadowBlur = 6;
 
 ctx.beginPath();
-ctx.moveTo(cx - motorW/2 - 60, cy);
-ctx.lineTo(cx + motorW/2 + gap + pumpW + 60, cy);
+ctx.moveTo(cx - motorW/2 - 80, cy);
+ctx.lineTo(cx + motorW/2 + gap + pumpW + 80, cy);
 ctx.stroke();
 
 ctx.restore();
-
-
 
   const rearFootX  = cx - motorW/2 + footW/2;   // ARRIÈRE = gauche
 const frontFootX = cx + motorW/2 - footW/2;   // AVANT   = droite
