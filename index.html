@@ -1361,28 +1361,31 @@ function drawTopView(){
 
   let cy = baseCy + (
     STEPS[state.step].id === "parH"
-    ? state.parH * scale
-    : 0
+      ? state.parH * scale
+      : 0
   );
   let cx = baseCx;
 
   const { motorW, motorH, pumpW, pumpH, gap, shaftH, coupW, coupH } = GEOM;
 
+  const footW = 24;
+  const footH = 12;
+
   // ====================================================
-  //   SEMELLE COMMUNE
+  //   SEMELLE COMMUNE (FIXE – RÉFÉRENCE)
   // ====================================================
   const baseMargin = 40;
 
   ctx.fillStyle = "#1a235a";
   ctx.fillRect(
-    cx - motorW/2 - baseMargin,
-    cy - motorH/2 - baseMargin,
+    baseCx - motorW/2 - baseMargin,
+    baseCy - motorH/2 - baseMargin,
     motorW + gap + pumpW + baseMargin*2,
     motorH + baseMargin*2
   );
 
   // ====================================================
-  //   ROTATION MOTEUR
+  //   PARAMÈTRE ANGULAIRE
   // ====================================================
   const ang =
     STEPS[state.step].id === "angH"
@@ -1390,7 +1393,7 @@ function drawTopView(){
       : 0;
 
   // ====================================================
-  //   MOTEUR + PATTES (rotation)
+  //   COORDONNÉES DES PATTES
   // ====================================================
   const P = {
     A:{x:cx - motorW/2 + 24, y:cy - motorH/2 + 18},
@@ -1399,26 +1402,95 @@ function drawTopView(){
     C:{x:cx + motorW/2 - 24, y:cy + motorH/2 - 18},
   };
 
-  ctx.save();
-  ctx.translate(cx, cy);
-  ctx.rotate(ang);
-  ctx.translate(-cx, -cy);
+  // ====================================================
+  //   CHOIX DU PIVOT MÉCANIQUE
+  // ====================================================
+  let pivot = {x:cx, y:cy};
+  if(ang > 0) pivot = P.C;
+  if(ang < 0) pivot = P.D;
 
+  // ====================================================
+  //   BLOC MOTEUR + ARBRE + ½ ACCOUPLEMENT + AXE
+  // ====================================================
+  ctx.save();
+  ctx.translate(pivot.x, pivot.y);
+  ctx.rotate(ang);
+  ctx.translate(-pivot.x, -pivot.y);
+
+  // ---- moteur ----
   ctx.fillStyle = "#00a2ff";
   ctx.fillRect(cx - motorW/2, cy - motorH/2, motorW, motorH);
 
+  // ---- pattes ----
   function drawPad(letter){
     const {x,y} = P[letter];
     ctx.fillStyle = footColor(letter);
-    ctx.fillRect(x-12, y-6, 24, 12);
+    ctx.fillRect(x - footW/2, y - footH/2, footW, footH);
   }
+  drawPad("A"); drawPad("B"); drawPad("C"); drawPad("D");
 
-  drawPad("A");
-  drawPad("B");
-  drawPad("C");
-  drawPad("D");
+  // ---- arbre moteur ----
+  ctx.fillStyle = "#bbbbbb";
+  ctx.fillRect(
+    cx + motorW/2,
+    cy - shaftH/2,
+    (gap/2) - 8,
+    shaftH
+  );
+
+  // ---- demi-accouplement moteur ----
+  const coupX = cx + motorW/2 + gap/2;
+  ctx.fillStyle = "#cfcfcf";
+  ctx.fillRect(coupX - 14, cy - coupH/2, coupW, coupH);
+
+  // ---- AXE MOTEUR (TOUJOURS AU PREMIER PLAN) ----
+  ctx.strokeStyle = "rgba(255,255,255,0.95)";
+  ctx.setLineDash([5,4]);
+  ctx.lineWidth = 2.5;
+
+  ctx.beginPath();
+  ctx.moveTo(cx - motorW/2 - 90, cy);
+  ctx.lineTo(cx + motorW/2 + gap/2, cy);
+  ctx.stroke();
 
   ctx.restore();
+
+  // ====================================================
+  //   BLOC POMPE FIXE + ARBRE + ½ ACCOUPLEMENT + AXE
+  // ====================================================
+  const pumpX = baseCx + motorW/2 + gap;
+
+  // ---- pompe ----
+  ctx.fillStyle="#ff9800";
+  ctx.fillRect(pumpX, baseCy - pumpH/2, pumpW, pumpH);
+
+  // ---- arbre pompe ----
+  ctx.fillStyle = "#bbbbbb";
+  ctx.fillRect(
+    baseCx + motorW/2 + gap/2 + 14,
+    baseCy - shaftH/2,
+    (gap/2) - 8,
+    shaftH
+  );
+
+  // ---- demi-accouplement pompe ----
+  ctx.fillStyle = "#cfcfcf";
+  ctx.fillRect(
+    baseCx + motorW/2 + gap/2 + 4,
+    baseCy - coupH/2,
+    coupW,
+    coupH
+  );
+
+  // ---- AXE POMPE ----
+  ctx.strokeStyle = "rgba(255,255,255,0.95)";
+  ctx.setLineDash([5,4]);
+  ctx.lineWidth = 2.5;
+
+  ctx.beginPath();
+  ctx.moveTo(baseCx + motorW/2 + gap/2, baseCy);
+  ctx.lineTo(baseCx + motorW/2 + gap + pumpW + 90, baseCy);
+  ctx.stroke();
 
   // ====================================================
   //   LETTRES
@@ -1430,68 +1502,12 @@ function drawTopView(){
   const labelOffset = 26;
   ctx.fillText("A", P.A.x, P.A.y - labelOffset);
   ctx.fillText("B", P.B.x, P.B.y - labelOffset);
-  ctx.fillText("D", P.D.x, P.D.y + labelOffset + 8);
-  ctx.fillText("C", P.C.x, P.C.y + labelOffset + 8);
-
-  // ====================================================
-  //   ARBRES
-  // ====================================================
-  ctx.fillStyle = "#bbbbbb";
-
-  ctx.fillRect(
-    cx + motorW/2,
-    cy - shaftH/2,
-    (gap/2) - 8,
-    shaftH
-  );
-
-  ctx.fillRect(
-    cx + motorW/2 + (gap/2) + 8,
-    cy - shaftH/2,
-    (gap/2) - 8,
-    shaftH
-  );
-
-  // ====================================================
-  //   ACCOUPLEMENT
-  // ====================================================
-  const coupX = cx + motorW/2 + gap/2;
-
-  ctx.fillStyle = "#cfcfcf";
-  ctx.fillRect(coupX - 14, cy - coupH/2, coupW, coupH);
-  ctx.fillRect(coupX + 2,  cy - coupH/2, coupW, coupH);
-
-  // ====================================================
-  //   POMPE FIXE
-  // ====================================================
-  const pumpX = cx + motorW/2 + gap;
-
-  ctx.fillStyle="#ff9800";
-  ctx.fillRect(pumpX, baseCy - pumpH/2, pumpW, pumpH);
-
-  // ====================================================
-  //   LIGNE D’AXE — PREMIER PLAN — SUIT LE MOTEUR
-  // ====================================================
-  ctx.save();
-  ctx.strokeStyle = "rgba(255,255,255,0.95)";
-  ctx.setLineDash([14,8]);
-  ctx.lineWidth = 4;
-  ctx.shadowColor = "rgba(255,255,255,0.7)";
-  ctx.shadowBlur = 6;
-
-  ctx.beginPath();
-  ctx.moveTo(cx - motorW/2 - 80, cy);
-  ctx.lineTo(cx + motorW/2 + gap + pumpW + 80, cy);
-  ctx.stroke();
-
-  ctx.restore();
+  ctx.fillText("D", P.D.x, P.D.y + labelOffset + 6);
+  ctx.fillText("C", P.C.x, P.C.y + labelOffset + 6);
 
   // ====================================================
   //   TITRES
   // ====================================================
-  ctx.fillStyle="#fff";
-  ctx.font="13px Arial";
-  ctx.textAlign="center";
   ctx.fillText("MOTEUR (mobile)", cx, cy - motorH/2 - 18);
   ctx.fillText("POMPE (fixe)", pumpX + pumpW/2, baseCy - pumpH/2 - 18);
 }
