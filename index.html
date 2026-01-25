@@ -1591,20 +1591,6 @@ ctx.translate(cx, cy);
 ctx.rotate(ang);
 ctx.translate(-cx, -cy);
 
-// ---- AXE MOTEUR ----
-ctx.save();
-ctx.strokeStyle = "rgba(255,255,255,0.95)";
-ctx.setLineDash([5,6]);
-ctx.lineWidth = 2;
-ctx.shadowColor = "rgba(255,255,255,0.6)";
-ctx.shadowBlur = 3;
-
-ctx.beginPath();
-ctx.moveTo(cx - motorW/2 - 100, cy);
-ctx.lineTo(cx + motorW/2 + gap/2, cy);
-ctx.stroke();
-ctx.restore();
-
 // ---- MOTEUR ----
 ctx.fillStyle = "#00a2ff";
 ctx.fillRect(cx - motorW/2, cy - motorH/2, motorW, motorH);
@@ -1638,8 +1624,19 @@ ctx.fillRect(
   coupH
 );
 
+// ---- AXE MOTEUR (TOUJOURS EN DERNIER = AU PREMIER PLAN) ----
+ctx.save();
+ctx.strokeStyle = "rgba(255,255,255,0.95)";
+ctx.setLineDash([5,4]);
+ctx.lineWidth = 2.5;
+
+ctx.beginPath();
+ctx.moveTo(cx - motorW/2 - 90, cy);
+ctx.lineTo(cx + motorW/2 + gap/2, cy);
+ctx.stroke();
 ctx.restore();
 
+ctx.restore();
   // ---- AXE POMPE (FIXE) ----
 ctx.save();
 ctx.strokeStyle = "rgba(255,255,255,0.95)";
