@@ -1584,12 +1584,22 @@ function drawSideView(){
   );
 
 // ====================================================
-//   MOTEUR + ARBRE + ½ ACCOUPLEMENT + AXE (BLOC SOLIDAIRE)
+//   MOTEUR + ARBRE + ½ ACCOUPLEMENT + AXE
+//   BLOC SOLIDAIRE — PIVOT MÉCANIQUE RÉALISTE
 // ====================================================
+
+// pivots mécaniques réels
+const pivotDX = rearFootX;
+const pivotCX = frontFootX;
+const pivotY  = cy + motorH/2;
+
+// choix automatique du pied porteur
+const pivotX = (ang >= 0) ? pivotDX : pivotCX;
+
 ctx.save();
-ctx.translate(cx, cy);
+ctx.translate(pivotX, pivotY);
 ctx.rotate(ang);
-ctx.translate(-cx, -cy);
+ctx.translate(-pivotX, -pivotY);
 
 // ---- MOTEUR ----
 ctx.fillStyle = "#00a2ff";
@@ -1624,7 +1634,7 @@ ctx.fillRect(
   coupH
 );
 
-// ---- AXE MOTEUR (TOUJOURS EN DERNIER = AU PREMIER PLAN) ----
+// ---- AXE MOTEUR (DERNIER = PREMIER PLAN) ----
 ctx.save();
 ctx.strokeStyle = "rgba(255,255,255,0.95)";
 ctx.setLineDash([5,4]);
