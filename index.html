@@ -1409,6 +1409,29 @@ ctx.fillText("A", P.A.x, P.A.y - labelOffset);
 ctx.fillText("B", P.B.x, P.B.y - labelOffset);
 ctx.fillText("D", P.D.x, P.D.y + labelOffset + 8);
 ctx.fillText("C", P.C.x, P.C.y + labelOffset + 8);
+
+  // ---------- ARBRES ----------
+  const shaftH = 10;
+
+  ctx.fillStyle = "#bbbbbb";
+
+  // arbre moteur → accouplement
+  ctx.fillRect(
+    cx + motorW/2,
+    cy - shaftH/2,
+    (gap/2) - 8,
+    shaftH
+  );
+
+  // arbre accouplement → pompe
+  ctx.fillRect(
+    cx + motorW/2 + (gap/2) + 8,
+    cy - shaftH/2,
+    (gap/2) - 8,
+    shaftH
+  );
+
+
   // ---------- pompe ----------
 
 
@@ -1528,7 +1551,7 @@ ctx.fillText("ACCOUPLEMENT", coupX, cy - coupH/2 - 10);
 
 // ---------- ARBRES ----------
 const shaftY = cy;
-const shaftH = 6;
+const shaftH = 12;
 
 // arbre moteur → accouplement
 ctx.fillStyle = "#bbbbbb";
