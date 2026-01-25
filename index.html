@@ -624,43 +624,48 @@ function buildCorrectionMessage(){
     return msg;
   }
 
-  // ---------- ANGULARITÉ VERTICALE ----------
   if(stepId === "angV"){
 
-    if(ok(state.angV, state.angVTol)){
-      return "✔️ Angularité verticale conforme.";
-    }
-
-    const v = state.angV * dialSign;
-    const shims = computeAngularShimsVertical();
-
-    const front = shims.front.toFixed(2);
-    const rear  = shims.rear.toFixed(2);
-
-    msg += "📐 Angularité verticale\n\n";
-    msg += "Correction géométrique équivalente :\n";
-    msg += `• AVANT : ${front} mil\n`;
-    msg += `• ARRIÈRE : ${rear} mil\n\n`;
-
-    if(v > 0){
-      msg += "Diagnostic : ARRIÈRE trop bas\n\n";
-      msg += "Solutions mécaniques possibles :\n";
-      msg += `➕ Ajouter ${rear} mil sous : A + D\n`;
-      msg += `OU\n`;
-      msg += `➖ Enlever ${front} mil sous : B + C`;
-    }
-
-    if(v < 0){
-      msg += "Diagnostic : AVANT trop bas\n\n";
-      msg += "Solutions mécaniques possibles :\n";
-      msg += `➕ Ajouter ${front} mil sous : B + C\n`;
-      msg += `OU\n`;
-      msg += `➖ Enlever ${rear} mil sous : A + D`;
-    }
-
-    return msg;
+  if(ok(state.angV, state.angVTol)){
+    return "✔️ Angularité verticale conforme.";
   }
 
+  const v = state.angV * dialSign;
+  const shims = computeAngularShimsVertical();
+
+  const front = shims.front.toFixed(2);
+  const rear  = shims.rear.toFixed(2);
+
+  msg += "📐 Angularité verticale\n\n";
+
+  if(v > 0){
+    msg += "Lecture POSITIVE → AVANT plus haut que l’arrière\n";
+    msg += "(le moteur est incliné vers l’arrière)\n\n";
+
+    msg += "Action mécanique :\n";
+    msg += "Abaisser l’avant du moteur\n\n";
+
+    msg += "Corrections possibles :\n";
+    msg += `➖ Enlever ${front} mil sous : B + C\n`;
+    msg += `OU\n`;
+    msg += `➕ Ajouter ${rear} mil sous : A + D`;
+  }
+
+  if(v < 0){
+    msg += "Lecture NÉGATIVE → ARRIÈRE plus haut que l’avant\n";
+    msg += "(le moteur est incliné vers l’avant)\n\n";
+
+    msg += "Action mécanique :\n";
+    msg += "Abaisser l’arrière du moteur\n\n";
+
+    msg += "Corrections possibles :\n";
+    msg += `➖ Enlever ${rear} mil sous : A + D\n`;
+    msg += `OU\n`;
+    msg += `➕ Ajouter ${front} mil sous : B + C`;
+  }
+
+  return msg;
+}
   // ---------- PARALLÉLISME VERTICAL ----------
   if(stepId === "parV"){
 
