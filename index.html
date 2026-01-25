@@ -1590,6 +1590,19 @@ function drawSideView(){
   ctx.translate(cx, cy);
   ctx.rotate(ang);
   ctx.translate(-cx, -cy);
+  // ---- AXE MOTEUR (suit la rotation) ----
+ctx.save();
+ctx.strokeStyle = "rgba(255,255,255,0.95)";
+ctx.setLineDash([4,6]);
+ctx.lineWidth = 2;
+ctx.shadowColor = "rgba(255,255,255,0.6)";
+ctx.shadowBlur = 3;
+
+ctx.beginPath();
+ctx.moveTo(cx - motorW/2 - 100, cy);
+ctx.lineTo(coupX, cy);
+ctx.stroke();
+ctx.restore();
 
   // moteur
   ctx.fillStyle = "#00a2ff";
