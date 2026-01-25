@@ -1376,6 +1376,15 @@ function drawTopView(){
   const motorCx = baseCx;
 
   const { motorW, motorH, pumpW, pumpH, gap, shaftH, coupW, coupH } = GEOM;
+  // ====================================================
+//   PATTES À POUSSER — PARALLÉLISME HORIZONTAL
+// ====================================================
+let flashFeet = [];
+
+if(STEPS[state.step].id === "parH"){
+  if(state.parH < 0) flashFeet = ["C","D"];
+  if(state.parH > 0) flashFeet = ["A","B"];
+}
 
   const footW = 24;
   const footH = 12;
@@ -1434,25 +1443,13 @@ function drawTopView(){
   ctx.fillStyle = "#00a2ff";
   ctx.fillRect(motorCx - motorW/2, motorCy - motorH/2, motorW, motorH);
 
-  // ---- pattes ----
   function drawPad(letter){
   const {x,y} = P[letter];
   let col = footColor(letter);
 
-  if(STEPS[state.step].id === "parH"){
-
-    // moteur trop à droite → déplacer à gauche → pousser C + D
-    if(state.parH < 0 && (letter === "C" || letter === "D")){
-      if(typeof blinkColor === "function"){
-        col = blinkColor(col);
-      }
-    }
-
-    // moteur trop à gauche → déplacer à droite → pousser A + B
-    if(state.parH > 0 && (letter === "A" || letter === "B")){
-      if(typeof blinkColor === "function"){
-        col = blinkColor(col);
-      }
+  if(flashFeet.includes(letter)){
+    if(typeof blinkColor === "function"){
+      col = blinkColor(col);
     }
   }
 
