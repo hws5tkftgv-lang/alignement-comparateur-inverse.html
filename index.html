@@ -1393,7 +1393,7 @@ ctx.stroke();
 
 ctx.setLineDash([]);
 
-  const { motorW, motorH, pumpW, pumpH, gap, shaftH, coupW, coupH } = GEOM;
+  
   const ang =
     STEPS[state.step].id === "angH"
     ? state.angH * dialSign * rotGain
@@ -1544,7 +1544,7 @@ const footH = 10;
 
 
 
-  const { motorW, motorH, pumpW, pumpH, gap, shaftH, coupW, coupH } = GEOM;
+
   const rearFootX  = cx - motorW/2 + footW/2;   // ARRIÈRE = gauche
 const frontFootX = cx + motorW/2 - footW/2;   // AVANT   = droite
 
