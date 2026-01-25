@@ -1594,7 +1594,7 @@ const pivotCX = frontFootX;
 const pivotY  = cy + motorH/2;
 
 // choix automatique du pied porteur
-const pivotX = (ang >= 0) ? pivotDX : pivotCX;
+const pivotX = (ang >= 0) ? pivotCX : pivotDX;
 
 ctx.save();
 ctx.translate(pivotX, pivotY);
