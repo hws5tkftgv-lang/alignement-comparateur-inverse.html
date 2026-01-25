@@ -459,10 +459,10 @@ function computeParallelVertical(){
 ===================================================== */
 function computeAngularHorizontal(){
   if(state.angH * dialSign > 0){
-    return { pair:["B","D"], direction:"Incliné droite" };
+    return { pair:["B","C"], direction:"Incliné vers la droite → corriger BC" };
   }
   if(state.angH * dialSign < 0){
-    return { pair:["A","C"], direction:"Incliné gauche" };
+    return { pair:["A","D"], direction:"Incliné vers la gauche → corriger AD" };
   }
   return null;
 }
@@ -473,13 +473,13 @@ function computeAngularHorizontal(){
 function computeParallelHorizontal(){
   if(state.parH > 0){
     return {
-      pair:["A","B"],
+      pair:["C","D"],
       direction:"Moteur trop à droite → déplacer vers la GAUCHE"
     };
   }
   if(state.parH < 0){
     return {
-      pair:["C","D"],
+      pair:["A","B"],
       direction:"Moteur trop à gauche → déplacer vers la DROITE"
     };
   }
@@ -1391,6 +1391,17 @@ function drawTopView(){
     STEPS[state.step].id === "angH"
       ? state.angH * dialSign * rotGain
       : 0;
+      
+      // ====================================================
+//   PARH — QUEL CÔTÉ POUSSER (A+B ou C+D)
+//   Convention: parH < 0 => moteur trop à droite => aller à gauche => pousser C+D
+//               parH > 0 => moteur trop à gauche => aller à droite => pousser A+B
+// ====================================================
+let pushFeet = [];
+if(STEPS[state.step].id === "parH"){
+  if(state.parH < 0) pushFeet = ["C","D"];
+  else if(state.parH > 0) pushFeet = ["A","B"];
+}
 
   // ====================================================
   //   COORDONNÉES DES PATTES
@@ -1422,11 +1433,28 @@ function drawTopView(){
   ctx.fillRect(cx - motorW/2, cy - motorH/2, motorW, motorH);
 
   // ---- pattes ----
-  function drawPad(letter){
-    const {x,y} = P[letter];
-    ctx.fillStyle = footColor(letter);
-    ctx.fillRect(x - footW/2, y - footH/2, footW, footH);
+function drawPad(letter){
+  const {x,y} = P[letter];
+
+  let col = footColor(letter);
+
+  // clignotement seulement en parH sur les bonnes pattes
+  if(STEPS[state.step].id === "parH"){
+
+    // moteur trop à droite → déplacer à gauche → pousser C + D
+    if(state.parH < 0 && (letter === "C" || letter === "D")){
+      col = blinkColor(col);
+    }
+
+    // moteur trop à gauche → déplacer à droite → pousser A + B
+    if(state.parH > 0 && (letter === "A" || letter === "B")){
+      col = blinkColor(col);
+    }
   }
+
+  ctx.fillStyle = col;
+  ctx.fillRect(x - footW/2, y - footH/2, footW, footH);
+}
   drawPad("A"); drawPad("B"); drawPad("C"); drawPad("D");
 
   // ---- arbre moteur ----
