@@ -1512,9 +1512,10 @@ function drawSideView(){
 
   let cy = baseCy + (
     STEPS[state.step].id === "parV"
-    ? state.parV * scale
-    : 0
+      ? state.parV * scale
+      : 0
   );
+
   let cx = baseCx;
 
   const axisPumpY  = baseCy;   // axe pompe = FIXE
@@ -1524,6 +1525,9 @@ function drawSideView(){
 
   const footW = 24;
   const footH = 10;
+
+  const rearFootX  = cx - motorW/2 + footW/2;
+  const frontFootX = cx + motorW/2 - footW/2;
 
   // ====================================================
   //   SEMELLE COMMUNE
@@ -1540,52 +1544,34 @@ function drawSideView(){
   );
 
   // ====================================================
-  //   PARAMÈTRES ANGULAIRES
+  //   PARAMÈTRE ANGULAIRE
   // ====================================================
   const ang =
     STEPS[state.step].id === "angV"
       ? -state.angV * dialSign * rotGain
       : 0;
 
-  const rearFootX  = cx - motorW/2 + footW/2;
-  const frontFootX = cx + motorW/2 - footW/2;
+  // ====================================================
+  //   POMPE FIXE
+  // ====================================================
+  const pumpX = cx + motorW/2 + gap;
+
+  ctx.fillStyle = "#ff9800";
+  ctx.fillRect(pumpX, baseCy - pumpH/2, pumpW, pumpH);
+
+  // pattes pompe
+  ctx.fillRect(pumpX + 12, baseCy + pumpH/2 - 2, footW, footH);
+  ctx.fillRect(pumpX + pumpW - 12 - footW, baseCy + pumpH/2 - 2, footW, footH);
 
   // ====================================================
-  //   AXE POMPE (FIXE — PREMIER PLAN)
-  // ====================================================
-  ctx.save();
-  ctx.strokeStyle = "rgba(255,255,255,0.95)";
-  ctx.setLineDash([14,8]);
-  ctx.lineWidth = 4;
-  ctx.shadowColor = "rgba(255,255,255,0.7)";
-  ctx.shadowBlur = 6;
-
-  ctx.beginPath();
-  ctx.moveTo(cx + motorW/2 + gap/2, axisPumpY);
-  ctx.lineTo(cx + motorW/2 + gap + pumpW + 80, axisPumpY);
-  ctx.stroke();
-
-  ctx.restore();
-
-  // ====================================================
-  //   MOTEUR + AXE MOTEUR (REPÈRE ROTATIF)
+  //   MOTEUR + ARBRE + ACCOUPLEMENT (BLOC SOLIDAIRE)
   // ====================================================
   ctx.save();
   ctx.translate(cx, cy);
   ctx.rotate(ang);
   ctx.translate(-cx, -cy);
 
-  // ---- AXE MOTEUR ----
-  ctx.strokeStyle = "rgba(255,255,255,1)";
-  ctx.setLineDash([14,8]);
-  ctx.lineWidth = 4;
-
-  ctx.beginPath();
-  ctx.moveTo(cx - motorW/2 - 80, axisMotorY);
-  ctx.lineTo(cx + motorW/2 + gap/2, axisMotorY);
-  ctx.stroke();
-
-  // ---- MOTEUR ----
+  // ---- moteur ----
   ctx.fillStyle = "#00a2ff";
   ctx.fillRect(cx - motorW/2, cy - motorH/2, motorW, motorH);
 
@@ -1600,22 +1586,8 @@ function drawSideView(){
   ctx.fillText("D", rearFootX,  cy + motorH/2 + 24);
   ctx.fillText("C", frontFootX, cy + motorH/2 + 24);
 
-  ctx.restore();
-
-  // ====================================================
-  //   ACCOUPLEMENT
-  // ====================================================
-  const coupX = cx + motorW/2 + gap/2;
-
-  ctx.fillStyle = "#cfcfcf";
-  ctx.fillRect(coupX - 14, cy - coupH/2, coupW, coupH);
-  ctx.fillRect(coupX + 4,  cy - coupH/2, coupW, coupH);
-
-  // ====================================================
-  //   ARBRES
-  // ====================================================
+  // ---- arbre moteur ----
   ctx.fillStyle = "#bbbbbb";
-
   ctx.fillRect(
     cx + motorW/2,
     axisMotorY - shaftH/2,
@@ -1623,23 +1595,24 @@ function drawSideView(){
     shaftH
   );
 
+  // ---- accouplement ----
+  const coupX = cx + motorW/2 + gap/2;
+  ctx.fillStyle = "#cfcfcf";
+  ctx.fillRect(coupX - 14, axisMotorY - coupH/2, coupW, coupH);
+  ctx.fillRect(coupX + 4,  axisMotorY - coupH/2, coupW, coupH);
+
+  ctx.restore();
+
+  // ====================================================
+  //   ARBRE CÔTÉ POMPE (FIXE)
+  // ====================================================
+  ctx.fillStyle = "#bbbbbb";
   ctx.fillRect(
     coupX + 14,
     axisPumpY - shaftH/2,
     (gap/2) - 8,
     shaftH
   );
-
-  // ====================================================
-  //   POMPE FIXE
-  // ====================================================
-  const pumpX = cx + motorW/2 + gap;
-
-  ctx.fillStyle = "#ff9800";
-  ctx.fillRect(pumpX, baseCy - pumpH/2, pumpW, pumpH);
-
-  ctx.fillRect(pumpX + 12, baseCy + pumpH/2 - 2, footW, footH);
-  ctx.fillRect(pumpX + pumpW - 12 - footW, baseCy + pumpH/2 - 2, footW, footH);
 
   // ====================================================
   //   TITRES
@@ -1650,6 +1623,33 @@ function drawSideView(){
   ctx.fillText("MOTEUR (mobile)", cx, cy - motorH/2 - 14);
   ctx.fillText("POMPE (fixe)", pumpX + pumpW/2, baseCy - pumpH/2 - 14);
 
+  // ====================================================
+  //   LIGNES D’AXE — PREMIER PLAN (STYLE LASER)
+  // ====================================================
+  ctx.save();
+  ctx.strokeStyle = "rgba(255,255,255,0.95)";
+  ctx.setLineDash([5,4]);
+  ctx.lineWidth = 2.5;
+  ctx.shadowColor = "rgba(255,255,255,0.5)";
+  ctx.shadowBlur = 3;
+
+  // axe moteur
+  ctx.beginPath();
+  ctx.moveTo(cx - motorW/2 - 90, axisMotorY);
+  ctx.lineTo(cx + motorW/2 + gap/2, axisMotorY);
+  ctx.stroke();
+
+  // axe pompe
+  ctx.beginPath();
+  ctx.moveTo(cx + motorW/2 + gap/2, axisPumpY);
+  ctx.lineTo(cx + motorW/2 + gap + pumpW + 90, axisPumpY);
+  ctx.stroke();
+
+  ctx.restore();
+
+  // ===============================
+  //   MESURES GÉOMÉTRIQUES
+  // ===============================
   // ===============================
   //   MESURES GÉOMÉTRIQUES
   // ===============================
