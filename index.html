@@ -1382,15 +1382,20 @@ ctx.fillRect(
   motorH + baseMargin*2
 );
   // ---------- LIGNE D'AXE ----------
-ctx.strokeStyle = "rgba(255,255,255,.75)";
-ctx.setLineDash([10,6]);
-ctx.lineWidth = 3;
+ctx.save();
+
+ctx.strokeStyle = "rgba(255,255,255,0.95)";
+ctx.setLineDash([14,8]);
+ctx.lineWidth = 4;
+ctx.shadowColor = "rgba(255,255,255,0.6)";
+ctx.shadowBlur = 6;
+
 ctx.beginPath();
-ctx.moveTo(cx - motorW/2 - 50, cy);
-ctx.lineTo(cx + motorW/2 + gap + pumpW + 50, cy);
+ctx.moveTo(cx - motorW/2 - 60, cy);
+ctx.lineTo(cx + motorW/2 + gap + pumpW + 60, cy);
 ctx.stroke();
 
-ctx.setLineDash([]);
+ctx.restore();
 
   
   const ang =
@@ -1535,20 +1540,20 @@ ctx.fillRect(
 );
   
   // ---------- LIGNE D'AXE ----------
-ctx.strokeStyle = "rgba(255,255,255,.75)";
-ctx.setLineDash([10,6]);
-ctx.lineWidth = 3;
-ctx.shadowColor = "rgba(255,255,255,0.5)";
-ctx.shadowBlur = 4;
+ctx.save();
+
+ctx.strokeStyle = "rgba(255,255,255,0.95)";
+ctx.setLineDash([14,8]);
+ctx.lineWidth = 4;
+ctx.shadowColor = "rgba(255,255,255,0.6)";
+ctx.shadowBlur = 6;
 
 ctx.beginPath();
-ctx.moveTo(cx - motorW/2 - 50, cy);
-ctx.lineTo(cx + motorW/2 + gap + pumpW + 50, cy);
+ctx.moveTo(cx - motorW/2 - 60, cy);
+ctx.lineTo(cx + motorW/2 + gap + pumpW + 60, cy);
 ctx.stroke();
 
-ctx.setLineDash([]);
-
-
+ctx.restore();
 
 
 
