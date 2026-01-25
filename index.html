@@ -1356,15 +1356,21 @@ function drawTopView(){
   const scale   = visualGain;
   const rotGain = visualGain * 0.00035;
 
-  let baseCy = h * 0.5;
-  let baseCx = w * 0.30;
+  // ====================================================
+  //   RÉFÉRENCES FIXES (POMPE + SOCLE)
+  // ====================================================
+  const baseCy = h * 0.5;
+  const baseCx = w * 0.30;
 
-  let cy = baseCy + (
+  // ====================================================
+  //   MOTEUR MOBILE (PARALLÉLISME HORIZONTAL = DÉPLACEMENT EN Y)
+  // ====================================================
+  const motorCy = baseCy + (
     STEPS[state.step].id === "parH"
       ? state.parH * scale
       : 0
   );
-  let cx = baseCx;
+  const motorCx = baseCx;
 
   const { motorW, motorH, pumpW, pumpH, gap, shaftH, coupW, coupH } = GEOM;
 
@@ -1378,49 +1384,43 @@ function drawTopView(){
 
   ctx.fillStyle = "#1a235a";
   ctx.fillRect(
-  cx - motorW/2 - baseMargin,
-  baseCy - motorH/2 - baseMargin,
-  motorW + gap + pumpW + baseMargin*2,
-  motorH + baseMargin*2
-);
+    baseCx - motorW/2 - baseMargin,
+    baseCy - motorH/2 - baseMargin,
+    motorW + gap + pumpW + baseMargin*2,
+    motorH + baseMargin*2
+  );
+
   // ====================================================
-  //   PARAMÈTRE ANGULAIRE
+  //   PARAMÈTRE ANGULAIRE (ANGULARITÉ HORIZONTALE)
   // ====================================================
   const ang =
     STEPS[state.step].id === "angH"
       ? state.angH * dialSign * rotGain
       : 0;
-      
-      // ====================================================
-//   PARH — QUEL CÔTÉ POUSSER (A+B ou C+D)
-//   Convention: parH < 0 => moteur trop à droite => aller à gauche => pousser C+D
-//               parH > 0 => moteur trop à gauche => aller à droite => pousser A+B
-// ====================================================
-let pushFeet = [];
-if(STEPS[state.step].id === "parH"){
-  if(state.parH < 0) pushFeet = ["C","D"];
-  else if(state.parH > 0) pushFeet = ["A","B"];
-}
 
   // ====================================================
-  //   COORDONNÉES DES PATTES
+  //   COORDONNÉES DES PATTES (EN POSITION MOTEUR)
+  //   IMPORTANT: utiliser motorCx / motorCy (pas baseCy)
   // ====================================================
   const P = {
-    A:{x:cx - motorW/2 + 24, y:cy - motorH/2 + 18},
-    B:{x:cx + motorW/2 - 24, y:cy - motorH/2 + 18},
-    D:{x:cx - motorW/2 + 24, y:cy + motorH/2 - 18},
-    C:{x:cx + motorW/2 - 24, y:cy + motorH/2 - 18},
+    A:{x: motorCx - motorW/2 + 24, y: motorCy - motorH/2 + 18},
+    B:{x: motorCx + motorW/2 - 24, y: motorCy - motorH/2 + 18},
+    D:{x: motorCx - motorW/2 + 24, y: motorCy + motorH/2 - 18},
+    C:{x: motorCx + motorW/2 - 24, y: motorCy + motorH/2 - 18},
   };
 
   // ====================================================
-  //   CHOIX DU PIVOT MÉCANIQUE
+  //   PIVOT MÉCANIQUE (OPTIONNEL)
+  //   - ang > 0  => pivot coin extérieur C
+  //   - ang < 0  => pivot coin extérieur D
+  //   - ang = 0  => pivot centre
   // ====================================================
-  let pivot = {x:cx, y:cy};
+  let pivot = {x: motorCx, y: motorCy};
   if(ang > 0) pivot = P.C;
   if(ang < 0) pivot = P.D;
 
   // ====================================================
-  //   BLOC MOTEUR + ARBRE + ½ ACCOUPLEMENT + AXE
+  //   BLOC MOTEUR (MOBILE) : MOTEUR + ARBRE + ½ ACCOUPLEMENT + AXE
   // ====================================================
   ctx.save();
   ctx.translate(pivot.x, pivot.y);
@@ -1429,61 +1429,60 @@ if(STEPS[state.step].id === "parH"){
 
   // ---- moteur ----
   ctx.fillStyle = "#00a2ff";
-  ctx.fillRect(cx - motorW/2, cy - motorH/2, motorW, motorH);
+  ctx.fillRect(motorCx - motorW/2, motorCy - motorH/2, motorW, motorH);
 
   // ---- pattes ----
-function drawPad(letter){
-  const {x,y} = P[letter];
+  function drawPad(letter){
+    const {x,y} = P[letter];
+    let col = footColor(letter);
 
-  let col = footColor(letter);
-
-  // clignotement seulement en parH sur les bonnes pattes
-  if(STEPS[state.step].id === "parH"){
-
-    // moteur trop à droite → déplacer à gauche → pousser C + D
-    if(state.parH < 0 && (letter === "C" || letter === "D")){
-      col = blinkColor(col);
+    // clignotement seulement en parH sur les bonnes pattes
+    if(STEPS[state.step].id === "parH"){
+      // moteur trop à droite (dans ton modèle) → déplacer à gauche → pousser C + D
+      if(state.parH < 0 && (letter === "C" || letter === "D")){
+        col = blinkColor(col);
+      }
+      // moteur trop à gauche → déplacer à droite → pousser A + B
+      if(state.parH > 0 && (letter === "A" || letter === "B")){
+        col = blinkColor(col);
+      }
     }
 
-    // moteur trop à gauche → déplacer à droite → pousser A + B
-    if(state.parH > 0 && (letter === "A" || letter === "B")){
-      col = blinkColor(col);
-    }
+    ctx.fillStyle = col;
+    ctx.fillRect(x - footW/2, y - footH/2, footW, footH);
   }
-
-  ctx.fillStyle = col;
-  ctx.fillRect(x - footW/2, y - footH/2, footW, footH);
-}
   drawPad("A"); drawPad("B"); drawPad("C"); drawPad("D");
 
   // ---- arbre moteur ----
   ctx.fillStyle = "#bbbbbb";
   ctx.fillRect(
-    cx + motorW/2,
-    cy - shaftH/2,
+    motorCx + motorW/2,
+    motorCy - shaftH/2,
     (gap/2) - 8,
     shaftH
   );
 
   // ---- demi-accouplement moteur ----
-  const coupX = cx + motorW/2 + gap/2;
+  const coupX = motorCx + motorW/2 + gap/2;
   ctx.fillStyle = "#cfcfcf";
-  ctx.fillRect(coupX - 14, cy - coupH/2, coupW, coupH);
+  ctx.fillRect(coupX - 14, motorCy - coupH/2, coupW, coupH);
 
-  // ---- AXE MOTEUR (TOUJOURS AU PREMIER PLAN) ----
+  // ---- AXE MOTEUR (AU PREMIER PLAN, DANS LE BLOC ROTATIF) ----
+  ctx.save();
   ctx.strokeStyle = "rgba(255,255,255,0.95)";
   ctx.setLineDash([5,4]);
   ctx.lineWidth = 2.5;
 
   ctx.beginPath();
-  ctx.moveTo(cx - motorW/2 - 90, cy);
-  ctx.lineTo(cx + motorW/2 + gap/2, cy);
+  ctx.moveTo(motorCx - motorW/2 - 90, motorCy);
+  ctx.lineTo(motorCx + motorW/2 + gap/2, motorCy);
   ctx.stroke();
-
   ctx.restore();
 
+  ctx.restore(); // FIN BLOC ROTATIF MOTEUR
+
   // ====================================================
-  //   BLOC POMPE FIXE + ARBRE + ½ ACCOUPLEMENT + AXE
+  //   BLOC POMPE (FIXE) : POMPE + ARBRE + ½ ACCOUPLEMENT + AXE
   // ====================================================
   const pumpX = baseCx + motorW/2 + gap;
 
@@ -1509,7 +1508,8 @@ function drawPad(letter){
     coupH
   );
 
-  // ---- AXE POMPE ----
+  // ---- AXE POMPE (FIXE) ----
+  ctx.save();
   ctx.strokeStyle = "rgba(255,255,255,0.95)";
   ctx.setLineDash([5,4]);
   ctx.lineWidth = 2.5;
@@ -1518,9 +1518,10 @@ function drawPad(letter){
   ctx.moveTo(baseCx + motorW/2 + gap/2, baseCy);
   ctx.lineTo(baseCx + motorW/2 + gap + pumpW + 90, baseCy);
   ctx.stroke();
+  ctx.restore();
 
   // ====================================================
-  //   LETTRES
+  //   LETTRES (UTILISER LES COORDONNÉES MOTEUR P)
   // ====================================================
   ctx.fillStyle = "#fff";
   ctx.font = "14px Arial";
@@ -1535,7 +1536,7 @@ function drawPad(letter){
   // ====================================================
   //   TITRES
   // ====================================================
-  ctx.fillText("MOTEUR (mobile)", cx, cy - motorH/2 - 18);
+  ctx.fillText("MOTEUR (mobile)", motorCx, motorCy - motorH/2 - 18);
   ctx.fillText("POMPE (fixe)", pumpX + pumpW/2, baseCy - pumpH/2 - 18);
 }
 
