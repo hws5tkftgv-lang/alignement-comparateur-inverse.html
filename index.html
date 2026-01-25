@@ -1432,6 +1432,27 @@ ctx.fillText("C", P.C.x, P.C.y + labelOffset + 8);
   );
 
 
+  // ---------- ACCOUPLEMENT ----------
+  const coupX = baseCx + motorW/2 + gap/2;
+  const coupW = 12;
+  const coupH = 46;
+
+  ctx.fillStyle = "#cfcfcf";
+
+  // demi-accouplement moteur
+  ctx.fillRect(coupX - 14, cy - coupH/2, coupW, coupH);
+
+  // demi-accouplement pompe
+  ctx.fillRect(coupX + 2, cy - coupH/2, coupW, coupH);
+
+  // texte
+  ctx.fillStyle = "#fff";
+  ctx.font = "12px Arial";
+  ctx.textAlign = "center";
+  ctx.fillText("ACCOUPLEMENT", coupX, cy - coupH/2 - 8);
+
+
+
   // ---------- pompe ----------
 
 
