@@ -1503,26 +1503,10 @@ const frontFootX = cx + motorW/2 - footW/2;   // AVANT   = droite
   ctx.restore();
 
 
-// ---------- ARBRES ----------
-const shaftY = cy;        // même axe vertical que l’accouplement
-const shaftH = 6;         // épaisseur visuelle de l’arbre
+const coupX = baseCx + motorW/2 + gap/2;
+const coupH = 56;
+const coupW = 10;
 
-// arbre moteur → accouplement
-ctx.fillStyle = "#bbbbbb";
-ctx.fillRect(
-  cx + motorW/2,
-  shaftY - shaftH/2,
-  (gap/2) - 8,
-  shaftH
-);
-
-// arbre accouplement → pompe
-ctx.fillRect(
-  coupX + 14,
-  shaftY - shaftH/2,
-  (gap/2) - 8,
-  shaftH
-);
 
 
 
@@ -1545,9 +1529,26 @@ ctx.textAlign = "center";
 ctx.fillText("ACCOUPLEMENT", coupX, cy - coupH/2 - 10);
 
 
+// ---------- ARBRES ----------
+const shaftY = cy;
+const shaftH = 6;
 
+// arbre moteur → accouplement
+ctx.fillStyle = "#bbbbbb";
+ctx.fillRect(
+  cx + motorW/2,
+  shaftY - shaftH/2,
+  (gap/2) - 8,
+  shaftH
+);
 
-
+// arbre accouplement → pompe
+ctx.fillRect(
+  coupX + 14,
+  shaftY - shaftH/2,
+  (gap/2) - 8,
+  shaftH
+);
 
   // ===============================
   //   POMPE (FIXE)
@@ -1569,7 +1570,7 @@ ctx.fillText("ACCOUPLEMENT", coupX, cy - coupH/2 - 10);
   // ===============================
   //   MESURES GÉOMÉTRIQUES
   // ===============================
-  if(STEPS[state.step].id !== "measures") return;
+  if(STEPS[state.step].id === "measures"){
 
   const sub = state.measureStep;
   const color = ["#00a2ff","#4caf50","#ff9800"][sub];
@@ -1644,6 +1645,7 @@ ctx.fillText("ACCOUPLEMENT", coupX, cy - coupH/2 - 10);
     ctx.stroke();
     return;
   }
+}
 }
 /* =====================================================
    RENDER GLOBAL
