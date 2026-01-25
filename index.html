@@ -1359,15 +1359,18 @@ function drawTopView(){
   const baseCx = w * 0.30;
 
   // ====================================================
-  //   MOTEUR MOBILE (PARALLÉLISME HORIZONTAL = DÉPLACEMENT EN Y)
-  // ====================================================
-  const motorCy = baseCy + (
-    STEPS[state.step].id === "parH"
-      ? state.parH * scale
-      : 0
-  );
-  const motorCx = baseCx;
+//   MOTEUR MOBILE — PARALLÉLISME HORIZONTAL (DÉPLACEMENT EN X)
+// ====================================================
+const maxShift = 60;
+const shift = Math.max(-maxShift, Math.min(maxShift, state.parH * scale));
 
+const motorCx = baseCx + (
+  STEPS[state.step].id === "parH"
+    ? shift
+    : 0
+);
+
+const motorCy = baseCy;
   const { motorW, motorH, pumpW, pumpH, gap, shaftH, coupW, coupH } = GEOM;
   // ====================================================
 //   PATTES À POUSSER — PARALLÉLISME HORIZONTAL
