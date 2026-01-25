@@ -1516,6 +1516,8 @@ function drawSideView(){
     : 0
   );
   let cx = baseCx;
+  const axisPumpY  = baseCy; // axe pompe = fixe
+const axisMotorY = cy;     // axe moteur = mobile
 
   const { motorW, motorH, pumpW, pumpH, gap, shaftH, coupW, coupH } = GEOM;
 
@@ -1636,6 +1638,38 @@ function drawSideView(){
   ctx.textAlign="center";
   ctx.fillText("MOTEUR (mobile)", cx, cy - motorH/2 - 14);
   ctx.fillText("POMPE (fixe)", pumpX + pumpW/2, baseCy - pumpH/2 - 14);
+
+// ====================================================
+//   LIGNES D’AXE — MOTEUR & POMPE (PREMIER PLAN)
+// ====================================================
+
+// Axe moteur (mobile)
+ctx.save();
+ctx.strokeStyle = "rgba(255,255,255,0.95)";
+ctx.setLineDash([14,8]);
+ctx.lineWidth = 4;
+ctx.shadowColor = "rgba(255,255,255,0.7)";
+ctx.shadowBlur = 6;
+
+ctx.beginPath();
+ctx.moveTo(cx - motorW/2 - 80, axisMotorY);
+ctx.lineTo(cx + motorW/2 + gap/2, axisMotorY);
+ctx.stroke();
+ctx.restore();
+
+// Axe pompe (fixe)
+ctx.save();
+ctx.strokeStyle = "rgba(255,255,255,0.95)";
+ctx.setLineDash([14,8]);
+ctx.lineWidth = 4;
+ctx.shadowColor = "rgba(255,255,255,0.7)";
+ctx.shadowBlur = 6;
+
+ctx.beginPath();
+ctx.moveTo(cx + motorW/2 + gap/2, axisPumpY);
+ctx.lineTo(cx + motorW/2 + gap + pumpW + 80, axisPumpY);
+ctx.stroke();
+ctx.restore();
 
   // ===============================
   //   MESURES GÉOMÉTRIQUES
