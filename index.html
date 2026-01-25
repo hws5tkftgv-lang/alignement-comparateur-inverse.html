@@ -1585,9 +1585,18 @@ ctx.fillRect(
   // ===============================
   const pumpX = baseCx + motorW/2 + gap;
 
-  ctx.fillStyle = "#ff9800";
-  ctx.fillRect(pumpX, baseCy - pumpH/2, pumpW, pumpH);
+// corps pompe
+ctx.fillStyle = "#ff9800";
+ctx.fillRect(pumpX, baseCy - pumpH/2, pumpW, pumpH);
 
+// pattes pompe (même hauteur que moteur)
+ctx.fillStyle = "#ff9800";
+
+const pumpRearFootX  = pumpX + footW/2;
+const pumpFrontFootX = pumpX + pumpW - footW/2;
+
+ctx.fillRect(pumpRearFootX - footW/2,  baseCy + pumpH/2 - 2, footW, footH);
+ctx.fillRect(pumpFrontFootX - footW/2, baseCy + pumpH/2 - 2, footW, footH);
   // ===============================
   //   TITRES
   // ===============================
