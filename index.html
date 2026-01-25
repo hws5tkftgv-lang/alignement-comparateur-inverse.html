@@ -1382,10 +1382,9 @@ ctx.fillRect(
   motorH + baseMargin*2
 );
   // ---------- LIGNE D'AXE ----------
-ctx.strokeStyle = "rgba(255,255,255,.35)";
-ctx.setLineDash([6,6]);
-ctx.lineWidth = 2;
-
+ctx.strokeStyle = "rgba(255,255,255,.75)";
+ctx.setLineDash([10,6]);
+ctx.lineWidth = 3;
 ctx.beginPath();
 ctx.moveTo(cx - motorW/2 - 50, cy);
 ctx.lineTo(cx + motorW/2 + gap + pumpW + 50, cy);
@@ -1536,9 +1535,11 @@ ctx.fillRect(
 );
   
   // ---------- LIGNE D'AXE ----------
-ctx.strokeStyle = "rgba(255,255,255,.35)";
-ctx.setLineDash([6,6]);
-ctx.lineWidth = 2;
+ctx.strokeStyle = "rgba(255,255,255,.75)";
+ctx.setLineDash([10,6]);
+ctx.lineWidth = 3;
+ctx.shadowColor = "rgba(255,255,255,0.5)";
+ctx.shadowBlur = 4;
 
 ctx.beginPath();
 ctx.moveTo(cx - motorW/2 - 50, cy);
