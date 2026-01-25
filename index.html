@@ -1381,6 +1381,7 @@ ctx.fillRect(
   motorW + gap + pumpW + baseMargin*2,
   motorH + baseMargin*2
 );
+ctx.restore();
   // ---------- LIGNE D'AXE ----------
 // ---------- LIGNE D'AXE (dépend du moteur) ----------
 ctx.save();
@@ -1396,7 +1397,7 @@ ctx.moveTo(cx - motorW/2 - 80, cy);
 ctx.lineTo(cx + motorW/2 + gap + pumpW + 80, cy);
 ctx.stroke();
 
-ctx.restore();
+
   const ang =
     STEPS[state.step].id === "angH"
     ? state.angH * dialSign * rotGain
@@ -1537,7 +1538,7 @@ ctx.fillRect(
   motorW + gap + pumpW + baseMargin*2,
   16
 );
-  
+  ctx.restore();
   // ---------- LIGNE D'AXE (dépend du moteur) ----------
 ctx.save();
 
@@ -1552,7 +1553,7 @@ ctx.moveTo(cx - motorW/2 - 80, cy);
 ctx.lineTo(cx + motorW/2 + gap + pumpW + 80, cy);
 ctx.stroke();
 
-ctx.restore();
+
 
   const rearFootX  = cx - motorW/2 + footW/2;   // ARRIÈRE = gauche
 const frontFootX = cx + motorW/2 - footW/2;   // AVANT   = droite
