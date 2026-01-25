@@ -1381,6 +1381,9 @@ ctx.save();
 ctx.translate(cx, cy);
 ctx.rotate(ang);
 ctx.translate(-cx, -cy);
+// moteur
+ctx.fillStyle = "#00a2ff";
+ctx.fillRect(cx - motorW/2, cy - motorH/2, motorW, motorH);
 
   function drawPad(letter){
     const {x,y} = P[letter];
