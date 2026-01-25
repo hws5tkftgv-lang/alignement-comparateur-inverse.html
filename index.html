@@ -306,6 +306,17 @@ setInterval(() => {
   drawSideView();
 }, 600);
 
+
+const GEOM = {
+  motorW: 200,
+  motorH: 80,
+
+  pumpW: 130,
+  pumpH: 80,
+
+  gap: 70,
+};
+
 /* =====================================================
    ÉTAT GLOBAL (mils)
 ===================================================== */
@@ -1357,13 +1368,7 @@ function drawTopView(){
   );
   let cx = baseCx;
 
-  const motorW = 200;
-  const motorH = 80;
-
-  const pumpW = 130;
-  const pumpH = 80;
-  const gap   = 70;
-
+  const { motorW, motorH, pumpW, pumpH, gap } = GEOM;
   const ang =
     STEPS[state.step].id === "angH"
     ? state.angH * dialSign * rotGain
@@ -1502,15 +1507,7 @@ const rotGain = visualGain * 0.00035;
 );
   let cx = baseCx;
 
-  const motorW = 200;
-  const motorH = 80;
-  const footH  = 12;
-  const footW  = 40;
-
-  const pumpW = 130;
-  const pumpH = 80;
-  const gap   = 70;
-
+  const { motorW, motorH, pumpW, pumpH, gap } = GEOM;
   const rearFootX  = cx - motorW/2 + footW/2;   // ARRIÈRE = gauche
 const frontFootX = cx + motorW/2 - footW/2;   // AVANT   = droite
 
