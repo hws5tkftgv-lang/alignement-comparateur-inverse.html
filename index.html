@@ -1379,6 +1379,18 @@ ctx.fillRect(
     : 0
   );
   let cx = baseCx;
+  
+  // ---------- LIGNE D'AXE ----------
+ctx.strokeStyle = "rgba(255,255,255,.35)";
+ctx.setLineDash([6,6]);
+ctx.lineWidth = 2;
+
+ctx.beginPath();
+ctx.moveTo(cx - motorW/2 - 50, cy);
+ctx.lineTo(cx + motorW/2 + gap + pumpW + 50, cy);
+ctx.stroke();
+
+ctx.setLineDash([]);
 
   const { motorW, motorH, pumpW, pumpH, gap, shaftH, coupW, coupH } = GEOM;
   const ang =
@@ -1518,6 +1530,18 @@ const rotGain = visualGain * 0.00035;
   STEPS[state.step].id === "parV" ? state.parV * scale : 0
 );
   let cx = baseCx;
+  
+  // ---------- LIGNE D'AXE ----------
+ctx.strokeStyle = "rgba(255,255,255,.35)";
+ctx.setLineDash([6,6]);
+ctx.lineWidth = 2;
+
+ctx.beginPath();
+ctx.moveTo(cx - motorW/2 - 50, cy);
+ctx.lineTo(cx + motorW/2 + gap + pumpW + 50, cy);
+ctx.stroke();
+
+ctx.setLineDash([]);
 
 const footW = 24;
 const footH = 10;
