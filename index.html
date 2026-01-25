@@ -1403,11 +1403,12 @@ ctx.fillRect(cx - motorW/2, cy - motorH/2, motorW, motorH);
   ctx.font = "14px Arial";
   ctx.textAlign = "center";
 
-  ctx.fillText("A", P.A.x, P.A.y - 14);
-  ctx.fillText("B", P.B.x, P.B.y - 14);
-  ctx.fillText("D", P.D.x, P.D.y + 22);
-  ctx.fillText("C", P.C.x, P.C.y + 22);
+  const labelOffset = 26;
 
+ctx.fillText("A", P.A.x, P.A.y - labelOffset);
+ctx.fillText("B", P.B.x, P.B.y - labelOffset);
+ctx.fillText("D", P.D.x, P.D.y + labelOffset + 8);
+ctx.fillText("C", P.C.x, P.C.y + labelOffset + 8);
   // ---------- pompe ----------
   const pumpX = baseCx + motorW/2 + gap;
 
