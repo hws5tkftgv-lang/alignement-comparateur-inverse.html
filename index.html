@@ -1410,6 +1410,26 @@ ctx.fillText("B", P.B.x, P.B.y - labelOffset);
 ctx.fillText("D", P.D.x, P.D.y + labelOffset + 8);
 ctx.fillText("C", P.C.x, P.C.y + labelOffset + 8);
   // ---------- pompe ----------
+
+// ---------- ACCOUPLEMENT ----------
+const coupX = baseCx + motorW/2 + gap/2;
+const coupH = 56;
+const coupW = 10;
+
+// moyeu moteur
+ctx.fillStyle = "#cfcfcf";
+ctx.fillRect(coupX - 14, cy - coupH/2, coupW, coupH);
+
+// moyeu pompe
+ctx.fillRect(coupX + 4, cy - coupH/2, coupW, coupH);
+
+// texte
+ctx.fillStyle = "#fff";
+ctx.font = "12px Arial";
+ctx.textAlign = "center";
+ctx.fillText("ACCOUPLEMENT", coupX, cy - coupH/2 - 10);
+
+
   const pumpX = baseCx + motorW/2 + gap;
 
   ctx.fillStyle="#ff9800";
