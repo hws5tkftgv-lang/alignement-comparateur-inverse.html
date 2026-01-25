@@ -1364,12 +1364,13 @@ function drawTopView(){
 const maxShift = 60;
 const shift = Math.max(-maxShift, Math.min(maxShift, state.parH * scale));
 
-const motorCx = baseCx + (
+const motorCx = baseCx;
+
+const motorCy = baseCy + (
   STEPS[state.step].id === "parH"
     ? shift
     : 0
 );
-
 const motorCy = baseCy;
   const { motorW, motorH, pumpW, pumpH, gap, shaftH, coupW, coupH } = GEOM;
   // ====================================================
