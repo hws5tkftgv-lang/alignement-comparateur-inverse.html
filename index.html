@@ -1355,6 +1355,15 @@ function drawTopView(){
 
   const {w,h} = resizeCanvas(topCanvas, topCtx);
   clear(topCtx,w,h);
+  // ---------- SEMELLE COMMUNE ----------
+const baseMargin = 40;
+ctx.fillStyle = "#1a235a";
+ctx.fillRect(
+  baseCx - motorW/2 - baseMargin,
+  baseCy - motorH/2 - baseMargin,
+  motorW + gap + pumpW + baseMargin*2,
+  motorH + baseMargin*2
+);
 
   const ctx = topCtx;
 
@@ -1479,6 +1488,15 @@ function drawSideView(){
 
   const {w,h} = resizeCanvas(sideCanvas, sideCtx);
   clear(sideCtx,w,h);
+  // ---------- SEMELLE COMMUNE ----------
+const baseMargin = 40;
+ctx.fillStyle = "#1a235a";
+ctx.fillRect(
+  baseCx - motorW/2 - baseMargin,
+  baseCy + motorH/2 + 6,
+  motorW + gap + pumpW + baseMargin*2,
+  16
+);
 
   const ctx = sideCtx;
 
