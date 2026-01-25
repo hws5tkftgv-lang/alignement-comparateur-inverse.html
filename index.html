@@ -1343,7 +1343,10 @@ function drawCouplingDiameter(ctx, cx, cy, diam){
   ctx.restore();
 }
 
-
+function blinkColor(col){
+  const t = Math.floor(Date.now() / 350) % 2;
+  return t ? "#ff5252" : col;
+}
 
 function drawTopView(){
 
@@ -1433,24 +1436,29 @@ function drawTopView(){
 
   // ---- pattes ----
   function drawPad(letter){
-    const {x,y} = P[letter];
-    let col = footColor(letter);
+  const {x,y} = P[letter];
+  let col = footColor(letter);
 
-    // clignotement seulement en parH sur les bonnes pattes
-    if(STEPS[state.step].id === "parH"){
-      // moteur trop à droite (dans ton modèle) → déplacer à gauche → pousser C + D
-      if(state.parH < 0 && (letter === "C" || letter === "D")){
-        col = blinkColor(col);
-      }
-      // moteur trop à gauche → déplacer à droite → pousser A + B
-      if(state.parH > 0 && (letter === "A" || letter === "B")){
+  if(STEPS[state.step].id === "parH"){
+
+    // moteur trop à droite → déplacer à gauche → pousser C + D
+    if(state.parH < 0 && (letter === "C" || letter === "D")){
+      if(typeof blinkColor === "function"){
         col = blinkColor(col);
       }
     }
 
-    ctx.fillStyle = col;
-    ctx.fillRect(x - footW/2, y - footH/2, footW, footH);
+    // moteur trop à gauche → déplacer à droite → pousser A + B
+    if(state.parH > 0 && (letter === "A" || letter === "B")){
+      if(typeof blinkColor === "function"){
+        col = blinkColor(col);
+      }
+    }
   }
+
+  ctx.fillStyle = col;
+  ctx.fillRect(x - footW/2, y - footH/2, footW, footH);
+}
   drawPad("A"); drawPad("B"); drawPad("C"); drawPad("D");
 
   // ---- arbre moteur ----
