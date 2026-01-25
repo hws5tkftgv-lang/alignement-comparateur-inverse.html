@@ -1270,11 +1270,8 @@ function footColor(letter){
     return isBlinking();
   }
 
-// parH géré exclusivement dans drawTopView()
-// (évite le double clignotement)
-
-  if(step === "parH"){
-    const r = computeParallelHorizontal();
+  if(step === "angH"){
+    const r = computeAngularHorizontal();
     if(bad && r && r.pair.includes(letter)){
       return isBlinking();
     }
