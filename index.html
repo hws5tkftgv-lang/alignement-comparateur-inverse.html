@@ -1521,59 +1521,44 @@ function drawSideView(){
   let cx = baseCx;
 
   const { motorW, motorH, pumpW, pumpH, gap, shaftH, coupW, coupH } = GEOM;
-  
+
   const footW = 24;
-const footH = 10;
+  const footH = 10;
 
-  
-  // ---------- SEMELLE COMMUNE ----------
-const baseMargin = 40;
+  // ====================================================
+  //   SEMELLE COMMUNE (BASE MÉCANIQUE)
+  // ====================================================
+  const baseMargin = 40;
+  const baseTop = cy + motorH/2 + footH - 2;
 
-const baseTop = cy + motorH/2 + footH - 2;
+  ctx.fillStyle = "#1a235a";
+  ctx.fillRect(
+    cx - motorW/2 - baseMargin,
+    baseTop,
+    motorW + gap + pumpW + baseMargin*2,
+    16
+  );
 
-ctx.fillStyle = "#1a235a";
-ctx.fillRect(
-  cx - motorW/2 - baseMargin,
-  baseTop,
-  motorW + gap + pumpW + baseMargin*2,
-  16
-);
-  ctx.restore();
-  // ---------- LIGNE D'AXE (dépend du moteur) ----------
-ctx.save();
-
-ctx.strokeStyle = "rgba(255,255,255,0.95)";
-ctx.setLineDash([14,8]);
-ctx.lineWidth = 4;
-ctx.shadowColor = "rgba(255,255,255,0.7)";
-ctx.shadowBlur = 6;
-
-ctx.beginPath();
-ctx.moveTo(cx - motorW/2 - 80, cy);
-ctx.lineTo(cx + motorW/2 + gap + pumpW + 80, cy);
-ctx.stroke();
-
-
-
-  const rearFootX  = cx - motorW/2 + footW/2;   // ARRIÈRE = gauche
-const frontFootX = cx + motorW/2 - footW/2;   // AVANT   = droite
-
+  // ====================================================
+  //   PARAMÈTRES ANGULAIRES
+  // ====================================================
   const ang =
-  STEPS[state.step].id === "angV"
-  ? -state.angV * dialSign * rotGain
-  : 0;
+    STEPS[state.step].id === "angV"
+      ? -state.angV * dialSign * rotGain
+      : 0;
 
-  // ===============================
-  //   TRANSFORMATION ANGULAIRE
-  // ===============================
+  const rearFootX  = cx - motorW/2 + footW/2;
+  const frontFootX = cx + motorW/2 - footW/2;
+
+  // ====================================================
+  //   MOTEUR (AVEC ROTATION)
+  // ====================================================
   ctx.save();
   ctx.translate(cx, cy);
   ctx.rotate(ang);
   ctx.translate(-cx, -cy);
 
-  // ===============================
-  //   MOTEUR
-  // ===============================
+  // corps moteur
   ctx.fillStyle = "#00a2ff";
   ctx.fillRect(cx - motorW/2, cy - motorH/2, motorW, motorH);
 
@@ -1581,7 +1566,7 @@ const frontFootX = cx + motorW/2 - footW/2;   // AVANT   = droite
   ctx.fillRect(rearFootX - footW/2,  cy + motorH/2 - 2, footW, footH);
   ctx.fillRect(frontFootX - footW/2, cy + motorH/2 - 2, footW, footH);
 
-  // lettres C et D
+  // lettres
   ctx.fillStyle = "#fff";
   ctx.font = "14px Arial";
   ctx.textAlign = "center";
@@ -1590,70 +1575,79 @@ const frontFootX = cx + motorW/2 - footW/2;   // AVANT   = droite
 
   ctx.restore();
 
+  // ====================================================
+  //   LIGNE D’AXE — PREMIER PLAN
+  // ====================================================
+  ctx.strokeStyle = "rgba(255,255,255,0.95)";
+  ctx.setLineDash([14,8]);
+  ctx.lineWidth = 4;
+  ctx.shadowColor = "rgba(255,255,255,0.7)";
+  ctx.shadowBlur = 6;
 
+  ctx.beginPath();
+  ctx.moveTo(cx - motorW/2 - 80, cy);
+  ctx.lineTo(cx + motorW/2 + gap + pumpW + 80, cy);
+  ctx.stroke();
 
+  ctx.setLineDash([]);
+  ctx.shadowBlur = 0;
 
+  // ====================================================
+  //   ACCOUPLEMENT
+  // ====================================================
+  const coupX = cx + motorW/2 + gap/2;
 
+  ctx.fillStyle = "#cfcfcf";
 
-// ---------- ACCOUPLEMENT ----------
-const coupX = baseCx + motorW/2 + gap/2;
+  // demi accouplement moteur
+  ctx.fillRect(coupX - 14, cy - coupH/2, coupW, coupH);
 
+  // demi accouplement pompe
+  ctx.fillRect(coupX + 4, cy - coupH/2, coupW, coupH);
 
-// moyeu moteur
-ctx.fillStyle = "#cfcfcf";
-ctx.fillRect(coupX - 14, cy - coupH/2, coupW, coupH);
+  // ====================================================
+  //   ARBRES
+  // ====================================================
+  ctx.fillStyle = "#bbbbbb";
 
-// moyeu pompe
-ctx.fillRect(coupX + 4, cy - coupH/2, coupW, coupH);
+  // moteur → accouplement
+  ctx.fillRect(
+    cx + motorW/2,
+    cy - shaftH/2,
+    (gap/2) - 8,
+    shaftH
+  );
 
+  // accouplement → pompe
+  ctx.fillRect(
+    coupX + 14,
+    cy - shaftH/2,
+    (gap/2) - 8,
+    shaftH
+  );
 
+  // ====================================================
+  //   POMPE FIXE
+  // ====================================================
+  const pumpX = cx + motorW/2 + gap;
 
-// ---------- ARBRES ----------
-const shaftY = cy;
+  // corps
+  ctx.fillStyle = "#ff9800";
+  ctx.fillRect(pumpX, baseCy - pumpH/2, pumpW, pumpH);
 
-ctx.fillStyle = "#bbbbbb";
+  // pattes pompe (même hauteur moteur)
+  ctx.fillRect(pumpX + footW/2 - footW/2,  baseCy + pumpH/2 - 2, footW, footH);
+  ctx.fillRect(pumpX + pumpW - footW/2 - footW/2, baseCy + pumpH/2 - 2, footW, footH);
 
-// arbre moteur → accouplement
-ctx.fillRect(
-  cx + motorW/2,
-  shaftY - shaftH/2,
-  (gap/2) - 8,
-  shaftH
-);
-
-// arbre accouplement → pompe
-ctx.fillRect(
-  coupX + 14,
-  shaftY - shaftH/2,
-  (gap/2) - 8,
-  shaftH
-);
-  // ===============================
-  //   POMPE (FIXE)
-  // ===============================
-  const pumpX = baseCx + motorW/2 + gap;
-
-// corps pompe
-ctx.fillStyle = "#ff9800";
-ctx.fillRect(pumpX, baseCy - pumpH/2, pumpW, pumpH);
-
-// pattes pompe (même hauteur que moteur)
-ctx.fillStyle = "#ff9800";
-
-const pumpRearFootX  = pumpX + footW/2;
-const pumpFrontFootX = pumpX + pumpW - footW/2;
-
-ctx.fillRect(pumpRearFootX - footW/2,  baseCy + pumpH/2 - 2, footW, footH);
-ctx.fillRect(pumpFrontFootX - footW/2, baseCy + pumpH/2 - 2, footW, footH);
-  // ===============================
+  // ====================================================
   //   TITRES
-  // ===============================
+  // ====================================================
   ctx.fillStyle="#fff";
   ctx.font="14px Arial";
   ctx.textAlign="center";
   ctx.fillText("MOTEUR (mobile)", cx, cy - motorH/2 - 14);
   ctx.fillText("POMPE (fixe)", pumpX + pumpW/2, baseCy - pumpH/2 - 14);
-
+}
   // ===============================
   //   MESURES GÉOMÉTRIQUES
   // ===============================
