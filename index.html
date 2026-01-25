@@ -316,9 +316,9 @@ const GEOM = {
 
   gap: 70,
 
-  shaftH: 12,
-  coupW: 12,
-  coupH: 56,
+  shaftH: 12,   // diamètre visuel arbre
+  coupH: 56,    // hauteur accouplement
+  coupW: 10     // largeur accouplement
 };
 /* =====================================================
    ÉTAT GLOBAL (mils)
@@ -1371,7 +1371,7 @@ function drawTopView(){
   );
   let cx = baseCx;
 
-  const { motorW, motorH, pumpW, pumpH, gap } = GEOM;
+  const { motorW, motorH, pumpW, pumpH, gap, shaftH, coupW, coupH } = GEOM;
   const ang =
     STEPS[state.step].id === "angH"
     ? state.angH * dialSign * rotGain
@@ -1506,7 +1506,7 @@ const footH = 10;
 
 
 
-  const { motorW, motorH, pumpW, pumpH, gap } = GEOM;
+  const { motorW, motorH, pumpW, pumpH, gap, shaftH, coupW, coupH } = GEOM;
   const rearFootX  = cx - motorW/2 + footW/2;   // ARRIÈRE = gauche
 const frontFootX = cx + motorW/2 - footW/2;   // AVANT   = droite
 
@@ -1549,8 +1549,7 @@ const { shaftH, coupW, coupH } = GEOM;
 
 // ---------- ACCOUPLEMENT ----------
 const coupX = baseCx + motorW/2 + gap/2;
-const coupH = 56;
-const coupW = 10;
+
 
 // moyeu moteur
 ctx.fillStyle = "#cfcfcf";
