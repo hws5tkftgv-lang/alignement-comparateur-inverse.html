@@ -1555,8 +1555,9 @@ function drawSideView(){
   //   POMPE FIXE + ARBRE + ½ ACCOUPLEMENT
   // ====================================================
   const pumpX = cx + motorW/2 + gap;
+  const coupX = cx + motorW/2 + gap/2;
 
-  // corps pompe
+  // pompe
   ctx.fillStyle = "#ff9800";
   ctx.fillRect(pumpX, baseCy - pumpH/2, pumpW, pumpH);
 
@@ -1567,109 +1568,87 @@ function drawSideView(){
   // arbre pompe
   ctx.fillStyle = "#bbbbbb";
   ctx.fillRect(
-    cx + motorW/2 + gap/2 + 14,
+    coupX + 14,
     axisPumpY - shaftH/2,
     (gap/2) - 8,
     shaftH
   );
 
   // demi-accouplement pompe
-  const coupX = cx + motorW/2 + gap/2;
   ctx.fillStyle = "#cfcfcf";
-  ctx.fillRect(coupX + 4, axisPumpY - coupH/2, coupW, coupH);
+  ctx.fillRect(
+    coupX + 4,
+    axisPumpY - coupH/2,
+    coupW,
+    coupH
+  );
 
   // ====================================================
-//   MOTEUR + ARBRE + ½ ACCOUPLEMENT + AXE (BLOC SOLIDAIRE)
-// ====================================================
-ctx.save();
-ctx.translate(cx, cy);
-ctx.rotate(ang);
-ctx.translate(-cx, -cy);
+  //   MOTEUR + ARBRE + ½ ACCOUPLEMENT (BLOC SOLIDAIRE)
+  // ====================================================
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(ang);
+  ctx.translate(-cx, -cy);
 
-// ---- AXE MOTEUR (suit le moteur) ----
-ctx.save();
-ctx.strokeStyle = "rgba(255,255,255,0.95)";
-ctx.setLineDash([5,4]);
-ctx.lineWidth = 2.5;
+  // moteur
+  ctx.fillStyle = "#00a2ff";
+  ctx.fillRect(cx - motorW/2, cy - motorH/2, motorW, motorH);
 
-ctx.beginPath();
-ctx.moveTo(cx - motorW/2 - 90, cy);
-ctx.lineTo(cx + motorW/2 + gap/2, cy);
-ctx.stroke();
-ctx.restore();
+  // pattes moteur
+  ctx.fillRect(rearFootX - footW/2,  cy + motorH/2 - 2, footW, footH);
+  ctx.fillRect(frontFootX - footW/2, cy + motorH/2 - 2, footW, footH);
 
-// ---- MOTEUR ----
-ctx.fillStyle = "#00a2ff";
-ctx.fillRect(cx - motorW/2, cy - motorH/2, motorW, motorH);
+  // lettres
+  ctx.fillStyle = "#fff";
+  ctx.font = "14px Arial";
+  ctx.textAlign = "center";
+  ctx.fillText("D", rearFootX,  cy + motorH/2 + 24);
+  ctx.fillText("C", frontFootX, cy + motorH/2 + 24);
 
-// pattes moteur
-ctx.fillRect(rearFootX - footW/2,  cy + motorH/2 - 2, footW, footH);
-ctx.fillRect(frontFootX - footW/2, cy + motorH/2 - 2, footW, footH);
+  // arbre moteur
+  ctx.fillStyle = "#bbbbbb";
+  ctx.fillRect(
+    cx + motorW/2,
+    cy - shaftH/2,
+    (gap/2) - 8,
+    shaftH
+  );
 
-// lettres
-ctx.fillStyle = "#fff";
-ctx.font = "14px Arial";
-ctx.textAlign = "center";
-ctx.fillText("D", rearFootX,  cy + motorH/2 + 24);
-ctx.fillText("C", frontFootX, cy + motorH/2 + 24);
+  // demi-accouplement moteur
+  ctx.fillStyle = "#cfcfcf";
+  ctx.fillRect(
+    coupX - 14,
+    cy - coupH/2,
+    coupW,
+    coupH
+  );
 
-// ---- ARBRE MOTEUR ----
-ctx.fillStyle = "#bbbbbb";
-ctx.fillRect(
-  cx + motorW/2,
-  cy - shaftH/2,
-  (gap/2) - 8,
-  shaftH
-);
+  ctx.restore();
 
-// ---- DEMI-ACCOUPLEMENT MOTEUR ----
-ctx.fillStyle = "#cfcfcf";
-ctx.fillRect(
-  cx + motorW/2 + gap/2 - 14,
-  cy - coupH/2,
-  coupW,
-  coupH
-);
+  // ====================================================
+  //   AXES (PREMIER PLAN — STYLE LASER)
+  // ====================================================
+  ctx.save();
+  ctx.strokeStyle = "rgba(255,255,255,0.95)";
+  ctx.setLineDash([4,6]);
+  ctx.lineWidth = 2;
+  ctx.shadowColor = "rgba(255,255,255,0.6)";
+  ctx.shadowBlur = 3;
 
-ctx.restore();
+  // axe moteur (suit le moteur)
+  ctx.beginPath();
+  ctx.moveTo(cx - motorW/2 - 100, axisMotorY);
+  ctx.lineTo(coupX, axisMotorY);
+  ctx.stroke();
 
-// ====================================================
-//   AXE + POMPE FIXE
-// ====================================================
+  // axe pompe (fixe)
+  ctx.beginPath();
+  ctx.moveTo(coupX, axisPumpY);
+  ctx.lineTo(cx + motorW/2 + gap + pumpW + 100, axisPumpY);
+  ctx.stroke();
 
-// ---- AXE POMPE ----
-ctx.save();
-ctx.strokeStyle = "rgba(255,255,255,0.95)";
-ctx.setLineDash([5,4]);
-ctx.lineWidth = 2.5;
-
-ctx.beginPath();
-ctx.moveTo(cx + motorW/2 + gap/2, axisPumpY);
-ctx.lineTo(cx + motorW/2 + gap + pumpW + 90, axisPumpY);
-ctx.stroke();
-ctx.restore();
-
-// ---- ARBRE POMPE ----
-ctx.fillStyle = "#bbbbbb";
-ctx.fillRect(
-  cx + motorW/2 + gap/2 + 14,
-  axisPumpY - shaftH/2,
-  (gap/2) - 8,
-  shaftH
-);
-
-// ---- DEMI-ACCOUPLEMENT POMPE ----
-ctx.fillStyle = "#cfcfcf";
-ctx.fillRect(
-  cx + motorW/2 + gap/2 + 4,
-  axisPumpY - coupH/2,
-  coupW,
-  coupH
-);
-
-// ---- POMPE ----
-ctx.fillStyle = "#ff9800";
-ctx.fillRect(pumpX, baseCy - pumpH/2, pumpW, pumpH);
+  ctx.restore();
 
   // ====================================================
   //   TITRES
@@ -1683,7 +1662,6 @@ ctx.fillRect(pumpX, baseCy - pumpH/2, pumpW, pumpH);
   // ===============================
   //   MESURES GÉOMÉTRIQUES
   // ===============================
-
   if(STEPS[state.step].id === "measures"){
 
     const sub = state.measureStep;
@@ -1713,9 +1691,7 @@ ctx.fillRect(pumpX, baseCy - pumpH/2, pumpW, pumpH);
 
     // 1 → CENTRE → PATTES AVANT
     if(sub === 1){
-
-      const couplingCenterX = baseCx + motorW/2 + gap/2;
-      const x1 = couplingCenterX;
+      const x1 = coupX;
       const x2 = frontFootX;
       const y  = cy + motorH/2 + 30;
 
@@ -1735,7 +1711,6 @@ ctx.fillRect(pumpX, baseCy - pumpH/2, pumpW, pumpH);
 
     // 2 → AVANT → ARRIÈRE
     if(sub === 2){
-
       const x1 = rearFootX;
       const x2 = frontFootX;
       const y  = cy + motorH/2 + 52;
