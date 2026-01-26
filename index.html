@@ -732,9 +732,10 @@ if(stepId === "angH"){
 
   const v = state.angH * dialSign;
 
-  const D  = GEOM.dialSpan;
-const Lf = GEOM.centerToFrontFeet;
-const Lr = GEOM.frontToRearFeet;
+  const D  = GEOM.dialSpan;              // distance entre comparateurs
+  const Lf = GEOM.centerToFrontFeet;    // centre → pattes AVANT
+  const Lr = GEOM.centerToFrontFeet + GEOM.frontToRearFeet; // centre → pattes ARRIÈRE
+
   const front = (Math.abs(v) * Lf / D).toFixed(2);
   const rear  = (Math.abs(v) * Lr / D).toFixed(2);
 
