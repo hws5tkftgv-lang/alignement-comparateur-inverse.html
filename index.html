@@ -442,6 +442,9 @@ function computeAngularVertical(){
 
   return null;
 }
+
+
+
 /* =====================================================
    PARALLÉLISME VERTICAL — 4 PATTES
 ===================================================== */
@@ -457,13 +460,28 @@ function computeParallelVertical(){
 /* =====================================================
    ANGULARITÉ HORIZONTALE — TOP VIEW
 ===================================================== */
-if(state.angH * dialSign > 0){
-  return { pair:["B","D"], direction:"Incliné vers la droite → corriger BD" };
-}
-if(state.angH * dialSign < 0){
-  return { pair:["A","C"], direction:"Incliné vers la gauche → corriger AC" };
-}
+function computeAngularHorizontal(){
 
+  const v = state.angH * dialSign;
+
+  // Lecture POSITIVE → moteur incliné vers la DROITE
+  if(v > 0){
+    return {
+      pair:["B","D"],
+      direction:"Moteur incliné vers la DROITE → corriger B + D"
+    };
+  }
+
+  // Lecture NÉGATIVE → moteur incliné vers la GAUCHE
+  if(v < 0){
+    return {
+      pair:["A","C"],
+      direction:"Moteur incliné vers la GAUCHE → corriger A + C"
+    };
+  }
+
+  return null;
+}
 /* =====================================================
    PARALLÉLISME HORIZONTAL — PAIRES
 ===================================================== */
