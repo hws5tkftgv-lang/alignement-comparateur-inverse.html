@@ -732,10 +732,9 @@ if(stepId === "angH"){
 
   const v = state.angH * dialSign;
 
-  // distances géométriques sécurisées
-  const D  = GEOM.compDist  || GEOM.D  || 12;
-  const Lf = GEOM.frontDist || GEOM.Lf || 6;
-  const Lr = GEOM.rearDist  || GEOM.Lr || 16;
+  const D  = GEOM.compDist;    // distance entre comparateurs
+  const Lf = GEOM.frontDist;  // centre → avant
+  const Lr = GEOM.rearDist;   // centre → arrière
 
   const front = (Math.abs(v) * Lf / D).toFixed(2);
   const rear  = (Math.abs(v) * Lr / D).toFixed(2);
