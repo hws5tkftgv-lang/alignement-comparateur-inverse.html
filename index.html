@@ -685,19 +685,19 @@ function buildCorrectionMessage(){
     return msg;
   }
 
-  // ---------- PARALLÉLISME VERTICAL (FIX ICI) ----------
+  // ---------- PARALLÉLISME VERTICAL ----------
   if(stepId === "parV"){
     if(ok(state.parV, state.parVTol)){
       return "✔️ Parallélisme vertical conforme.";
     }
 
-    const v   = state.parV;                 // signe tel quel (dessin: + descend, - monte)
+    const v   = state.parV;
     const amt = Math.abs(v).toFixed(2);
 
     msg += "↕️ Parallélisme vertical\n\n";
 
     if(v > 0){
-      msg += "Lecture NEGATIVE → moteur trop BAS\n\n";
+      msg += "Lecture NÉGATIVE → moteur trop BAS\n\n";
       msg += "Action mécanique : remonter le moteur\n\n";
       msg += "Correction :\n";
       msg += `➕ Ajouter +${amt} mil sous :\n`;
@@ -717,7 +717,7 @@ function buildCorrectionMessage(){
     return msg;
   }
 
-  // ---------- ANGULARITÉ HORIZONTALE ----------
+  // ---------- ANGULARITÉ HORIZONTALE (CORRIGÉ MÉCANIQUEMENT) ----------
   if(stepId === "angH"){
     if(ok(state.angH, state.angHTol)){
       return "✔️ Angularité horizontale conforme.";
@@ -730,15 +730,19 @@ function buildCorrectionMessage(){
     if(v > 0){
       msg += "Lecture POSITIVE → moteur incliné vers la DROITE\n\n";
       msg += "Action mécanique : ramener vers la GAUCHE\n\n";
-      msg += "Correction :\n";
-      msg += "👉 Agir principalement sur : B + D";
+      msg += "Correction mécanique équivalente :\n";
+      msg += "👉 Tirer sur : B + D\n";
+      msg += "OU\n";
+      msg += "👉 Pousser sur : A + C";
     }
 
     if(v < 0){
       msg += "Lecture NÉGATIVE → moteur incliné vers la GAUCHE\n\n";
       msg += "Action mécanique : ramener vers la DROITE\n\n";
-      msg += "Correction :\n";
-      msg += "👉 Agir principalement sur : A + C";
+      msg += "Correction mécanique équivalente :\n";
+      msg += "👉 Tirer sur : A + C\n";
+      msg += "OU\n";
+      msg += "👉 Pousser sur : B + D";
     }
 
     return msg;
@@ -758,7 +762,7 @@ function buildCorrectionMessage(){
       msg += "Lecture POSITIVE → moteur trop à DROITE\n\n";
       msg += "Action mécanique : déplacer vers la GAUCHE\n\n";
       msg += "Correction :\n";
-      msg += `👉 Pousser côté : C + D\n`;
+      msg += "👉 Pousser sur : C + D\n";
       msg += "(translation pure — sans rotation)";
     }
 
@@ -766,7 +770,7 @@ function buildCorrectionMessage(){
       msg += "Lecture NÉGATIVE → moteur trop à GAUCHE\n\n";
       msg += "Action mécanique : déplacer vers la DROITE\n\n";
       msg += "Correction :\n";
-      msg += `👉 Pousser côté : A + B\n`;
+      msg += "👉 Pousser sur : A + B\n";
       msg += "(translation pure — sans rotation)";
     }
 
@@ -775,8 +779,6 @@ function buildCorrectionMessage(){
 
   return "";
 }
-
-
 /* =====================================================
    UI — Inputs par étape (avec IDs)
 ===================================================== */
