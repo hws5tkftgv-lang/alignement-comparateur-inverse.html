@@ -1573,7 +1573,7 @@ if(STEPS[state.step].id === "parH"){
 //   (AU PREMIER PLAN)
 // ====================================================
 // ====================================================
-//   ANGULARITÉ HORIZONTALE — FLÈCHES = POUSSER (AXE Y)
+//   ANGULARITÉ HORIZONTALE — FLÈCHES = POUSSER (SENS RÉEL)
 // ====================================================
 if(STEPS[state.step].id === "angH"){
 
@@ -1583,15 +1583,15 @@ if(STEPS[state.step].id === "angH"){
   // POSITIF → moteur incliné DROITE → pousser A + C
   if(v > 0){
 
-    // A → pousser vers le HAUT
+    // A → pousser vers le BAS
     drawArrow(ctx,
-      P.A.x, P.A.y + len,
+      P.A.x, P.A.y - len,
       P.A.x, P.A.y
     );
 
-    // C → pousser vers le BAS
+    // C → pousser vers le HAUT
     drawArrow(ctx,
-      P.C.x, P.C.y - len,
+      P.C.x, P.C.y + len,
       P.C.x, P.C.y
     );
   }
@@ -1599,15 +1599,15 @@ if(STEPS[state.step].id === "angH"){
   // NÉGATIF → moteur incliné GAUCHE → pousser B + D
   if(v < 0){
 
-    // B → pousser vers le HAUT
+    // B → pousser vers le BAS
     drawArrow(ctx,
-      P.B.x, P.B.y + len,
+      P.B.x, P.B.y - len,
       P.B.x, P.B.y
     );
 
-    // D → pousser vers le BAS
+    // D → pousser vers le HAUT
     drawArrow(ctx,
-      P.D.x, P.D.y - len,
+      P.D.x, P.D.y + len,
       P.D.x, P.D.y
     );
   }
