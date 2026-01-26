@@ -682,7 +682,7 @@ function buildCorrectionMessage(){
     msg += "↕️ Parallélisme vertical\n\n";
 
     if(v > 0){
-      msg += "Lecture POSITIVE → moteur trop BAS\n\n";
+      msg += "Lecture NEGATIVE → moteur trop BAS\n\n";
       msg += "Action mécanique : remonter le moteur\n\n";
       msg += "Correction :\n";
       msg += `➕ Ajouter +${amt} mil sous :\n`;
@@ -691,7 +691,7 @@ function buildCorrectionMessage(){
     }
 
     if(v < 0){
-      msg += "Lecture NÉGATIVE → moteur trop HAUT\n\n";
+      msg += "Lecture POSITIVE → moteur trop HAUT\n\n";
       msg += "Action mécanique : abaisser le moteur\n\n";
       msg += "Correction :\n";
       msg += `➖ Enlever ${amt} mil sous :\n`;
