@@ -666,87 +666,104 @@ function buildCorrectionMessage(){
 
   return msg;
 }
-  // ---------- PARALLÉLISME VERTICAL ----------
-  if(stepId === "parV"){
+  // =====================================================
+// PARALLÉLISME VERTICAL — LECTURE + / -
+// =====================================================
+if(step.id === "parV"){
 
-    if(ok(state.parV, state.parVTol)){
-      return "✔️ Parallélisme vertical conforme.";
-    }
+  const val = state.parV;
+  const mag = Math.abs(val);
 
-    const amt = Math.abs(state.parV).toFixed(2);
-
-    msg += "⬆️ Parallélisme vertical\n\n";
-
-    if(state.parV > 0){
-      msg += "Diagnostic : moteur trop bas\n\n";
-      msg += "Correction :\n";
-      msg += `➕ Ajouter +${amt} mil sous : A + B + C + D\n`;
-      msg += "(même quantité sur les 4 pattes)";
-    }else{
-      msg += "Diagnostic : moteur trop haut\n\n";
-      msg += "Correction :\n";
-      msg += `➖ Enlever ${amt} mil sous : A + B + C + D\n`;
-      msg += "(même quantité sur les 4 pattes)";
-    }
-
+  if(mag < tolerance){
+    msg.push("✅ Dans la tolérance");
     return msg;
   }
 
-  // ---------- ANGULARITÉ HORIZONTALE ----------
+  if(val > 0){
+    msg.push("📈 Lecture positive");
+    msg.push("→ Moteur trop haut");
+    msg.push("");
+    msg.push("Correction :");
+    msg.push(`Retirer **${fmt(mag)} mil** sous :`);
+    msg.push("👉 A + B + C + D");
+  }
+
+  if(val < 0){
+    msg.push("📉 Lecture négative");
+    msg.push("→ Moteur trop bas");
+    msg.push("");
+    msg.push("Correction :");
+    msg.push(`Ajouter **+${fmt(mag)} mil** sous :`);
+    msg.push("👉 A + B + C + D");
+  }
+}
+
   if(stepId === "angH"){
 
-    if(ok(state.angH, state.angHTol)){
-      return "✔️ Angularité horizontale conforme.";
-    }
-
-    const v = state.angH * dialSign;
-    const shims = computeAngularShimsHorizontal();
-
-    const front = shims.front.toFixed(2);
-    const rear  = shims.rear.toFixed(2);
-
-    msg += "↔️ Angularité horizontale\n\n";
-    msg += "Correction géométrique équivalente :\n";
-    msg += `• AVANT : ${front} mil\n`;
-    msg += `• ARRIÈRE : ${rear} mil\n\n`;
-
-    if(v > 0){
-      msg += "Diagnostic : moteur incliné vers la DROITE\n\n";
-      msg += "Solutions mécaniques possibles :\n";
-      msg += `➡️ Déplacer le moteur vers la GAUCHE\n`;
-      msg += `(agir principalement sur : B + D)`;
-    }
-
-    if(v < 0){
-      msg += "Diagnostic : moteur incliné vers la GAUCHE\n\n";
-      msg += "Solutions mécaniques possibles :\n";
-      msg += `➡️ Déplacer le moteur vers la DROITE\n`;
-      msg += `(agir principalement sur : A + C)`;
-    }
-
-    return msg;
+  if(ok(state.angH, state.angHTol)){
+    return "✔️ Angularité horizontale conforme.";
   }
 
-  // ---------- PARALLÉLISME HORIZONTAL ----------
-  if(stepId === "parH"){
+  const v = state.angH * dialSign;
 
-    if(ok(state.parH, state.parHTol)){
-      return "✔️ Parallélisme horizontal conforme.";
-    }
+  msg += "↔️ Angularité horizontale\n\n";
 
-    const amt = Math.abs(state.parH).toFixed(2);
-    const r = computeParallelHorizontal();
+  if(v > 0){
+    msg += "Lecture POSITIVE → moteur incliné vers la DROITE\n\n";
 
-    msg += "↔️ Parallélisme horizontal\n\n";
-    msg += r.direction + "\n\n";
+    msg += "Action mécanique :\n";
+    msg += "Ramener l’arrière vers la GAUCHE\n\n";
 
     msg += "Correction :\n";
-    msg += `➕ Déplacer le moteur de ${amt} mil côté :\n`;
-    msg += `👉 ${r.pair.join(" + ")}\n`;
-    msg += "(translation latérale pure — sans rotation)";
-
-    return msg;
+    msg += "👉 Agir principalement sur : B + D";
   }
+
+  if(v < 0){
+    msg += "Lecture NÉGATIVE → moteur incliné vers la GAUCHE\n\n";
+
+    msg += "Action mécanique :\n";
+    msg += "Ramener l’arrière vers la DROITE\n\n";
+
+    msg += "Correction :\n";
+    msg += "👉 Agir principalement sur : A + C";
+  }
+
+  return msg;
+}
+  if(stepId === "parH"){
+
+  if(ok(state.parH, state.parHTol)){
+    return "✔️ Parallélisme horizontal conforme.";
+  }
+
+  const amt = Math.abs(state.parH).toFixed(2);
+
+  msg += "↔️ Parallélisme horizontal\n\n";
+
+  if(state.parH > 0){
+    msg += "Lecture POSITIVE → moteur trop à DROITE\n\n";
+
+    msg += "Action mécanique :\n";
+    msg += "Déplacer le moteur vers la GAUCHE\n\n";
+
+    msg += "Correction :\n";
+    msg += `👉 Pousser côté : C + D\n`;
+    msg += "(translation pure — sans rotation)";
+  }
+
+  if(state.parH < 0){
+    msg += "Lecture NÉGATIVE → moteur trop à GAUCHE\n\n";
+
+    msg += "Action mécanique :\n";
+    msg += "Déplacer le moteur vers la DROITE\n\n";
+
+    msg += "Correction :\n";
+    msg += `👉 Pousser côté : A + B\n`;
+    msg += "(translation pure — sans rotation)";
+  }
+
+  return msg;
+}
 
   // ---------- PAR DÉFAUT ----------
   return "";
