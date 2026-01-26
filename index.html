@@ -320,6 +320,11 @@ const GEOM = {
   coupH: 56,
   coupW: 10,
 
+  // ===== DIMENSIONS GÉOMÉTRIQUES POUR CALCULS =====
+  dialSpan: 12,          // D = distance entre comparateurs
+  centerToFrontFeet: 6, // a = centre → pattes avant
+  frontToRearFeet: 10   // b = pattes avant → arrière
+};
   // ===== DIMENSIONS POUR CALCULS (POUCES) =====
   dialSpan: 12,        // D = distance entre les 2 comparateurs (ou entre les points 3–9 sur l’accouplement)
   centerToFrontFeet: 6, // Lf = centre accouplement -> pattes AVANT
@@ -661,9 +666,26 @@ function buildCorrectionMessage(){
     }
 
     const v = state.angV * dialSign;
+    const a = geometry.centerToFrontFeet;  // centre → pattes AVANT
+const b = geometry.frontToRearFeet;    // pattes AVANT → ARRIÈRE
+const D = geometry.couplingDiameter;   // diamètre accouplement
     const shims = computeAngularShimsVertical();
     const front = shims.front.toFixed(2);
     const rear  = shims.rear.toFixed(2);
+    
+    msg += "🧮 CALCUL — Angularité verticale\n\n";
+
+msg += `v = ${Math.abs(v).toFixed(2)} mil\n`;
+msg += `a = ${a} po (centre → pattes AVANT)\n`;
+msg += `b = ${b} po (pattes AVANT → ARRIÈRE)\n`;
+msg += `D = ${D} po (Ø accouplement)\n\n`;
+
+msg += "Formules :\n";
+msg += "Avant  = (v / D) × a\n";
+msg += "Arrière = (v / D) × (a + b)\n\n";
+
+msg += `Avant  = (${Math.abs(v).toFixed(2)} / ${D}) × ${a} = ${front} mil\n`;
+msg += `Arrière = (${Math.abs(v).toFixed(2)} / ${D}) × ${a + b} = ${rear} mil\n\n`;
 
     msg += "📐 Angularité verticale\n\n";
 
@@ -724,6 +746,7 @@ function buildCorrectionMessage(){
 
   // ---------- ANGULARITÉ HORIZONTALE ----------
 // ---------- ANGULARITÉ HORIZONTALE ----------
+// ---------- ANGULARITÉ HORIZONTALE ----------
 if(stepId === "angH"){
 
   if(ok(state.angH, state.angHTol)){
@@ -731,44 +754,42 @@ if(stepId === "angH"){
   }
 
   const v = state.angH * dialSign;
+  const D = GEOM.dialSpan;
+  const a = GEOM.centerToFrontFeet;
+  const b = GEOM.frontToRearFeet;
 
-  const D  = geometry.couplingDiameter;      // Ø accouplement
-const Lf = geometry.centerToFrontFeet;     // centre → pattes AVANT
-const Lr = geometry.frontToRearFeet;       // pattes AVANT → ARRIÈRE
-
-  const front = (Math.abs(v) * Lf / D).toFixed(2);
-  const rear  = (Math.abs(v) * Lr / D).toFixed(2);
+  const front = (Math.abs(v) * a / D).toFixed(2);
+  const rear  = (Math.abs(v) * (a + b) / D).toFixed(2);
 
   msg += "↔️ Angularité horizontale\n\n";
 
   msg += "🧮 CALCUL :\n\n";
-  msg += `Lecture v = ${v.toFixed(2)} mil\n`;
-  msg += `D (écart comparateurs) = ${D} po\n`;
-  msg += `Lf (centre → AVANT) = ${Lf} po\n`;
-  msg += `Lr (centre → ARRIÈRE) = ${Lr} po\n\n`;
+  msg += `v = ${v.toFixed(2)} mil\n`;
+  msg += `D = ${D} po\n`;
+  msg += `a = ${a} po\n`;
+  msg += `b = ${b} po\n\n`;
 
-  msg += "Formule :\n";
-  msg += "Δ = (v × L) / D\n\n";
+  msg += "Formules :\n";
+  msg += "Avant   = (v × a) / D\n";
+  msg += "Arrière = (v × (a+b)) / D\n\n";
 
-  msg += `Avant : (${Math.abs(v).toFixed(2)} × ${Lf}) / ${D} = ${front} mil\n`;
-  msg += `Arrière : (${Math.abs(v).toFixed(2)} × ${Lr}) / ${D} = ${rear} mil\n\n`;
+  msg += `Avant   = (${Math.abs(v).toFixed(2)} × ${a}) / ${D} = ${front} mil\n`;
+  msg += `Arrière = (${Math.abs(v).toFixed(2)} × ${a+b}) / ${D} = ${rear} mil\n\n`;
 
   if(v > 0){
     msg += "📈 Lecture POSITIVE → moteur incliné vers la DROITE\n\n";
-    msg += "Action mécanique : ramener vers la GAUCHE\n\n";
     msg += "Correction mécanique :\n";
-    msg += "👉 Tirer sur : B + D\n";
+    msg += "👉 Tirer sur B + D\n";
     msg += "OU\n";
-    msg += "👉 Pousser sur : A + C\n";
+    msg += "👉 Pousser sur A + C\n";
   }
 
   if(v < 0){
     msg += "📉 Lecture NÉGATIVE → moteur incliné vers la GAUCHE\n\n";
-    msg += "Action mécanique : ramener vers la DROITE\n\n";
     msg += "Correction mécanique :\n";
-    msg += "👉 Tirer sur : A + C\n";
+    msg += "👉 Tirer sur A + C\n";
     msg += "OU\n";
-    msg += "👉 Pousser sur : B + D\n";
+    msg += "👉 Pousser sur B + D\n";
   }
 
   return msg;
