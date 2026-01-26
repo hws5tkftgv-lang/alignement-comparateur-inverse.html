@@ -316,9 +316,14 @@ const GEOM = {
 
   gap: 70,
 
-  shaftH: 12,   // diamètre visuel arbre
-  coupH: 56,    // hauteur accouplement
-  coupW: 10     // largeur accouplement
+  shaftH: 12,
+  coupH: 56,
+  coupW: 10,
+
+  // ===== DIMENSIONS POUR CALCULS (POUCES) =====
+  dialSpan: 12,        // D = distance entre les 2 comparateurs (ou entre les points 3–9 sur l’accouplement)
+  centerToFrontFeet: 6, // Lf = centre accouplement -> pattes AVANT
+  frontToRearFeet: 10   // Lr = pattes AVANT -> pattes ARRIÈRE
 };
 /* =====================================================
    ÉTAT GLOBAL (mils)
@@ -1317,6 +1322,63 @@ function drawFoot(ctx,x,y,label){
   ctx.textAlign="center";
   ctx.fillText(label,x,y+18);
 }
+
+function drawArrow(ctx, x1, y1, x2, y2, color="#ff5252"){
+  const head = 12;
+  const angle = Math.atan2(y2-y1, x2-x1);
+
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.fillStyle = color;
+  ctx.lineWidth = 3;
+
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.moveTo(x2, y2);
+  ctx.lineTo(
+    x2 - head * Math.cos(angle - Math.PI/6),
+    y2 - head * Math.sin(angle - Math.PI/6)
+  );
+  ctx.lineTo(
+    x2 - head * Math.cos(angle + Math.PI/6),
+    y2 - head * Math.sin(angle + Math.PI/6)
+  );
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.restore();
+}
+
+function drawMathBlock(ctx, x, y, lines){
+  ctx.save();
+  ctx.font = "13px Consolas, monospace";
+  ctx.fillStyle = "rgba(255,255,255,.95)";
+  ctx.textAlign = "left";
+
+  // petit fond discret
+  const pad = 10;
+  const lineH = 18;
+  const boxW = 360;
+  const boxH = pad*2 + lines.length*lineH;
+
+  ctx.fillStyle = "rgba(0,0,0,.35)";
+  ctx.fillRect(x-pad, y-pad, boxW, boxH);
+
+  ctx.fillStyle = "rgba(255,255,255,.95)";
+  let dy = 0;
+  for(const l of lines){
+    ctx.fillText(l, x, y + dy);
+    dy += lineH;
+  }
+
+  ctx.restore();
+}
+
+
 function drawDimLine(ctx, x1, x2, y, label){
   const left = Math.min(x1, x2);
   const right = Math.max(x1, x2);
@@ -1346,6 +1408,9 @@ function drawDimLine(ctx, x1, x2, y, label){
 
   ctx.restore();
 }
+
+
+
 
 function drawCouplingDiameter(ctx, cx, cy, diam){
   ctx.save();
@@ -1512,7 +1577,65 @@ if(STEPS[state.step].id === "parH"){
   ctx.restore();
 
   ctx.restore(); // FIN BLOC ROTATIF MOTEUR
+// ====================================================
+//   ANGULARITÉ HORIZONTALE — FLÈCHES + CALCUL EXPLICITE
+//   (AU PREMIER PLAN)
+// ====================================================
+if(STEPS[state.step].id === "angH"){
 
+  // v = lecture signée (selon ta convention)
+  const v = state.angH * dialSign;
+
+  // distances (pouces)
+  const D  = GEOM.dialSpan;            // distance entre comparateurs
+  const Lf = GEOM.centerToFrontFeet;   // centre -> pattes avant
+  const Lr = GEOM.frontToRearFeet;     // avant -> arrière
+
+  // corrections (mils) à appliquer en hauteur latérale (équivalent)
+  // Formule : Δ = (v × L) / D
+  const corrFront = (v * Lf) / D;
+  const corrRear  = (v * (Lf + Lr)) / D;
+
+  // --- DESSIN DES FLÈCHES ---
+  // Convention graphique simple :
+  // v > 0 : moteur "vers la droite" -> ramener vers gauche (flèches vers gauche)
+  // v < 0 : moteur "vers la gauche" -> ramener vers droite (flèches vers droite)
+  const len = 70;
+
+  if(v > 0){
+    // flèche sur l'avant (près accouplement)
+    drawArrow(ctx, motorCx + motorW/2 + 20, motorCy - 18, motorCx + motorW/2 + 20 - len, motorCy - 18);
+    // flèche sur l'arrière
+    drawArrow(ctx, motorCx - motorW/2 - 20, motorCy + 18, motorCx - motorW/2 - 20 - len, motorCy + 18);
+  }
+
+  if(v < 0){
+    // flèche sur l'avant
+    drawArrow(ctx, motorCx + motorW/2 + 20, motorCy - 18, motorCx + motorW/2 + 20 + len, motorCy - 18);
+    // flèche sur l'arrière
+    drawArrow(ctx, motorCx - motorW/2 - 20, motorCy + 18, motorCx - motorW/2 - 20 + len, motorCy + 18);
+  }
+
+  // --- AFFICHAGE DU CALCUL EXPLICITE ---
+  drawMathBlock(ctx, 22, 28, [
+    "CALCUL — ANGULARITÉ HORIZONTALE (angH)",
+    "",
+    `Lecture v = ${v.toFixed(2)} mil`,
+    `D (écart comparateurs) = ${D} po`,
+    `Lf (centre->AVANT) = ${Lf} po`,
+    `Lr (AVANT->ARRIÈRE) = ${Lr} po`,
+    "",
+    "Formule : Δ = (v × L) / D",
+    "",
+    `Avant  : (${v.toFixed(2)} × ${Lf}) / ${D} = ${corrFront.toFixed(2)} mil`,
+    `Arrière: (${v.toFixed(2)} × ${Lf + Lr}) / ${D} = ${corrRear.toFixed(2)} mil`,
+    "",
+    "INTERPRÉTATION :",
+    v > 0 ? "v > 0 → ramener vers la GAUCHE (tirer BD ou pousser AC)" :
+    v < 0 ? "v < 0 → ramener vers la DROITE (tirer AC ou pousser BD)" :
+            "v = 0 → OK"
+  ]);
+}
   // ====================================================
   //   BLOC POMPE (FIXE) : POMPE + ARBRE + ½ ACCOUPLEMENT + AXE
   // ====================================================
