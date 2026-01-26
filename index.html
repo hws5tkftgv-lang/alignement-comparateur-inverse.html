@@ -1574,58 +1574,32 @@ if(STEPS[state.step].id === "parH"){
 // ====================================================
 if(STEPS[state.step].id === "angH"){
 
-  // v = lecture signée (selon ta convention)
   const v = state.angH * dialSign;
-
-  // distances (pouces)
-  const D  = GEOM.dialSpan;            // distance entre comparateurs
-  const Lf = GEOM.centerToFrontFeet;   // centre -> pattes avant
-  const Lr = GEOM.frontToRearFeet;     // avant -> arrière
-
-  // corrections (mils) à appliquer en hauteur latérale (équivalent)
-  // Formule : Δ = (v × L) / D
-  const corrFront = (v * Lf) / D;
-  const corrRear  = (v * (Lf + Lr)) / D;
-
-  // --- DESSIN DES FLÈCHES ---
-  // Convention graphique simple :
-  // v > 0 : moteur "vers la droite" -> ramener vers gauche (flèches vers gauche)
-  // v < 0 : moteur "vers la gauche" -> ramener vers droite (flèches vers droite)
   const len = 70;
 
   if(v > 0){
-    // flèche sur l'avant (près accouplement)
-    drawArrow(ctx, motorCx + motorW/2 + 20, motorCy - 18, motorCx + motorW/2 + 20 - len, motorCy - 18);
-    // flèche sur l'arrière
-    drawArrow(ctx, motorCx - motorW/2 - 20, motorCy + 18, motorCx - motorW/2 - 20 - len, motorCy + 18);
+    drawArrow(ctx,
+      motorCx + motorW/2 + 20, motorCy - 18,
+      motorCx + motorW/2 + 20 - len, motorCy - 18
+    );
+
+    drawArrow(ctx,
+      motorCx - motorW/2 - 20, motorCy + 18,
+      motorCx - motorW/2 - 20 - len, motorCy + 18
+    );
   }
 
   if(v < 0){
-    // flèche sur l'avant
-    drawArrow(ctx, motorCx + motorW/2 + 20, motorCy - 18, motorCx + motorW/2 + 20 + len, motorCy - 18);
-    // flèche sur l'arrière
-    drawArrow(ctx, motorCx - motorW/2 - 20, motorCy + 18, motorCx - motorW/2 - 20 + len, motorCy + 18);
-  }
+    drawArrow(ctx,
+      motorCx + motorW/2 + 20, motorCy - 18,
+      motorCx + motorW/2 + 20 + len, motorCy - 18
+    );
 
-  // --- AFFICHAGE DU CALCUL EXPLICITE ---
-  drawMathBlock(ctx, 22, 28, [
-    "CALCUL — ANGULARITÉ HORIZONTALE (angH)",
-    "",
-    `Lecture v = ${v.toFixed(2)} mil`,
-    `D (écart comparateurs) = ${D} po`,
-    `Lf (centre->AVANT) = ${Lf} po`,
-    `Lr (AVANT->ARRIÈRE) = ${Lr} po`,
-    "",
-    "Formule : Δ = (v × L) / D",
-    "",
-    `Avant  : (${v.toFixed(2)} × ${Lf}) / ${D} = ${corrFront.toFixed(2)} mil`,
-    `Arrière: (${v.toFixed(2)} × ${Lf + Lr}) / ${D} = ${corrRear.toFixed(2)} mil`,
-    "",
-    "INTERPRÉTATION :",
-    v > 0 ? "v > 0 → ramener vers la GAUCHE (tirer BD ou pousser AC)" :
-    v < 0 ? "v < 0 → ramener vers la DROITE (tirer AC ou pousser BD)" :
-            "v = 0 → OK"
-  ]);
+    drawArrow(ctx,
+      motorCx - motorW/2 - 20, motorCy + 18,
+      motorCx - motorW/2 - 20 + len, motorCy + 18
+    );
+  }
 }
   // ====================================================
   //   BLOC POMPE (FIXE) : POMPE + ARBRE + ½ ACCOUPLEMENT + AXE
