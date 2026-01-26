@@ -606,13 +606,10 @@ const ui = {
 ===================================================== */
 
 function buildCorrectionMessage(){
-
   const stepId = STEPS[state.step].id;
   let msg = "";
 
-  // =====================================================
-  // PIED BOITEUX
-  // =====================================================
+  // ---------- PIED BOITEUX ----------
   if(stepId === "softfoot"){
     const sf = computeSoftFoot();
 
@@ -622,41 +619,38 @@ function buildCorrectionMessage(){
 
     const each = (sf.correction / 2).toFixed(1);
 
-    msg += "🦶 Pied boiteux détecté\n\n";
+    msg += "🦶 Pied boiteux\n\n";
+    msg += "⚠️ Hors tolérance\n\n";
     msg += `Diag AC = ${sf.diagAC}\n`;
     msg += `Diag BD = ${sf.diagBD}\n`;
-    msg += `Δ = ${sf.delta}\n\n`;
-    msg += `➕ Ajouter **+${each} mil** sous les pattes :\n`;
-    msg += `👉 ${sf.faulty.join(" + ")}\n\n`;
-    msg += "⚠️ Toujours corriger en DIAGONALE";
+    msg += `Δ = ${sf.delta}\n`;
+    msg += `Correction ≈ ${sf.correction}\n\n`;
+
+    msg += "👣 Pied boiteux détecté\n\n";
+    msg += `➕ Ajouter **+${each} mil** sous :\n`;
+    msg += `👉 ${sf.faulty.join(" + ")}\n`;
+    msg += "\n⚠️ Toujours corriger en DIAGONALE";
 
     return msg;
   }
 
-  // =====================================================
-  // ANGULARITÉ VERTICALE
-  // =====================================================
+  // ---------- ANGULARITÉ VERTICALE ----------
   if(stepId === "angV"){
-
     if(ok(state.angV, state.angVTol)){
       return "✔️ Angularité verticale conforme.";
     }
 
     const v = state.angV * dialSign;
     const shims = computeAngularShimsVertical();
-
     const front = shims.front.toFixed(2);
     const rear  = shims.rear.toFixed(2);
 
     msg += "📐 Angularité verticale\n\n";
 
     if(v > 0){
-      msg += "📈 Lecture POSITIVE → AVANT plus haut que l’arrière\n";
+      msg += "Lecture POSITIVE → AVANT plus haut que l’arrière\n";
       msg += "(moteur incliné vers l’arrière)\n\n";
-
-      msg += "Action mécanique :\n";
-      msg += "Abaisser l’avant du moteur\n\n";
-
+      msg += "Action mécanique : abaisser l’avant\n\n";
       msg += "Corrections possibles :\n";
       msg += `➖ Enlever ${front} mil sous : B + C\n`;
       msg += `OU\n`;
@@ -664,12 +658,9 @@ function buildCorrectionMessage(){
     }
 
     if(v < 0){
-      msg += "📉 Lecture NÉGATIVE → ARRIÈRE plus haut que l’avant\n";
+      msg += "Lecture NÉGATIVE → ARRIÈRE plus haut que l’avant\n";
       msg += "(moteur incliné vers l’avant)\n\n";
-
-      msg += "Action mécanique :\n";
-      msg += "Abaisser l’arrière du moteur\n\n";
-
+      msg += "Action mécanique : abaisser l’arrière\n\n";
       msg += "Corrections possibles :\n";
       msg += `➖ Enlever ${rear} mil sous : A + D\n`;
       msg += `OU\n`;
@@ -679,45 +670,40 @@ function buildCorrectionMessage(){
     return msg;
   }
 
-  // =====================================================
-  // PARALLÉLISME VERTICAL
-  // =====================================================
+  // ---------- PARALLÉLISME VERTICAL (FIX ICI) ----------
   if(stepId === "parV"){
-
     if(ok(state.parV, state.parVTol)){
       return "✔️ Parallélisme vertical conforme.";
     }
 
-    const v = state.parV;
+    const v   = state.parV;                 // signe tel quel (dessin: + descend, - monte)
+    const amt = Math.abs(v).toFixed(2);
 
     msg += "↕️ Parallélisme vertical\n\n";
 
     if(v > 0){
-      msg += "📈 Lecture POSITIVE → moteur trop HAUT\n\n";
-      msg += "Action mécanique :\n";
-      msg += "Abaisser le moteur\n\n";
+      msg += "Lecture POSITIVE → moteur trop BAS\n\n";
+      msg += "Action mécanique : remonter le moteur\n\n";
       msg += "Correction :\n";
-      msg += `➖ Retirer ${Math.abs(v).toFixed(2)} mil sous :\n`;
-      msg += "👉 A + B + C + D";
+      msg += `➕ Ajouter +${amt} mil sous :\n`;
+      msg += "👉 A + B + C + D\n";
+      msg += "(même quantité sur les 4 pattes)";
     }
 
     if(v < 0){
-      msg += "📉 Lecture NÉGATIVE → moteur trop BAS\n\n";
-      msg += "Action mécanique :\n";
-      msg += "Remonter le moteur\n\n";
+      msg += "Lecture NÉGATIVE → moteur trop HAUT\n\n";
+      msg += "Action mécanique : abaisser le moteur\n\n";
       msg += "Correction :\n";
-      msg += `➕ Ajouter +${Math.abs(v).toFixed(2)} mil sous :\n`;
-      msg += "👉 A + B + C + D";
+      msg += `➖ Enlever ${amt} mil sous :\n`;
+      msg += "👉 A + B + C + D\n";
+      msg += "(même quantité sur les 4 pattes)";
     }
 
     return msg;
   }
 
-  // =====================================================
-  // ANGULARITÉ HORIZONTALE
-  // =====================================================
+  // ---------- ANGULARITÉ HORIZONTALE ----------
   if(stepId === "angH"){
-
     if(ok(state.angH, state.angHTol)){
       return "✔️ Angularité horizontale conforme.";
     }
@@ -727,17 +713,15 @@ function buildCorrectionMessage(){
     msg += "↔️ Angularité horizontale\n\n";
 
     if(v > 0){
-      msg += "📈 Lecture POSITIVE → moteur incliné vers la DROITE\n\n";
-      msg += "Action mécanique :\n";
-      msg += "Ramener l’arrière vers la GAUCHE\n\n";
+      msg += "Lecture POSITIVE → moteur incliné vers la DROITE\n\n";
+      msg += "Action mécanique : ramener vers la GAUCHE\n\n";
       msg += "Correction :\n";
       msg += "👉 Agir principalement sur : B + D";
     }
 
     if(v < 0){
-      msg += "📉 Lecture NÉGATIVE → moteur incliné vers la GAUCHE\n\n";
-      msg += "Action mécanique :\n";
-      msg += "Ramener l’arrière vers la DROITE\n\n";
+      msg += "Lecture NÉGATIVE → moteur incliné vers la GAUCHE\n\n";
+      msg += "Action mécanique : ramener vers la DROITE\n\n";
       msg += "Correction :\n";
       msg += "👉 Agir principalement sur : A + C";
     }
@@ -745,34 +729,29 @@ function buildCorrectionMessage(){
     return msg;
   }
 
-  // =====================================================
-  // PARALLÉLISME HORIZONTAL
-  // =====================================================
+  // ---------- PARALLÉLISME HORIZONTAL ----------
   if(stepId === "parH"){
-
     if(ok(state.parH, state.parHTol)){
       return "✔️ Parallélisme horizontal conforme.";
     }
 
-    const v = state.parH;
+    const amt = Math.abs(state.parH).toFixed(2);
 
     msg += "↔️ Parallélisme horizontal\n\n";
 
-    if(v > 0){
-      msg += "📈 Lecture POSITIVE → moteur trop à DROITE\n\n";
-      msg += "Action mécanique :\n";
-      msg += "Déplacer le moteur vers la GAUCHE\n\n";
+    if(state.parH > 0){
+      msg += "Lecture POSITIVE → moteur trop à DROITE\n\n";
+      msg += "Action mécanique : déplacer vers la GAUCHE\n\n";
       msg += "Correction :\n";
-      msg += "👉 Pousser côté : C + D\n";
+      msg += `👉 Pousser côté : C + D\n`;
       msg += "(translation pure — sans rotation)";
     }
 
-    if(v < 0){
-      msg += "📉 Lecture NÉGATIVE → moteur trop à GAUCHE\n\n";
-      msg += "Action mécanique :\n";
-      msg += "Déplacer le moteur vers la DROITE\n\n";
+    if(state.parH < 0){
+      msg += "Lecture NÉGATIVE → moteur trop à GAUCHE\n\n";
+      msg += "Action mécanique : déplacer vers la DROITE\n\n";
       msg += "Correction :\n";
-      msg += "👉 Pousser côté : A + B\n";
+      msg += `👉 Pousser côté : A + B\n`;
       msg += "(translation pure — sans rotation)";
     }
 
@@ -781,7 +760,6 @@ function buildCorrectionMessage(){
 
   return "";
 }
-
 
 
 /* =====================================================
