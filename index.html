@@ -449,6 +449,24 @@ const STEPS = [
 ===================================================== */
 const abs = Math.abs;
 const ok = (v,t) => abs(v) <= t;
+function mapFeetByScheme(A, B, C, D, scheme){
+  switch(scheme){
+    case "standard":
+      return { A, B, C, D };
+
+    case "invBottom":   // A / B / D / C
+      return { A, B, C: D, D: C };
+
+    case "rot180":      // rotation 180°
+      return { A: C, B: D, C: A, D: B };
+
+    case "roles":       // futur (non utilisé encore)
+      return { A, B, C, D };
+
+    default:
+      return { A, B, C, D };
+  }
+}
 
 /* =====================================================
    PIED BOITEUX — DIAGONALES
