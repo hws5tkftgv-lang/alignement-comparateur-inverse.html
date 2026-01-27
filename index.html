@@ -471,7 +471,19 @@ function mapFeetByScheme(A, B, C, D, scheme){
       return { A, B, C, D };
   }
 }
+function mapFeetToCorners(){
 
+  const { A, B, C, D, HA, HB, BA, BB } = state.softFoot;
+
+  const scheme = FOOT_SCHEMES[footSchemeKey];
+
+  return {
+    TL: Number(state.softFoot[scheme.TL] || 0),
+    TR: Number(state.softFoot[scheme.TR] || 0),
+    BR: Number(state.softFoot[scheme.BR] || 0),
+    BL: Number(state.softFoot[scheme.BL] || 0)
+  };
+}
 /* =====================================================
    PIED BOITEUX — DIAGONALES
    AC vs BD
@@ -969,6 +981,9 @@ function renderInputsForCurrentStep(){
       ["in_sfC", v => state.softFoot.C = Math.abs(v)],
       ["in_sfD", v => state.softFoot.D = Math.abs(v)],
       ["in_sfTol", v => state.softFootTol = Math.max(0, v)],
+      ["in_footScheme", v => {
+  footSchemeKey = v;
+}]
     ]);
     return;
   }
