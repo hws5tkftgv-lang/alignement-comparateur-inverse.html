@@ -221,6 +221,22 @@ canvas{
 
 <div class="wrap">
   <div class="grid">
+    
+    <div class="card">
+  <h2>Orientation des pattes (réel)</h2>
+
+  <label>Choisir l’orientation :</label>
+  <select id="footLayout" style="width:100%; padding:10px; font-size:16px; border-radius:12px; border:none;">
+    <option value="ABCD">Standard (A haut-gauche, B haut-droite, C bas-droite, D bas-gauche)</option>
+    <option value="ABDC">A / B / D / C (inverse bas)</option>
+    <option value="R180">Rotation 180°</option>
+    <option value="ROLE">Par rôles (HA, HB, BA, BB)</option>
+  </select>
+
+  <div class="noteBox" style="margin-top:10px;">
+    Cette option ne change pas les calculs, seulement les lettres affichées aux élèves.
+  </div>
+</div>
 
     <!-- ===== ÉTAPES ===== -->
   
@@ -288,7 +304,37 @@ let currentView = "top"; // "top" | "side"
 let blinkPhase = true;
 let visualGain = 6;
 const FOOT_NORMAL = "#0070c0";   // bleu foncé visible
+// ============================
+// ORIENTATION / ÉTIQUETTES PATTES (affichage seulement)
+// ============================
+let footLayout = "ABCD";
 
+// mapping: lettre interne -> texte affiché
+const footLabelMap = {
+  // Interne : A B C D (A=haut-gauche, B=haut-droite, C=bas-droite, D=bas-gauche)
+  "ABCD": { A:"A", B:"B", C:"C", D:"D" },
+
+  // Exemple demandé: A/B/D/C
+  "ABDC": { A:"A", B:"B", C:"D", D:"C" },
+
+  // Rotation 180° (haut-gauche devient bas-droite, etc.)
+  "R180": { A:"C", B:"D", C:"A", D:"B" },
+
+  // Mode rôles (HA/HB/BA/BB)
+  // HA = Haut Arrière, HB = Haut Avant, BA = Bas Arrière, BB = Bas Avant
+  // ⚠️ Ici, on ASSUME que "haut" = côté arbre vers pompe (en haut de ton dessin TopView),
+  // et "avant" = côté accouplement (à droite dans ton dessin). Tu peux changer ces mots ensuite.
+  "ROLE": { A:"HA", B:"HB", C:"BB", D:"BA" },
+};
+
+function labelFoot(letter){
+  return footLabelMap[footLayout]?.[letter] || letter;
+}
+
+// utilitaire: transforme ["A","C"] en "HA + BA" (ou autre)
+function labelFeet(arr){
+  return arr.map(labelFoot).join(" + ");
+}
 
 const gainSlider = document.getElementById("gainSlider");
 if(gainSlider){
@@ -601,7 +647,7 @@ function buildMessage(){
     txt += `Δ = ${sf.delta}\n`;
     txt += `Correction ≈ ${sf.correction}\n`;
     if(sf.faulty){
-      txt += `Pattes à corriger : ${sf.faulty.join(" + ")}`;
+      txt += `Pattes à corriger : ${labelFeet(sf.faulty)}`;
     }
   }
 
@@ -649,7 +695,7 @@ function buildCorrectionMessage(){
 
     msg += "👣 Pied boiteux détecté\n\n";
     msg += `➕ Ajouter **+${each} mil** sous :\n`;
-    msg += `👉 ${sf.faulty.join(" + ")}\n`;
+    msg += `👉 ${labelFeet(sf.faulty)}\n`;
     msg += "\n⚠️ Toujours corriger en DIAGONALE";
 
     return msg;
@@ -690,9 +736,9 @@ msg += `Arrière = (${Math.abs(v).toFixed(2)} / ${D}) × ${a + b} = ${rear} mil\
       msg += "(moteur incliné vers l’arrière)\n\n";
       msg += "Action mécanique : abaisser l’avant\n\n";
       msg += "Corrections possibles :\n";
-      msg += `➖ Enlever ${front} mil sous : B + C\n`;
+      msg += `➖ Enlever ${front} mil sous : ${labelFeet(["B","C"])}\n`;
       msg += `OU\n`;
-      msg += `➕ Ajouter ${rear} mil sous : A + D`;
+      msg += `➕ Ajouter ${rear} mil sous : ${labelFeet(["A","D"])}`;
     }
 
     if(v < 0){
@@ -700,9 +746,9 @@ msg += `Arrière = (${Math.abs(v).toFixed(2)} / ${D}) × ${a + b} = ${rear} mil\
       msg += "(moteur incliné vers l’avant)\n\n";
       msg += "Action mécanique : abaisser l’arrière\n\n";
       msg += "Corrections possibles :\n";
-      msg += `➖ Enlever ${rear} mil sous : A + D\n`;
+      msg += `➖ Enlever ${rear} mil sous : ${labelFeet(["A","D"])}\n`;
       msg += `OU\n`;
-      msg += `➕ Ajouter ${front} mil sous : B + C`;
+      msg += `➕ Ajouter ${front} mil sous : ${labelFeet(["B","C"])}`;
     }
 
     return msg;
@@ -775,17 +821,17 @@ if(stepId === "angH"){
   if(v > 0){
     msg += "📈 Lecture POSITIVE → moteur incliné vers la DROITE\n\n";
     msg += "Correction mécanique :\n";
-    msg += "👉 Tirer sur B + D\n";
+    msg += `👉 Tirer sur ${labelFeet(["B","D"])}\n`;
     msg += "OU\n";
-    msg += "👉 Pousser sur A + C\n";
+    msg += `👉 Pousser sur ${labelFeet(["A","C"])}\n`;
   }
 
   if(v < 0){
     msg += "📉 Lecture NÉGATIVE → moteur incliné vers la GAUCHE\n\n";
     msg += "Correction mécanique :\n";
-    msg += "👉 Tirer sur A + C\n";
+    msg += `👉 Tirer sur ${labelFeet(["A","C"])}\n`;
     msg += "OU\n";
-    msg += "👉 Pousser sur B + D\n";
+    msg += `👉 Pousser sur ${labelFeet(["B","D"])}\n`;
   }
 
   return msg;
@@ -1676,11 +1722,10 @@ if(STEPS[state.step].id === "angH"){
   ctx.textAlign = "center";
 
   const labelOffset = 26;
-  ctx.fillText("A", P.A.x, P.A.y - labelOffset);
-  ctx.fillText("B", P.B.x, P.B.y - labelOffset);
-  ctx.fillText("D", P.D.x, P.D.y + labelOffset + 6);
-  ctx.fillText("C", P.C.x, P.C.y + labelOffset + 6);
-
+  ctx.fillText(labelFoot("A"), P.A.x, P.A.y - labelOffset);
+ctx.fillText(labelFoot("B"), P.B.x, P.B.y - labelOffset);
+ctx.fillText(labelFoot("D"), P.D.x, P.D.y + labelOffset + 6);
+ctx.fillText(labelFoot("C"), P.C.x, P.C.y + labelOffset + 6);
   // ====================================================
   //   TITRES
   // ====================================================
@@ -1940,9 +1985,19 @@ function renderAll(){
 
 
 window.addEventListener("load", () => {
+
+  const layoutSelect = document.getElementById("footLayout");
+  if(layoutSelect){
+    layoutSelect.value = footLayout;
+
+    layoutSelect.addEventListener("change", () => {
+      footLayout = layoutSelect.value;
+      renderAll(); // refreshUI + redraw
+    });
+  }
+
   renderAll();
 });
-
 </script>
 
 
