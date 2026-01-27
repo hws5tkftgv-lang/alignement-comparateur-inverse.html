@@ -310,8 +310,10 @@ const FOOT_SCHEMES = {
   roles:    { name:"Par rôles (HA, HB, BA, BB)",       TL:"HA",TR:"HB",BR:"BB",BL:"BA" }
 };
 
+
 // mode actif
 let footSchemeKey = "standard";
+
 
 // retourne l'étiquette (texte) à afficher pour un coin
 function cornerLabel(corner){
@@ -409,6 +411,8 @@ const state = {
 
   softFoot: { A:0, B:0, C:0, D:0, HA:0, HB:0, BA:0, BB:0 },
   softFootTol: 3,
+  
+  footScheme: "standard",
 
   angV: 0,
   angVTol: 1,
@@ -473,20 +477,22 @@ function mapFeetByScheme(A, B, C, D, scheme){
    AC vs BD
 ===================================================== */
 function computeSoftFoot(){
-  // diagonales basées sur COINS (TL+BR) et (TR+BL)
-  const diag1 = sfVal("TL") + sfVal("BR"); // diagonale 1
-  const diag2 = sfVal("TR") + sfVal("BL"); // diagonale 2
+
+  const feet = mapFeetToCorners();
+
+  const diag1 = feet.TL + feet.BR;   // diagonale TL ↔ BR
+  const diag2 = feet.TR + feet.BL;   // diagonale TR ↔ BL
 
   const delta = Math.abs(diag1 - diag2);
   const correction = delta * 0.8;
 
-  // quelles pattes (étiquettes) corriger? (celles de la diagonale la plus grande)
   let faulty = null;
-  if(diag1 > diag2) faulty = [cornerLabel("TL"), cornerLabel("BR")];
-  if(diag2 > diag1) faulty = [cornerLabel("TR"), cornerLabel("BL")];
+
+  if(diag1 > diag2) faulty = ["TL","BR"];
+  if(diag2 > diag1) faulty = ["TR","BL"];
 
   return {
-    diagAC: diag1,   // tu peux garder les noms diagAC/diagBD pour ton UI (mais ce sont diag1/diag2)
+    diagAC: diag1,
     diagBD: diag2,
     delta,
     correction,
