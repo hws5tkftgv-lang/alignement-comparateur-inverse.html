@@ -298,6 +298,31 @@ Les pattes A / B / C / D seront affichées ici.
 
 <script>
 "use strict";
+/* =====================================================
+   MAPPING PATTES (lettres ↔ coins)
+   Coins = TL (haut-gauche), TR (haut-droite),
+           BR (bas-droite), BL (bas-gauche)
+===================================================== */
+const FOOT_SCHEMES = {
+  standard: { name:"Standard (A HG, B HD, C BD, D BG)", TL:"A", TR:"B", BR:"C", BL:"D" },
+  invBottom:{ name:"A / B / D / C (inverse bas)",      TL:"A", TR:"B", BR:"D", BL:"C" },
+  rot180:   { name:"Rotation 180°",                    TL:"C", TR:"D", BR:"A", BL:"B" },
+  roles:    { name:"Par rôles (HA, HB, BA, BB)",       TL:"HA",TR:"HB",BR:"BB",BL:"BA" }
+};
+
+// mode actif
+let footSchemeKey = "standard";
+
+// retourne l'étiquette (texte) à afficher pour un coin
+function cornerLabel(corner){
+  return FOOT_SCHEMES[footSchemeKey][corner];
+}
+
+// retourne la valeur softfoot (mils) pour un coin, peu importe le mode
+function sfVal(corner){
+  const key = cornerLabel(corner);           // ex: "A" ou "D" ou "HA"
+  return Number(state.softFoot[key] || 0);
+}
 let dialSign = 1;   // +1 = CW normal,  -1 = CW inversé
 let correctionMode = "add";  // "add" | "remove"
 let currentView = "top"; // "top" | "side"
@@ -382,7 +407,7 @@ const state = {
   runout: 0,
   runoutTol: 2,
 
-  softFoot: { A:0, B:0, C:0, D:0 },
+  softFoot: { A:0, B:0, C:0, D:0, HA:0, HB:0, BA:0, BB:0 },
   softFootTol: 3,
 
   angV: 0,
@@ -430,25 +455,26 @@ const ok = (v,t) => abs(v) <= t;
    AC vs BD
 ===================================================== */
 function computeSoftFoot(){
-  const {A,B,C,D} = state.softFoot;
-  const diagAC = A + C;
-  const diagBD = B + D;
-  const delta = abs(diagAC - diagBD);
+  // diagonales basées sur COINS (TL+BR) et (TR+BL)
+  const diag1 = sfVal("TL") + sfVal("BR"); // diagonale 1
+  const diag2 = sfVal("TR") + sfVal("BL"); // diagonale 2
+
+  const delta = Math.abs(diag1 - diag2);
   const correction = delta * 0.8;
 
+  // quelles pattes (étiquettes) corriger? (celles de la diagonale la plus grande)
   let faulty = null;
-  if(diagAC > diagBD) faulty = ["A","C"];
-  if(diagBD > diagAC) faulty = ["B","D"];
+  if(diag1 > diag2) faulty = [cornerLabel("TL"), cornerLabel("BR")];
+  if(diag2 > diag1) faulty = [cornerLabel("TR"), cornerLabel("BL")];
 
   return {
-    diagAC,
-    diagBD,
+    diagAC: diag1,   // tu peux garder les noms diagAC/diagBD pour ton UI (mais ce sont diag1/diag2)
+    diagBD: diag2,
     delta,
     correction,
     faulty
   };
 }
-
 /* =====================================================
    ANGULARITÉ VERTICALE — PAIRES
    Avant = BC
@@ -867,6 +893,18 @@ function renderInputsForCurrentStep(){
 
   if(id === "softfoot"){
     ui.inputsArea.innerHTML = `
+    
+    <div style="margin-bottom:10px;">
+  <label>Disposition des pattes</label>
+  <select id="in_footScheme" style="width:100%; padding:10px; border-radius:12px; border:none;">
+    <option value="standard">Standard (A HG, B HD, C BD, D BG)</option>
+    <option value="invBottom">A / B / D / C (inverse bas)</option>
+    <option value="rot180">Rotation 180°</option>
+    <option value="roles">Par rôles (HA, HB, BA, BB)</option>
+  </select>
+</div>
+    
+    
       <div class="row">
         <div>
           <label>Patte A (haut gauche)</label>
