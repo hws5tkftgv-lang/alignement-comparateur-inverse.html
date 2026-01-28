@@ -208,7 +208,122 @@ canvas{
   background:#00a2ff !important;
   color:white !important;
 }
+/* =========================
+   MODAL AIDE / FORMULES
+========================= */
+#helpModal{
+  position:fixed;
+  inset:0;
+  z-index:9999;
+}
 
+#helpBackdrop{
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,.65);
+}
+
+#helpPanel{
+  position:relative;
+  width:min(920px, calc(100% - 24px));
+  max-height:calc(100% - 24px);
+  margin:12px auto;
+  background:#0b1436;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:14px;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  box-shadow:0 10px 40px rgba(0,0,0,.35);
+}
+
+.helpHeader{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  padding:12px;
+  background:rgba(255,255,255,.06);
+  border-bottom:1px solid rgba(255,255,255,.10);
+}
+
+.helpTitle{
+  font-weight:900;
+  font-size:14px;
+}
+
+.helpActions{
+  display:flex;
+  gap:10px;
+}
+
+.helpBtn{
+  padding:10px 12px;
+  border:none;
+  border-radius:10px;
+  background:var(--accent);
+  color:#fff;
+  font-weight:900;
+  cursor:pointer;
+}
+
+.helpBtn.secondary{
+  background:rgba(255,255,255,.15);
+}
+
+.helpContent{
+  padding:14px;
+  overflow:auto;
+  font-size:13px;
+  line-height:1.45;
+  color:rgba(234,241,255,.95);
+  white-space:pre-wrap;
+}
+
+/* Titres internes */
+.helpContent h3{
+  margin:14px 0 6px;
+  font-size:14px;
+}
+.helpContent .box{
+  border:1px solid rgba(255,255,255,.10);
+  background:rgba(255,255,255,.04);
+  border-radius:12px;
+  padding:10px 12px;
+  margin:8px 0;
+}
+.helpContent code{
+  font-family:Consolas, monospace;
+  background:rgba(0,0,0,.25);
+  padding:2px 6px;
+  border-radius:8px;
+}
+
+/* =========================
+   IMPRESSION (imprimer seulement le panel)
+========================= */
+@media print{
+  body *{
+    visibility:hidden !important;
+  }
+  #helpModal, #helpModal *{
+    visibility:visible !important;
+  }
+  #helpBackdrop{
+    display:none !important;
+  }
+  #helpPanel{
+    width:100% !important;
+    max-height:none !important;
+    margin:0 !important;
+    border:none !important;
+    border-radius:0 !important;
+    box-shadow:none !important;
+  }
+  .helpActions{
+    display:none !important; /* cache boutons à l’impression */
+  }
+}
 
 </style>
 </head>
@@ -216,7 +331,15 @@ canvas{
 <body>
 
 <div class="headerBar">
-  Alignement d’arbres — Comparateur inversé (mils)
+  <div style="display:flex; align-items:center; justify-content:center; gap:10px;">
+    <span>Alignement d’arbres — Comparateur inversé (mils)</span>
+
+    <button id="btnHelp"
+      type="button"
+      style="flex:0; padding:6px 10px; border-radius:10px; border:none; background:rgba(255,255,255,.15); color:#fff; font-weight:900; cursor:pointer;">
+      ℹ️
+    </button>
+  </div>
 </div>
 
 <div class="wrap">
@@ -295,9 +418,140 @@ Les pattes A / B / C / D seront affichées ici.
     <span>Pédagogique</span>
   </div>
 </div>
+<!-- =========================
+     MODAL AIDE / FORMULES
+========================= -->
+<div id="helpModal" style="display:none;">
+  <div id="helpBackdrop"></div>
 
+  <div id="helpPanel" role="dialog" aria-modal="true" aria-label="Aide et formules">
+    <div class="helpHeader">
+      <div class="helpTitle">ℹ️ Guide — Formules & Conventions (Alignement)</div>
+
+      <div class="helpActions">
+        <button id="btnHelpPrint" type="button" class="helpBtn">🖨️ Imprimer</button>
+        <button id="btnHelpClose" type="button" class="helpBtn secondary">Fermer ✕</button>
+      </div>
+    </div>
+
+    <div id="helpContent" class="helpContent">
+      <!-- injecté par JS -->
+    </div>
+  </div>
+</div>
 <script>
 "use strict";
+/* =====================================================
+   AIDE / FORMULES (BULLE ℹ️) + IMPRESSION
+===================================================== */
+
+// 1) contenu HTML de la fiche
+function buildHelpHTML(){
+  // ⚠️ Ici on écrit LA référence pédagogique (une seule source de vérité)
+  return `
+    <h3>Conventions importantes</h3>
+
+    <div class="box">
+      <b>1) Comparateur inversé = mesure RELATIVE entre 2 arbres</b><br>
+      La lecture au cadran représente l’écart entre l’arbre mobile (moteur) et l’arbre fixe (pompe).
+    </div>
+
+    <div class="box">
+      <b>2) Parallélisme (12–6 et 3–9) : règle CRITIQUE</b><br>
+      <code>Correction moteur = Lecture / 2</code><br>
+      Parce que tu corriges une seule machine (le moteur).
+    </div>
+
+    <div class="box">
+      <b>3) Angularité</b><br>
+      Les valeurs <b>Avant</b> et <b>Arrière</b> sont des <b>magnitudes</b> (valeurs absolues de cale).<br>
+      Ensuite, le <b>signe</b> (+ / −) te dit <b>quelle extrémité est plus haute/basse</b>, et ta règle (ajouter/enlever) te dit <b>sur quelles pattes appliquer</b>.
+    </div>
+
+    <h3>Étape 1 — Voilage (Runout)</h3>
+    <div class="box">
+      But : valider que la lecture est dans la tolérance.<br>
+      Condition : <code>|voilage| ≤ tolérance</code>
+    </div>
+
+    <h3>Étape 2 — Pied boiteux (Soft Foot)</h3>
+    <div class="box">
+      Méthode diagonales :<br>
+      <code>Diag 1 = TL + BR</code><br>
+      <code>Diag 2 = TR + BL</code><br>
+      <code>Δ = |Diag1 − Diag2|</code><br>
+      <code>Correction ≈ 0.8 × Δ</code><br>
+      <code>Par patte (2 pattes) = Correction / 2</code><br><br>
+      On corrige les 2 pattes de la diagonale la plus grande.
+    </div>
+
+    <h3>Étape 3 — Mesures géométriques</h3>
+    <div class="box">
+      <code>D</code> = Ø accouplement (po)<br>
+      <code>a</code> = centre → pattes AVANT (po)<br>
+      <code>b</code> = pattes AVANT → ARRIÈRE (po)
+    </div>
+
+    <h3>Étape 4 — Angularité verticale (12–6)</h3>
+    <div class="box">
+      Lecture : <code>v = |angV|</code> (mils)<br>
+      Formules (magnitudes) :<br>
+      <code>Avant  = (v / D) × a</code><br>
+      <code>Arrière = (v / D) × (a + b)</code><br><br>
+      Ensuite, appliquer selon le signe (+ / −) et ta règle (ajouter/enlever).
+    </div>
+
+    <h3>Étape 5 — Parallélisme vertical (12–6)</h3>
+    <div class="box">
+      Lecture : <code>p = parV</code> (mils)<br>
+      Règle : <code>Correction = |p| / 2</code><br>
+      Application : même quantité sur les 4 pattes (A+B+C+D), ajouter ou enlever selon le signe.
+    </div>
+
+    <h3>Étape 6 — Angularité horizontale (3–9)</h3>
+    <div class="box">
+      Lecture : <code>h = |angH|</code> (mils)<br>
+      Formules (magnitudes) :<br>
+      <code>Avant  = (h / D) × a</code><br>
+      <code>Arrière = (h / D) × (a + b)</code><br>
+      Puis appliquer selon le signe (+ / −) sur les bonnes pattes (pousser/tirer).
+    </div>
+
+    <h3>Étape 7 — Parallélisme horizontal (3–9)</h3>
+    <div class="box">
+      Lecture : <code>p = parH</code> (mils)<br>
+      Règle : <code>Correction = |p| / 2</code><br>
+      Déplacement réel du moteur = moitié de la lecture.
+    </div>
+  `;
+}
+
+// 2) ouvrir/fermer/imprimer
+function openHelp(){
+  const modal = document.getElementById("helpModal");
+  const content = document.getElementById("helpContent");
+  if(!modal || !content) return;
+
+  content.innerHTML = buildHelpHTML();
+  modal.style.display = "block";
+  document.body.classList.add("modal-open");
+}
+
+function closeHelp(){
+  const modal = document.getElementById("helpModal");
+  if(!modal) return;
+  modal.style.display = "none";
+  document.body.classList.remove("modal-open");
+}
+
+function printHelp(){
+  // Ouvre si jamais fermé, pour être sûr d’imprimer la fiche
+  const modal = document.getElementById("helpModal");
+  if(modal && modal.style.display !== "block"){
+    openHelp();
+  }
+  window.print();
+}
 /* =====================================================
    MAPPING PATTES (lettres ↔ coins)
    Coins = TL (haut-gauche), TR (haut-droite),
@@ -2069,6 +2323,21 @@ window.addEventListener("load", () => {
 
     layoutSelect.addEventListener("change", () => {
       footLayout = layoutSelect.value;
+        // ===== ℹ️ AIDE / FORMULES =====
+  const btnHelp = document.getElementById("btnHelp");
+  const btnHelpClose = document.getElementById("btnHelpClose");
+  const btnHelpPrint = document.getElementById("btnHelpPrint");
+  const backdrop = document.getElementById("helpBackdrop");
+
+  if(btnHelp) btnHelp.addEventListener("click", openHelp);
+  if(btnHelpClose) btnHelpClose.addEventListener("click", closeHelp);
+  if(btnHelpPrint) btnHelpPrint.addEventListener("click", printHelp);
+  if(backdrop) backdrop.addEventListener("click", closeHelp);
+
+  // ESC pour fermer
+  document.addEventListener("keydown", (e) => {
+    if(e.key === "Escape") closeHelp();
+  });
       renderAll(); // refreshUI + redraw
     });
   }
