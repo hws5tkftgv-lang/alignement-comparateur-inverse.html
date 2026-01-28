@@ -2317,13 +2317,18 @@ function renderAll(){
 
 window.addEventListener("load", () => {
 
+  // ===== ORIENTATION =====
   const layoutSelect = document.getElementById("footLayout");
   if(layoutSelect){
     layoutSelect.value = footLayout;
 
     layoutSelect.addEventListener("change", () => {
       footLayout = layoutSelect.value;
-        // ===== ℹ️ AIDE / FORMULES =====
+      renderAll();
+    });
+  }
+
+  // ===== ℹ️ AIDE / FORMULES =====
   const btnHelp = document.getElementById("btnHelp");
   const btnHelpClose = document.getElementById("btnHelpClose");
   const btnHelpPrint = document.getElementById("btnHelpPrint");
@@ -2334,12 +2339,12 @@ window.addEventListener("load", () => {
   if(btnHelpPrint) btnHelpPrint.addEventListener("click", printHelp);
   if(backdrop) backdrop.addEventListener("click", closeHelp);
 
-  // ESC pour fermer
   document.addEventListener("keydown", (e) => {
     if(e.key === "Escape") closeHelp();
   });
-      renderAll(); // refreshUI + redraw
-    });
+
+  renderAll();
+});
   }
 
   renderAll();
