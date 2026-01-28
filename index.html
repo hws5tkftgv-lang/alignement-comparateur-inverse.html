@@ -516,7 +516,6 @@ function buildHelpHTML(){
 <div class="box">
   <b>1) Comparateur inversé = mesure RELATIVE entre 2 arbres</b><br>
   La lecture au cadran représente l’écart entre l’arbre mobile (moteur) et l’arbre fixe (pompe).<br>
-  Installer le support du cadran sur la <b>pompe (machine fixe)</b> et l’indicateur sur le <b>moteur (machine mobile)</b>.
 </div>
 
 <div class="box">
@@ -527,7 +526,7 @@ function buildHelpHTML(){
 
 <div class="box">
   <b>3) Angularité</b><br>
-  Les valeurs <b>Avant</b> et <b>Arrière</b> sont des <b>magnitudes</b> (valeurs absolues de cale).<br>
+  Les valeurs <b>Avant</b> et <b>Arrière</b> sont des valeurs absolues de cale.
   Ensuite, le <b>signe</b> (+ / −) indique quelle extrémité est plus haute ou plus basse, et la règle (ajouter / enlever) indique sur quelles pattes appliquer la correction.
 </div>
 
@@ -535,21 +534,21 @@ function buildHelpHTML(){
 <h3><b>Étape 1 — Voilage (Runout)</b></h3>
 <div class="box">
   But : vérifier que la rotation est correcte et que la lecture est dans la tolérance.<br>
-  Condition : valeur mesurée ≤ tolérance admissible.
+  Condition : Il faut que la valeur mesurée soit plus petite que la tolérance admissible.
 </div>
 
 
 <h3><b>Étape 2 — Pied boiteux (Soft Foot)</b></h3>
 <div class="box">
   Méthode par diagonales :<br>
-  Diag 1 = TL (haut gauche) + BR (bas droit)<br>
-  Diag 2 = TR (haut droit) + BL (bas gauche)<br><br>
+  Diag 1 = A (haut gauche) + C (bas droit)<br>
+  Diag 2 = B (haut droit) + D (bas gauche)<br><br>
 
-  Δ = |Diag 1 − Diag 2|<br>
-  Correction ≈ 0.8 × Δ<br>
-  Par patte (2 pattes) = Correction ÷ 2<br><br>
-
+  Δ = Diag 1 (celle ayant la plus grande valeur) − Diag 2 (celle ayant la valeur la plus petite<br>
+  Si le résultat est de 3 mils et moins= Aucune correction nécéssaire.
+  Si résultat est de plus de 3 mils= Correction ≈ 0.8 × Δ<br>
   On corrige les deux pattes de la diagonale la plus élevée.
+  Par patte (2 pattes) = Correction ÷ 2<br><br>
 </div>
 
 
@@ -563,7 +562,7 @@ function buildHelpHTML(){
 
 <h3><b>Étape 4 — Angularité verticale (12–6)</b></h3>
 <div class="box">
-  Lecture : v = |angV| (mils)<br><br>
+  Lecture : v = Lecture du cadran 12–6 (mils)<br><br>
 
   Formules :<br>
   Avant  = (v ÷ D) × a<br>
@@ -575,8 +574,8 @@ function buildHelpHTML(){
 
 <h3><b>Étape 5 — Parallélisme vertical (12–6)</b></h3>
 <div class="box">
-  Lecture : p = parV (mils)<br>
-  Règle : Correction = |p| ÷ 2<br><br>
+  Lecture : Lecture du cadran 12–6
+  Règle : Correction = Valeur mesurée ÷ 2<br><br>
 
   Application : même correction sur les quatre pattes (A + B + C + D), en ajout ou en retrait selon le signe.
 </div>
@@ -584,7 +583,7 @@ function buildHelpHTML(){
 
 <h3><b>Étape 6 — Angularité horizontale (3–9)</b></h3>
 <div class="box">
-  Lecture : h = |angH| (mils)<br><br>
+  Lecture : Lecture du cadran 3–9 <br><br>
 
   Formules :<br>
   Avant  = (h ÷ D) × a<br>
