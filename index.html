@@ -295,59 +295,66 @@ canvas{
 .helpContent code{
   font-family:Consolas, monospace;
   background:rgba(0,0,0,.25);
-@media print{
+  
+  
+  
+  
+@media print {
 
-  body *{
-    visibility:hidden !important;
+  /* Cache ABSOLUMENT TOUT */
+  body * {
+    visibility: hidden !important;
   }
 
-  #helpModal, #helpModal *{
-    visibility:visible !important;
+  /* Affiche UNIQUEMENT la fenêtre d’aide */
+  #helpModal,
+  #helpModal * {
+    visibility: visible !important;
   }
 
-  #helpBackdrop{
-    display:none !important;
+  /* Supprime le fond sombre */
+  #helpBackdrop {
+    display: none !important;
   }
 
-  #helpPanel{
-    width:100% !important;
-    max-height:none !important;
-    margin:0 !important;
-    border:none !important;
-    border-radius:0 !important;
-    box-shadow:none !important;
-    background:#ffffff !important;
-    color:#000000 !important;
+  /* Forcer fond BLANC total */
+  #helpModal {
+    position: absolute;
+    inset: 0;
+    background: #ffffff !important;
   }
 
-  .helpHeader{
-    background:#ffffff !important;
-    border-bottom:2px solid #000 !important;
+  #helpPanel {
+    width: 100% !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: 18px !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: #ffffff !important;
+    color: #000000 !important;
   }
 
-  .helpTitle{
-    color:#000 !important;
+  /* Nettoyage graphique */
+  .helpHeader,
+  .helpContent,
+  .box {
+    background: #ffffff !important;
+    color: #000000 !important;
   }
 
-  .helpContent{
-    background:#ffffff !important;
-    color:#000000 !important;
-    font-size:13px;
+  /* Bordures pédagogiques propres */
+  .box {
+    border: 1px solid #000 !important;
   }
 
-  .helpContent .box{
-    background:#ffffff !important;
-    border:1px solid #000 !important;
+  /* Boutons supprimés */
+  .helpActions,
+  button {
+    display: none !important;
   }
 
-  .helpContent code{
-    background:#f2f2f2 !important;
-    color:#000 !important;
-  }
-
-  .helpActions{
-    display:none !important;
-  }
 }
 </style>
 </head>
