@@ -306,14 +306,13 @@ canvas{
 
   body {
     background:#fff !important;
+    color:#000 !important;
   }
 
-  /* On cache tout */
   body > * {
     display:none !important;
   }
 
-  /* On montre uniquement la modale */
   #helpModal {
     display:block !important;
     position:static !important;
@@ -327,6 +326,7 @@ canvas{
     background:#fff !important;
     color:#000 !important;
     border-radius:0 !important;
+    padding:20px !important;
   }
 
   #helpBackdrop {
@@ -335,6 +335,35 @@ canvas{
 
   .helpActions {
     display:none !important;
+  }
+
+  /* ===== TEXTE ULTRA LISIBLE ===== */
+
+  .helpContent {
+    font-size:13.5pt !important;
+    line-height:1.45 !important;
+    color:#000 !important;
+  }
+
+  .helpContent h3 {
+    font-size:16pt !important;
+    margin-top:20px !important;
+    color:#000 !important;
+    border-bottom:2px solid #000 !important;
+    padding-bottom:4px !important;
+  }
+
+  .helpContent .box {
+    border:1px solid #000 !important;
+    background:#fff !important;
+    color:#000 !important;
+  }
+
+  .helpContent code {
+    background:#eee !important;
+    color:#000 !important;
+    font-weight:bold !important;
+    padding:2px 5px !important;
   }
 
 }
