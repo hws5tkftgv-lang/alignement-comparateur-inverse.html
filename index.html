@@ -492,31 +492,14 @@ function buildHelpHTML(){
   // ⚠️ Ici on écrit LA référence pédagogique (une seule source de vérité)
   return `
     <h3>Conventions importantes</h3>
-
-    <div class="box">
-      <b>1) Comparateur inversé = mesure RELATIVE entre 2 arbres</b><br>
-      La lecture au cadran représente l’écart entre l’arbre mobile (moteur) et l’arbre fixe (pompe).
-    </div>
-
-    <div class="box">
-      <b>2) Parallélisme (12–6 et 3–9) : règle CRITIQUE</b><br>
-      <code>Correction moteur = Lecture / 2</code><br>
-      Parce que tu corriges une seule machine (le moteur).
-    </div>
-
-    <div class="box">
-      <b>3) Angularité</b><br>
-      Les valeurs <b>Avant</b> et <b>Arrière</b> sont des <b>magnitudes</b> (valeurs absolues de cale).<br>
-      Ensuite, le <b>signe</b> (+ / −) te dit <b>quelle extrémité est plus haute/basse</b>, et ta règle (ajouter/enlever) te dit <b>sur quelles pattes appliquer</b>.
-    </div>
-
-    <h3>Étape 1 — Voilage (Runout)</h3>
+    
+      <h3>Étape 1 — Voilage (Runout)</h3>
     <div class="box">
       But : valider que la lecture est dans la tolérance.<br>
       Condition : <code>|voilage| ≤ tolérance</code>
     </div>
 
-    <h3>Étape 2 — Pied boiteux (Soft Foot)</h3>
+      <h3>Étape 2 — Pied boiteux (Soft Foot)</h3>
     <div class="box">
       Méthode diagonales :<br>
       <code>Diag 1 = TL(Top Left)+ BR(Bottom Right)</code><br>
@@ -527,14 +510,29 @@ function buildHelpHTML(){
       On corrige les 2 pattes de la diagonale la plus grande.
     </div>
 
-    <h3>Étape 3 — Mesures géométriques</h3>
+     <h3>Étape 3 — Mesures géométriques</h3>
     <div class="box">
       <code>D</code> = Ø accouplement (Support)(po)<br>
       <code>a</code> = Distance entre point de mesure et pattes AVANT (po)<br>
       <code>b</code> = Distance entre pattes AVANT et pattes ARRIÈRE (po)
     </div>
 
-    <h3>Étape 4 — Angularité verticale (12–6)</h3>
+
+    <div class="box">
+      <b>1) Comparateur inversé = mesure RELATIVE entre 2 arbres</b><br>
+      La lecture au cadran représente l’écart entre l’arbre mobile (moteur) et l’arbre fixe (pompe).
+      
+      Installez le support du cadran sur la POMPE (machine fixe) et l'indicateur sur le MOTEUR (machine mobile).
+    </div>
+
+     <div class="box">
+      <b>3) Angularité</b><br>
+      Les valeurs <b>Avant</b> et <b>Arrière</b> sont des <b>magnitudes</b> (valeurs absolues de cale).<br>
+      Ensuite, le <b>signe</b> (+ / −) te dit <b>quelle extrémité est plus haute/basse</b>, et ta règle (ajouter/enlever) te dit <b>sur quelles pattes appliquer</b>.
+    </div>
+
+
+      <h3>Étape 4 — Angularité verticale (12–6)</h3>
     <div class="box">
       Lecture : <code>v = |angV|</code> (mils)<br>
       Formules (magnitudes) :<br>
@@ -543,14 +541,22 @@ function buildHelpHTML(){
       Ensuite, appliquer selon le signe (+ / −) et ta règle (ajouter/enlever).
     </div>
 
-    <h3>Étape 5 — Parallélisme vertical (12–6)</h3>
+
+   <div class="box">
+      <b>2) Parallélisme (12–6 et 3–9) : règle CRITIQUE</b><br>
+      <code>Correction moteur = Lecture / 2</code><br>
+      Parce que tu corriges une seule machine (le moteur).
+    </div>
+
+
+     <h3>Étape 5 — Parallélisme vertical (12–6)</h3>
     <div class="box">
       Lecture : <code>p = parV</code> (mils)<br>
       Règle : <code>Correction = |p| / 2</code><br>
       Application : même quantité sur les 4 pattes (A+B+C+D), ajouter ou enlever selon le signe.
     </div>
 
-    <h3>Étape 6 — Angularité horizontale (3–9)</h3>
+     <h3>Étape 6 — Angularité horizontale (3–9)</h3>
     <div class="box">
       Lecture : <code>h = |angH|</code> (mils)<br>
       Formules (magnitudes) :<br>
