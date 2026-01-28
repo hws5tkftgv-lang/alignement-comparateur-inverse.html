@@ -511,85 +511,96 @@ Les pattes A / B / C / D seront affichées ici.
 function buildHelpHTML(){
   // ⚠️ Ici on écrit LA référence pédagogique (une seule source de vérité)
   return `
-    <h3>Conventions importantes</h3>
-    
-      <h3>Étape 1 — Voilage (Runout)</h3>
-    <div class="box">
-      But : valider que la lecture est dans la tolérance.<br>
-      Condition : <span class="formula"> voilage ≤ tolérance</code>
-    </div>
+  <h3><b>Conventions importantes</b></h3>
 
-      <h3>Étape 2 — Pied boiteux (Soft Foot)</h3>
-    <div class="box">
-      Méthode diagonales :<br>
-      <span class="formula">Diag 1 = TL(Top Left) + BR(Bottom Right)</code><br>
-      <span class="formula">Diag 2 = TR(Top Right) + BL(Bottom Left)</code><br>
-      <span class="formula">Δ = Diag1 − Diag2</code><br>
-      <span class="formula">Correction ≈ 0.8 × Δ</code><br>
-      Par patte (2 pattes) = Correction / 2</code><br><br>
-      On corrige les 2 pattes de la diagonale la plus grande.
-    </div>
+<div class="box">
+  <b>1) Comparateur inversé = mesure RELATIVE entre 2 arbres</b><br>
+  La lecture au cadran représente l’écart entre l’arbre mobile (moteur) et l’arbre fixe (pompe).<br>
+  Installer le support du cadran sur la <b>pompe (machine fixe)</b> et l’indicateur sur le <b>moteur (machine mobile)</b>.
+</div>
 
-     <h3>Étape 3 — Mesures géométriques</h3>
-    <div class="box">
-      <code>D</code> = Ø accouplement (Support)(po)<br>
-      <code>a</code> = Distance entre point de mesure et pattes AVANT (po)<br>
-      <code>b</code> = Distance entre pattes AVANT et pattes ARRIÈRE (po)
-    </div>
+<div class="box">
+  <b>2) Parallélisme (12–6 et 3–9) : règle CRITIQUE</b><br>
+  Correction moteur = Lecture ÷ 2<br>
+  Parce que l’on corrige uniquement une des deux machines (le moteur).
+</div>
+
+<div class="box">
+  <b>3) Angularité</b><br>
+  Les valeurs <b>Avant</b> et <b>Arrière</b> sont des <b>magnitudes</b> (valeurs absolues de cale).<br>
+  Ensuite, le <b>signe</b> (+ / −) indique quelle extrémité est plus haute ou plus basse, et la règle (ajouter / enlever) indique sur quelles pattes appliquer la correction.
+</div>
 
 
-    <div class="box">
-      <b>1) Comparateur inversé = mesure RELATIVE entre 2 arbres</b><br>
-      La lecture au cadran représente l’écart entre l’arbre mobile (moteur) et l’arbre fixe (pompe).
-     
-    </div>
-
-     <div class="box">
-      <b>Angularité</b><br>
-      Les valeurs <b>Avant</b> et <b>Arrière</b> sont des <b>magnitudes</b> (valeurs absolues de cale).<br>
-      Ensuite, le <b>signe</b> (+ / −) te dit <b>quelle extrémité est plus haute/basse</b>, et ta règle (ajouter/enlever) te dit <b>sur quelles pattes appliquer</b>.
-    </div>
+<h3><b>Étape 1 — Voilage (Runout)</b></h3>
+<div class="box">
+  But : vérifier que la rotation est correcte et que la lecture est dans la tolérance.<br>
+  Condition : valeur mesurée ≤ tolérance admissible.
+</div>
 
 
-      <h3>Étape 4 — Angularité verticale (12–6)</h3>
-    <div class="box">
-      Lecture : <span class="formula"> v = angV </code> (mils)<br>
-      Formules (magnitudes) :<br>
-      <span class="formula">Avant  = (v / D) × a</code><br>
-      <span class="formula">Arrière = (v / D) × (a + b)</code><br><br>
-      Ensuite, appliquer selon le signe (+ / −) et ta règle (ajouter/enlever).
-    </div>
+<h3><b>Étape 2 — Pied boiteux (Soft Foot)</b></h3>
+<div class="box">
+  Méthode par diagonales :<br>
+  Diag 1 = TL (haut gauche) + BR (bas droit)<br>
+  Diag 2 = TR (haut droit) + BL (bas gauche)<br><br>
+
+  Δ = |Diag 1 − Diag 2|<br>
+  Correction ≈ 0.8 × Δ<br>
+  Par patte (2 pattes) = Correction ÷ 2<br><br>
+
+  On corrige les deux pattes de la diagonale la plus élevée.
+</div>
 
 
-   <div class="box">
-      <b>Parallélisme (12–6 et 3–9) : règle CRITIQUE</b><br>
-      <span class="formula">Correction moteur = Lecture / 2</code><br>
-      Parce que tu corriges une seule machine (le moteur).
-    </div>
+<h3><b>Étape 3 — Mesures géométriques</b></h3>
+<div class="box">
+  D = diamètre de l’accouplement (support) en pouces (po)<br>
+  a = distance entre le point de mesure et les pattes AVANT (po)<br>
+  b = distance entre les pattes AVANT et les pattes ARRIÈRE (po)
+</div>
 
 
-     <h3>Étape 5 — Parallélisme vertical (12–6)</h3>
-    <div class="box">
-      Lecture : <code>p = parV</code> (mils)<br>
-      Règle : <code>Correction = |p| / 2</code><br>
-      Application : même quantité sur les 4 pattes (A+B+C+D), ajouter ou enlever selon le signe.
-    </div>
+<h3><b>Étape 4 — Angularité verticale (12–6)</b></h3>
+<div class="box">
+  Lecture : v = |angV| (mils)<br><br>
 
-     <h3>Étape 6 — Angularité horizontale (3–9)</h3>
-    <div class="box">
-      Lecture : <code>h = |angH|</code> (mils)<br>
-      Formules (magnitudes) :<br>
-      <code>Avant  = (h / D) × a</code><br>
-      <code>Arrière = (h / D) × (a + b)</code><br>
-      Puis appliquer selon le signe (+ / −) sur les bonnes pattes (pousser/tirer).
-    </div>
+  Formules :<br>
+  Avant  = (v ÷ D) × a<br>
+  Arrière = (v ÷ D) × (a + b)<br><br>
 
-    <h3>Étape 7 — Parallélisme horizontal (3–9)</h3>
-    <div class="box">
-      Lecture : <code>p = parH</code> (mils)<br>
-      Règle : <code>Correction = |p| / 2</code><br>
-      Déplacement réel du moteur = moitié de la lecture.
-    </div>
+  Appliquer ensuite selon le signe (+ / −) et la règle d’ajout / retrait.
+</div>
+
+
+<h3><b>Étape 5 — Parallélisme vertical (12–6)</b></h3>
+<div class="box">
+  Lecture : p = parV (mils)<br>
+  Règle : Correction = |p| ÷ 2<br><br>
+
+  Application : même correction sur les quatre pattes (A + B + C + D), en ajout ou en retrait selon le signe.
+</div>
+
+
+<h3><b>Étape 6 — Angularité horizontale (3–9)</b></h3>
+<div class="box">
+  Lecture : h = |angH| (mils)<br><br>
+
+  Formules :<br>
+  Avant  = (h ÷ D) × a<br>
+  Arrière = (h ÷ D) × (a + b)<br><br>
+
+  Appliquer selon le signe (+ / −) sur les bonnes pattes en poussant ou en tirant.
+</div>
+
+
+<h3><b>Étape 7 — Parallélisme horizontal (3–9)</b></h3>
+<div class="box">
+  Lecture : p = parH (mils)<br>
+  Règle : Correction = |p| ÷ 2<br><br>
+
+  Le déplacement réel du moteur correspond à la moitié de la lecture mesurée.
+</div>
   `;
 }
 
