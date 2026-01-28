@@ -299,59 +299,53 @@ canvas{
   
   
   
+/* ==========================
+   MODE IMPRESSION — PRO
+========================== */
+
 @media print {
 
-  /* Cache ABSOLUMENT TOUT */
-  body * {
-    visibility: hidden !important;
+  /* Fond blanc forcé */
+  body {
+    background: #fff !important;
   }
 
-  /* Affiche UNIQUEMENT la fenêtre d’aide */
-  #helpModal,
-  #helpModal * {
+  /* On cache absolument TOUT */
+  body * {
+    display: none !important;
+  }
+
+  /* On réactive UNIQUEMENT la fenêtre aide */
+  .print-scope,
+  .print-scope * {
+    display: block !important;
     visibility: visible !important;
   }
 
-  /* Supprime le fond sombre */
+  /* On remet la modale en plein écran propre */
+  #helpModal {
+    position: absolute;
+    inset: 0;
+    background: #fff !important;
+  }
+
+  /* Suppression du fond sombre */
   #helpBackdrop {
     display: none !important;
   }
 
-  /* Forcer fond BLANC total */
-  #helpModal {
-    position: absolute;
-    inset: 0;
-    background: #ffffff !important;
-  }
-
+  /* Style propre d'impression */
   #helpPanel {
-    width: 100% !important;
-    max-height: none !important;
-    margin: 0 !important;
-    padding: 18px !important;
-    border: none !important;
-    border-radius: 0 !important;
     box-shadow: none !important;
-    background: #ffffff !important;
-    color: #000000 !important;
+    background: #fff !important;
+    color: #000 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    border-radius: 0 !important;
   }
 
-  /* Nettoyage graphique */
-  .helpHeader,
-  .helpContent,
-  .box {
-    background: #ffffff !important;
-    color: #000000 !important;
-  }
-
-  /* Bordures pédagogiques propres */
-  .box {
-    border: 1px solid #000 !important;
-  }
-
-  /* Boutons supprimés */
-  .helpActions,
-  button {
+  /* Boutons inutiles à l'impression */
+  .helpActions {
     display: none !important;
   }
 
@@ -452,7 +446,7 @@ Les pattes A / B / C / D seront affichées ici.
 <!-- =========================
      MODAL AIDE / FORMULES
 ========================= -->
-<div id="helpModal" style="display:none;">
+<div id="helpModal" class="print-scope" style="display:none;">
   <div id="helpBackdrop"></div>
 
   <div id="helpPanel" role="dialog" aria-modal="true" aria-label="Aide et formules">
