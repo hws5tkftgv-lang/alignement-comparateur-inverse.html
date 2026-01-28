@@ -295,23 +295,20 @@ canvas{
 .helpContent code{
   font-family:Consolas, monospace;
   background:rgba(0,0,0,.25);
-  padding:2px 6px;
-  border-radius:8px;
-}
-
-/* =========================
-   IMPRESSION (imprimer seulement le panel)
-========================= */
 @media print{
+
   body *{
     visibility:hidden !important;
   }
+
   #helpModal, #helpModal *{
     visibility:visible !important;
   }
+
   #helpBackdrop{
     display:none !important;
   }
+
   #helpPanel{
     width:100% !important;
     max-height:none !important;
@@ -319,12 +316,39 @@ canvas{
     border:none !important;
     border-radius:0 !important;
     box-shadow:none !important;
+    background:#ffffff !important;
+    color:#000000 !important;
   }
+
+  .helpHeader{
+    background:#ffffff !important;
+    border-bottom:2px solid #000 !important;
+  }
+
+  .helpTitle{
+    color:#000 !important;
+  }
+
+  .helpContent{
+    background:#ffffff !important;
+    color:#000000 !important;
+    font-size:13px;
+  }
+
+  .helpContent .box{
+    background:#ffffff !important;
+    border:1px solid #000 !important;
+  }
+
+  .helpContent code{
+    background:#f2f2f2 !important;
+    color:#000 !important;
+  }
+
   .helpActions{
-    display:none !important; /* cache boutons à l’impression */
+    display:none !important;
   }
 }
-
 </style>
 </head>
 
