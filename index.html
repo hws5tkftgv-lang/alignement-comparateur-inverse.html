@@ -304,48 +304,37 @@ canvas{
 
 @media print {
 
-  /* Fond blanc forcé */
   body {
-    background: #fff !important;
+    background:#fff !important;
   }
 
-  /* On cache absolument TOUT */
-  body * {
-    display: none !important;
+  /* On cache tout */
+  body > * {
+    display:none !important;
   }
 
-  /* On réactive UNIQUEMENT la fenêtre aide */
-  .print-scope,
-  .print-scope * {
-    display: block !important;
-    visibility: visible !important;
-  }
-
-  /* On remet la modale en plein écran propre */
+  /* On montre uniquement la modale */
   #helpModal {
-    position: absolute;
-    inset: 0;
-    background: #fff !important;
+    display:block !important;
+    position:static !important;
   }
 
-  /* Suppression du fond sombre */
-  #helpBackdrop {
-    display: none !important;
-  }
-
-  /* Style propre d'impression */
   #helpPanel {
-    box-shadow: none !important;
-    background: #fff !important;
-    color: #000 !important;
-    max-width: 100% !important;
-    width: 100% !important;
-    border-radius: 0 !important;
+    display:block !important;
+    width:100% !important;
+    max-width:100% !important;
+    box-shadow:none !important;
+    background:#fff !important;
+    color:#000 !important;
+    border-radius:0 !important;
   }
 
-  /* Boutons inutiles à l'impression */
+  #helpBackdrop {
+    display:none !important;
+  }
+
   .helpActions {
-    display: none !important;
+    display:none !important;
   }
 
 }
