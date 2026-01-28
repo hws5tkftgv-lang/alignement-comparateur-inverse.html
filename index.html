@@ -516,16 +516,16 @@ function buildHelpHTML(){
       <h3>Étape 1 — Voilage (Runout)</h3>
     <div class="box">
       But : valider que la lecture est dans la tolérance.<br>
-      Condition : <span class="formula">|voilage| ≤ tolérance</code>
+      Condition : <span class="formula"> voilage ≤ tolérance</code>
     </div>
 
       <h3>Étape 2 — Pied boiteux (Soft Foot)</h3>
     <div class="box">
       Méthode diagonales :<br>
-      <code>Diag 1 = TL(Top Left)+ BR(Bottom Right)</code><br>
-      <code>Diag 2 = TR(Top Right) + BL(Bottom Left)</code><br>
-      <code>Δ = |Diag1 − Diag2|</code><br>
-      <code>Correction ≈ 0.8 × Δ</code><br>
+      <span class="formula">Diag 1 = TL(Top Left)+ BR(Bottom Right)</code><br>
+      <span class="formula">Diag 2 = TR(Top Right) + BL(Bottom Left)</code><br>
+      <span class="formula">Δ = Diag1 − Diag2</code><br>
+      <span class="formula">Correction ≈ 0.8 × Δ</code><br>
       <code>Par patte (2 pattes) = Correction / 2</code><br><br>
       On corrige les 2 pattes de la diagonale la plus grande.
     </div>
@@ -546,7 +546,7 @@ function buildHelpHTML(){
     </div>
 
      <div class="box">
-      <b>3) Angularité</b><br>
+      <b>Angularité</b><br>
       Les valeurs <b>Avant</b> et <b>Arrière</b> sont des <b>magnitudes</b> (valeurs absolues de cale).<br>
       Ensuite, le <b>signe</b> (+ / −) te dit <b>quelle extrémité est plus haute/basse</b>, et ta règle (ajouter/enlever) te dit <b>sur quelles pattes appliquer</b>.
     </div>
@@ -554,17 +554,17 @@ function buildHelpHTML(){
 
       <h3>Étape 4 — Angularité verticale (12–6)</h3>
     <div class="box">
-      Lecture : <code>v = |angV|</code> (mils)<br>
+      Lecture : <span class="formula"> v = angV </code> (mils)<br>
       Formules (magnitudes) :<br>
-      <code>Avant  = (v / D) × a</code><br>
-      <code>Arrière = (v / D) × (a + b)</code><br><br>
+      <span class="formula">Avant  = (v / D) × a</code><br>
+      <span class="formula">Arrière = (v / D) × (a + b)</code><br><br>
       Ensuite, appliquer selon le signe (+ / −) et ta règle (ajouter/enlever).
     </div>
 
 
    <div class="box">
-      <b>2) Parallélisme (12–6 et 3–9) : règle CRITIQUE</b><br>
-      <code>Correction moteur = Lecture / 2</code><br>
+      <b>Parallélisme (12–6 et 3–9) : règle CRITIQUE</b><br>
+      <span class="formula">Correction moteur = Lecture / 2</code><br>
       Parce que tu corriges une seule machine (le moteur).
     </div>
 
