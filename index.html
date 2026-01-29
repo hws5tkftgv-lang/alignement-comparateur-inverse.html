@@ -316,19 +316,7 @@ canvas{
   background:rgba(0,0,0,.65);
 }
 
-#trainingPanel{
-  position:relative;
-  width:min(920px, calc(100% - 24px));
-  max-height:calc(100% - 24px);
-  margin:12px auto;
-  background:#0b1436;
-  border:1px solid rgba(255,255,255,.12);
-  border-radius:14px;
-  overflow:hidden;
-  display:flex;
-  flex-direction:column;
-  box-shadow:0 10px 40px rgba(0,0,0,.35);
-}
+
   
 /* ==========================
    MODE IMPRESSION — PRO
@@ -424,13 +412,18 @@ canvas{
 
 #trainingPanel{
   position:relative;
-  width:min(720px, calc(100% - 24px));
+  width:min(900px, calc(100% - 24px));
   margin:12px auto;
   background:#0b1436;
   border-radius:14px;
   border:1px solid rgba(255,255,255,.15);
-  overflow:hidden;
   box-shadow:0 10px 40px rgba(0,0,0,.45);
+
+  display:flex;
+  flex-direction:column;
+
+  max-height:90vh;
+  overflow:hidden;
 }
 </style>
 </head>
@@ -748,6 +741,10 @@ Comprendre le lien entre :
 <div style="margin-top:18px;">
   <label>Déplacement réel du moteur (mils)</label>
   <input id="trainSlider" type="range" min="-50" max="50" step="1" value="0">
+  <div id="dialBlock">
+  <canvas id="trainCanvas" width="260" height="260"></canvas>
+  <div id="trainInfo"></div>
+</div>
   <div style="display:flex; justify-content:space-between; font-size:12px;">
     <span>-50</span>
     <span>0</span>
