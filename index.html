@@ -410,7 +410,28 @@ canvas{
   font-weight: 600;
   display: inline-block;
 }
+#trainingModal{
+  position:fixed;
+  inset:0;
+  z-index:9999;
+}
 
+#trainingBackdrop{
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,.65);
+}
+
+#trainingPanel{
+  position:relative;
+  width:min(720px, calc(100% - 24px));
+  margin:12px auto;
+  background:#0b1436;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.15);
+  overflow:hidden;
+  box-shadow:0 10px 40px rgba(0,0,0,.45);
+}
 </style>
 </head>
 
@@ -2535,13 +2556,268 @@ window.addEventListener("load", () => {
   document.addEventListener("keydown", (e) => {
     if(e.key === "Escape") closeHelp();
   });
-  // ===== 🎓 TRAINING BUTTON =====
+  
+  // ============================
+// 🎓 TRAINING — LOGIQUE CADRAN
+// ============================
+
+const trainingModal = document.getElementById("trainingModal");
+const trainingBackdrop = document.getElementById("trainingBackdrop");
+const btnTrainingClose = document.getElementById("btnTrainingClose");
+
+const trainMount = document.getElementById("trainMount");
+const trainMode  = document.getElementById("trainMode");
+const trainSlider= document.getElementById("trainSlider");
+const trainInfo  = document.getElementById("trainInfo");
+
+const trainCanvas = document.getElementById("trainDial");
+const trainCtx    = trainCanvas.getContext("2d");
+
+// ouvrir modal
+btnTraining.addEventListener("click", () => {
+  trainingModal.style.display = "block";
+  drawTrainingDial();
+});
+
+// fermer modal
+btnTrainingClose.addEventListener("click", closeTraining);
+trainingBackdrop.addEventListener("click", closeTraining);
+
+function closeTraining(){
+  trainingModal.style.display = "none";
+}
+
+// mise à jour
+[trainMount, trainMode, trainSlider].forEach(el=>{
+  el.addEventListener("input", drawTrainingDial);
+});
+
+// logique mécanique réelle
+function computeDialReading(){
+  const motorMove = parseFloat(trainSlider.value);
+
+  if(trainMount.value === "motor"){
+    return -motorMove;
+  }else{
+    return motorMove;
+  }
+}
+
+// dessin cadran
+function drawTrainingDial(){
+
+  const ctx = trainCtx;
+  const w = trainCanvas.width;
+  const h = trainCanvas.height;
+
+  ctx.clearRect(0,0,w,h);
+
+  const cx = w/2;
+  const cy = h/2;
+  const r  = 100;
+
+  // fond
+  ctx.fillStyle = "#fff";
+  ctx.beginPath();
+  ctx.arc(cx,cy,r,0,Math.PI*2);
+  ctx.fill();
+
+  // cercle
+  ctx.strokeStyle="#000";
+  ctx.lineWidth=3;
+  ctx.beginPath();
+  ctx.arc(cx,cy,r,0,Math.PI*2);
+  ctx.stroke();
+
+  // graduations 0–100
+  for(let i=0;i<=100;i+=10){
+    const ang = (i/100)*2*Math.PI - Math.PI/2;
+    const x1 = cx + Math.cos(ang)*(r-10);
+    const y1 = cy + Math.sin(ang)*(r-10);
+    const x2 = cx + Math.cos(ang)*r;
+    const y2 = cy + Math.sin(ang)*r;
+
+    ctx.strokeStyle="#000";
+    ctx.lineWidth=2;
+    ctx.beginPath();
+    ctx.moveTo(x1,y1);
+    ctx.lineTo(x2,y2);
+    ctx.stroke();
+
+    ctx.fillStyle="#000";
+    ctx.font="12px Arial";
+    ctx.textAlign="center";
+    ctx.textBaseline="middle";
+    ctx.fillText(i, cx + Math.cos(ang)*(r-25), cy + Math.sin(ang)*(r-25));
+  }
+
+  // lecture réelle
+  const dial = computeDialReading();
+  const ang = (dial/100)*2*Math.PI - Math.PI/2;
+
+  // aiguille
+  ctx.strokeStyle="red";
+  ctx.lineWidth=3;
+  ctx.beginPath();
+  ctx.moveTo(cx,cy);
+  ctx.lineTo(cx + Math.cos(ang)*(r-20), cy + Math.sin(ang)*(r-20));
+  ctx.stroke();
+
+  // centre
+  ctx.fillStyle="#000";
+  ctx.beginPath();
+  ctx.arc(cx,cy,5,0,Math.PI*2);
+  ctx.fill();
+
+  trainInfo.innerHTML =
+`Déplacement moteur : ${trainSlider.value} mil
+Lecture cadran : ${dial.toFixed(1)} mil
+
+${trainMount.value === "motor"
+? "📍 Cadran sur le MOTEUR → lecture INVERSE"
+: "📍 Cadran sur la POMPE → lecture DIRECTE"}`;
+}
+/* =====================================================
+   🎓 MODE TRAINING — LOGIQUE + CADRAN ANIMÉ
+===================================================== */
+
+let trainingState = {
+  mountedOn: "motor",    // motor | pump
+  mode: "parV",          // angV | parV | angH | parH
+  displacement: 0        // déplacement simulé (mils)
+};
+
+// ouverture modal training
+function openTraining(){
+  document.getElementById("trainingModal").style.display = "block";
+  document.body.classList.add("modal-open");
+  updateDial();
+}
+
+// fermeture
+function closeTraining(){
+  document.getElementById("trainingModal").style.display = "none";
+  document.body.classList.remove("modal-open");
+}
+
+// logique cadran pédagogique
+function computeDialValue(){
+
+  const d = trainingState.displacement;
+
+  switch(trainingState.mode){
+
+    case "parV":
+      return (trainingState.mountedOn === "motor") ? -d*2 : d*2;
+
+    case "angV":
+      return (trainingState.mountedOn === "motor") ? -d*1.8 : d*1.8;
+
+    case "parH":
+      return (trainingState.mountedOn === "motor") ? -d*2 : d*2;
+
+    case "angH":
+      return (trainingState.mountedOn === "motor") ? -d*1.8 : d*1.8;
+  }
+  return 0;
+}
+
+// animation aiguille
+function updateDial(){
+
+  const dial = document.getElementById("dialNeedle");
+  const val = computeDialValue();
+
+  let angle = val * 1.8;
+  angle = Math.max(-180, Math.min(180, angle));
+
+  dial.style.transform = `rotate(${angle}deg)`;
+
+  document.getElementById("dialValue").textContent =
+    `${val.toFixed(1)} mil`;
+}
+
+// slider moteur
+function trainingMove(v){
+  trainingState.displacement = parseFloat(v);
+  updateDial();
+}
+
+// sélecteurs
+function trainingSetMount(v){
+  trainingState.mountedOn = v;
+  updateDial();
+}
+
+function trainingSetMode(v){
+  trainingState.mode = v;
+  updateDial();
+}
+ <!-- =========================
+     MODAL 🎓 TRAINING
+========================= -->
+<div id="trainingModal" style="display:none;">
+  <div id="trainingBackdrop"></div>
+
+  <div id="trainingPanel">
+    <div class="helpHeader">
+      <div class="helpTitle">🎓 Mode Training — Compréhension du cadran</div>
+
+      <div class="helpActions">
+        <button id="btnTrainingClose" class="helpBtn secondary">Fermer ✕</button>
+      </div>
+    </div>
+
+    <div class="helpContent">
+
+      <div class="row">
+        <div>
+          <label>Montage du cadran</label>
+          <select id="trainMount">
+            <option value="motor">Monté sur le moteur</option>
+            <option value="pump">Monté sur la pompe</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Type de mouvement</label>
+          <select id="trainMode">
+            <option value="vertical">Vertical</option>
+            <option value="horizontal">Horizontal</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="margin-top:18px;">
+        <label>Déplacement réel du moteur (mils)</label>
+        <input id="trainSlider" type="range" min="-50" max="50" step="1" value="0">
+        <div style="display:flex; justify-content:space-between; font-size:13px;">
+          <span>-50</span>
+          <span>0</span>
+          <span>+50</span>
+        </div>
+      </div>
+
+      <div style="margin-top:16px; text-align:center;">
+        <canvas id="trainDial" width="260" height="260"></canvas>
+      </div>
+
+      <div class="noteBox" id="trainInfo" style="margin-top:14px; text-align:center;"></div>
+
+    </div>
+  </div>
+</div>
+
+
+// ===== 🎓 TRAINING BUTTON =====
 const btnTraining = document.getElementById("btnTraining");
 if(btnTraining){
   btnTraining.addEventListener("click", openTraining);
 }
   renderAll();
 });
+
+
 </script>
 </body>
 </html>
