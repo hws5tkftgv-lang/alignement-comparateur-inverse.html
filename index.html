@@ -910,7 +910,7 @@ function drawDial(value){
 
  // graduations
 ctx.strokeStyle = "#aaa";
-for(let i=0;i<100;i++){
+for(let i=0;i<=100;i++){
   const ang = (i/100)*Math.PI*2;
   let r1 = 96;
 
@@ -2281,12 +2281,13 @@ function blinkColor(col){
   return t ? "#ff5252" : col;
 }
 
-function drawTopView(){
+function drawTopViewGeneric(ctxTarget){
 
   currentView = "top";
 
-  const {w,h} = resizeCanvas(topCanvas, topCtx);
-  const ctx = topCtx;
+  const canvas = ctxTarget.canvas;
+const {w,h} = resizeCanvas(canvas, ctxTarget);
+const ctx = ctxTarget;
   clear(ctx,w,h);
 
   const scale   = visualGain;
@@ -2527,12 +2528,13 @@ ctx.fillText(labelFoot("C"), P.C.x, P.C.y + labelOffset + 6);
 
 
 
-function drawSideView(){
+function drawSideViewGeneric(ctxTarget){
 
   currentView = "side";
 
-  const {w,h} = resizeCanvas(sideCanvas, sideCtx);
-  const ctx = sideCtx;
+  const canvas = ctxTarget.canvas;
+const {w,h} = resizeCanvas(canvas, ctxTarget);
+const ctx = ctxTarget;
   clear(ctx,w,h);
 
   const scale   = visualGain;
