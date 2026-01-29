@@ -523,41 +523,7 @@ Les pattes A / B / C / D seront affichées ici.
       </div>
       
       
-      <!-- ============================
-     ZONE TEST PÉDAGOGIQUE (SANDBOX)
-============================= -->
-
-<div class="card" style="margin-top:12px; border:2px dashed rgba(255,255,255,.25);">
-  <h2>Zone test pédagogique (sandbox)</h2>
-  <p>Zone isolée pour tester les améliorations visuelles sans toucher au système principal.</p>
-
-  <div class="canvasGrid">
-    <div class="canvasCard">
-      <div class="canvasHeader">Vue de dessus — TEST</div>
-      <canvas id="topViewTest"></canvas>
-    </div>
-
-    <div class="canvasCard">
-      <div class="canvasHeader">Vue de profil — TEST</div>
-      <canvas id="sideViewTest"></canvas>
-    </div>
-  </div>
-</div>
-    </div>
-
-  </div>
-</div>
-<div class="card" style="margin-top:12px;">
-  <h2>Amplification du dessin</h2>
-
-  <label>Effet visuel :</label>
-  <input id="gainSlider" type="range" min="1" max="20" value="6" step="1" style="width:100%">
-
-  <div style="display:flex; justify-content:space-between; font-size:12px; opacity:.8;">
-    <span>Réaliste</span>
-    <span>Pédagogique</span>
-  </div>
-</div>
+      
 <!-- =========================
      MODAL AIDE / FORMULES
 ========================= -->
@@ -733,10 +699,6 @@ function printHelp(){
   window.print();
 }
 
-/* =====================================================
-   TRAINING — MODE ENTRAÎNEMENT
-===================================================== */
-
 function buildTrainingHTML(){
   return `
 <h3>Mode entraînement — Compréhension du cadran</h3>
@@ -775,35 +737,52 @@ Comprendre le lien entre :
 
 <div style="margin-top:18px;">
   <label>Déplacement réel du moteur (mils)</label>
- <input id="trainSlider" type="range" min="-100" max="100" step="1" value="0">
+  <input id="trainSlider" type="range" min="-100" max="100" step="1" value="0">
 
- <div id="dialBlock" style="display:flex; flex-direction:column; align-items:center;">
+  <div id="dialBlock" style="display:flex; flex-direction:column; align-items:center; margin-top:10px;">
 
-  <canvas id="trainDial" width="260" height="260"
-    style="background:#000;border-radius:50%;border:3px solid #666;">
-  </canvas>
+    <canvas id="trainDial" width="260" height="260"
+      style="background:#000;border-radius:50%;border:3px solid #666;">
+    </canvas>
 
-  <div id="dialValue"
-    style="margin-top:10px;font-weight:900;font-size:16px;text-align:center;">
-    0.00 mil
+    <div id="dialValue"
+      style="margin-top:10px;font-weight:900;font-size:16px;text-align:center;">
+      0.00 mil
+    </div>
+
+    <div id="trainingExplain"
+      style="margin-top:8px;text-align:center;font-size:13px;">
+    </div>
+
   </div>
 
-  <div id="trainingExplain"
-    style="margin-top:8px;text-align:center;font-size:13px;">
+  <div style="display:flex; justify-content:space-between; font-size:12px;">
+    <span>-100</span>
+    <span>0</span>
+    <span>+100</span>
   </div>
-
-</div>
- <div style="display:flex; justify-content:space-between; font-size:12px;">
-  <span>-100</span>
-  <span>0</span>
-  <span>+100</span>
 </div>
 
 </div>
 
+<!-- ============================
+     SANDBOX VISUEL — TRAINING SEULEMENT
+============================= -->
+<div class="card" style="margin-top:16px; border:2px dashed rgba(255,255,255,.25);">
+  <h3 style="margin-top:0;">Visualisation pédagogique</h3>
+
+  <div class="canvasGrid">
+    <div class="canvasCard">
+      <div class="canvasHeader">Vue de dessus — TRAINING</div>
+      <canvas id="topViewTest"></canvas>
+    </div>
+
+    <div class="canvasCard">
+      <div class="canvasHeader">Vue de profil — TRAINING</div>
+      <canvas id="sideViewTest"></canvas>
+    </div>
+  </div>
 </div>
-
-
 
 <div id="trainInfo" class="noteBox" style="margin-top:14px;text-align:center;">
 —
