@@ -753,7 +753,8 @@ Comprendre le lien entre :
 
 <div style="margin-top:18px;">
   <label>Déplacement réel du moteur (mils)</label>
-  <input id="trainSlider" type="range" min="-50" max="50" step="1" value="0">
+ <input id="trainSlider" type="range" min="-100" max="100" step="1" value="0">
+
  <div id="dialBlock" style="display:flex; flex-direction:column; align-items:center;">
 
   <canvas id="trainDial" width="260" height="260"
@@ -770,11 +771,12 @@ Comprendre le lien entre :
   </div>
 
 </div>
-  <div style="display:flex; justify-content:space-between; font-size:12px;">
-    <span>-50</span>
-    <span>0</span>
-    <span>+50</span>
-  </div>
+ <div style="display:flex; justify-content:space-between; font-size:12px;">
+  <span>-100</span>
+  <span>0</span>
+  <span>+100</span>
+</div>
+
 </div>
 
 </div>
@@ -884,27 +886,33 @@ function drawDial(value){
   ctx.fillStyle="#fff";
   ctx.fill();
 
-  // graduations
-  ctx.strokeStyle = "#aaa";
-  for(let i=0;i<60;i++){
-    const ang = (i/60)*Math.PI*2;
-    const r1 = (i%5===0)?90:98;
-    const r2 = 110;
+ // graduations
+ctx.strokeStyle = "#aaa";
+for(let i=0;i<100;i++){
+  const ang = (i/100)*Math.PI*2;
+  let r1 = 96;
 
-    ctx.beginPath();
-    ctx.moveTo(
-      130 + Math.cos(ang)*r1,
-      130 + Math.sin(ang)*r1
-    );
-    ctx.lineTo(
-      130 + Math.cos(ang)*r2,
-      130 + Math.sin(ang)*r2
-    );
-    ctx.stroke();
-  }
+  if(i % 10 === 0) r1 = 86;   // grosses divisions (10 mil)
+  if(i % 50 === 0) r1 = 78;   // ultra grosses divisions (50 mil)
+
+  const r2 = 110;
+
+  ctx.beginPath();
+  ctx.moveTo(
+    130 + Math.cos(ang)*r1,
+    130 + Math.sin(ang)*r1
+  );
+  ctx.lineTo(
+    130 + Math.cos(ang)*r2,
+    130 + Math.sin(ang)*r2
+  );
+  ctx.stroke();
+}
+
 
   // aiguille
-  const angle = (value * 1.2) * Math.PI / 180;
+ const angle = (value / 100) * Math.PI * 2;
+
 
   ctx.save();
   ctx.translate(130,130);
