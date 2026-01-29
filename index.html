@@ -970,6 +970,9 @@ function updateTraining(){
   const reading = computeDialReading();
 
   drawDial(reading);
+  
+  drawTopViewTest();
+  drawSideViewTest();
 
   const txt = document.getElementById("dialValue");
   if(txt){
@@ -2697,17 +2700,6 @@ ctx.restore();
   ctx.fillText("MOTEUR (mobile)", cx, cy - motorH/2 - 14);
   ctx.fillText("POMPE (fixe)", pumpX + pumpW/2, baseCy - pumpH/2 - 14);
 
-// ===== VUES TEST (ZONE PÉDAGOGIQUE) =====
-
-function drawTopViewTest(){
-  if(!topCtxTest) return;
-  drawTopViewGeneric(topCtxTest);
-}
-
-function drawSideViewTest(){
-  if(!sideCtxTest) return;
-  drawSideViewGeneric(sideCtxTest);
-}
 
 
 
@@ -2781,6 +2773,20 @@ function drawSideViewTest(){
       return;
     }
   }
+}
+
+
+
+// ===== VUES TEST (ZONE PÉDAGOGIQUE) =====
+
+function drawTopViewTest(){
+  if(!topCtxTest) return;
+  drawTopViewGeneric(topCtxTest);
+}
+
+function drawSideViewTest(){
+  if(!sideCtxTest) return;
+  drawSideViewGeneric(sideCtxTest);
 }
 function renderAll(){
   refreshUI();
