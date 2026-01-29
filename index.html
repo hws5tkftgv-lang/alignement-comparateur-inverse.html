@@ -711,43 +711,95 @@ function printHelp(){
 
 function buildTrainingHTML(){
   return `
-<h3>Mode entraînement interactif</h3>
+
+<h3>🎓 Entraînement — Cadran interactif</h3>
 
 <div class="box">
-<b>But :</b><br>
-Comprendre le lien entre :
+<b>Objectif pédagogique :</b><br>
+Comprendre concrètement :
 <ul>
-<li>Position du cadran</li>
-<li>Compression / décompression</li>
-<li>Direction réelle du déplacement du moteur</li>
+<li>La compression / décompression du comparateur</li>
+<li>Le lien mécanique réel avec le déplacement moteur</li>
+<li>Le sens physique des corrections</li>
 </ul>
 </div>
 
 <div class="box">
-<b>Choix du montage :</b><br>
-• Cadran monté sur le <b>moteur</b><br>
-• Cadran monté sur la <b>pompe</b>
+<b>Configuration :</b>
+
+<div style="display:grid; gap:10px; margin-top:10px;">
+
+  <div>
+    <label>Type de défaut :</label>
+    <select id="trainType" style="width:100%; padding:8px; border-radius:8px;">
+      <option value="angV">Angularité verticale</option>
+      <option value="parV">Parallélisme vertical</option>
+      <option value="angH">Angularité horizontale</option>
+      <option value="parH">Parallélisme horizontal</option>
+    </select>
+  </div>
+
+  <div>
+    <label>Position du comparateur :</label>
+    <select id="trainMount" style="width:100%; padding:8px; border-radius:8px;">
+      <option value="motor">Cadran sur le moteur</option>
+      <option value="pump">Cadran sur la pompe</option>
+    </select>
+  </div>
+
+</div>
 </div>
 
 <div class="box">
-<b>Choix du type :</b><br>
-• Angularité verticale<br>
-• Parallélisme vertical<br>
-• Angularité horizontale<br>
-• Parallélisme horizontal
+
+<b>Déplacement du moteur :</b>
+
+<input id="trainSlider"
+       type="range"
+       min="-20"
+       max="20"
+       value="0"
+       step="0.1"
+       style="width:100%; margin-top:10px;">
+
+<div style="display:flex; justify-content:space-between; font-size:12px; opacity:.8;">
+  <span>⬅ Négatif</span>
+  <span>0</span>
+  <span>Positif ➡</span>
 </div>
 
-<div class="box">
-<b>Utilisation :</b><br>
-Un curseur déplacera le moteur et le cadran réagira dynamiquement.
 </div>
 
-<div style="margin-top:14px; text-align:center; font-weight:900; opacity:.85">
-🚧 Module interactif en construction
+<div class="box" style="text-align:center;">
+
+<b>Lecture du comparateur</b>
+
+<canvas id="dialCanvas"
+        width="260"
+        height="260"
+        style="background:#111; border-radius:50%; border:2px solid #444;">
+</canvas>
+
+<div id="dialValue"
+     style="margin-top:10px; font-size:18px; font-weight:900;">
+0.0 mil
 </div>
+
+</div>
+
+<div class="box" id="trainingExplain">
+
+<b>Interprétation :</b><br>
+Déplace le curseur pour observer :
+<ul>
+<li>le sens de rotation de l’aiguille</li>
+<li>le lien mécanique réel</li>
+</ul>
+
+</div>
+
 `;
 }
-
 function openTraining(){
   const modal = document.getElementById("trainingModal");
   const content = document.getElementById("trainingContent");
