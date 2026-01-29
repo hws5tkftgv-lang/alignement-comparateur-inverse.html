@@ -2753,62 +2753,7 @@ function trainingSetMode(v){
   trainingState.mode = v;
   updateDial();
 }
- <!-- =========================
-     MODAL 🎓 TRAINING
-========================= -->
-<div id="trainingModal" style="display:none;">
-  <div id="trainingBackdrop"></div>
-
-  <div id="trainingPanel">
-    <div class="helpHeader">
-      <div class="helpTitle">🎓 Mode Training — Compréhension du cadran</div>
-
-      <div class="helpActions">
-        <button id="btnTrainingClose" class="helpBtn secondary">Fermer ✕</button>
-      </div>
-    </div>
-
-    <div class="helpContent">
-
-      <div class="row">
-        <div>
-          <label>Montage du cadran</label>
-          <select id="trainMount">
-            <option value="motor">Monté sur le moteur</option>
-            <option value="pump">Monté sur la pompe</option>
-          </select>
-        </div>
-
-        <div>
-          <label>Type de mouvement</label>
-          <select id="trainMode">
-            <option value="vertical">Vertical</option>
-            <option value="horizontal">Horizontal</option>
-          </select>
-        </div>
-      </div>
-
-      <div style="margin-top:18px;">
-        <label>Déplacement réel du moteur (mils)</label>
-        <input id="trainSlider" type="range" min="-50" max="50" step="1" value="0">
-        <div style="display:flex; justify-content:space-between; font-size:13px;">
-          <span>-50</span>
-          <span>0</span>
-          <span>+50</span>
-        </div>
-      </div>
-
-      <div style="margin-top:16px; text-align:center;">
-        <canvas id="trainDial" width="260" height="260"></canvas>
-      </div>
-
-      <div class="noteBox" id="trainInfo" style="margin-top:14px; text-align:center;"></div>
-
-    </div>
-  </div>
-</div>
-
-
+ 
 // ===== 🎓 TRAINING BUTTON =====
 const btnTraining = document.getElementById("btnTraining");
 if(btnTraining){
