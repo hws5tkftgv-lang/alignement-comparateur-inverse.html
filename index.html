@@ -425,6 +425,15 @@ canvas{
   max-height:90vh;
   overflow:hidden;
 }
+
+
+#dialBlock{
+  margin-top:12px;
+  padding:14px;
+  background:#0b1436;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.15);
+}
 </style>
 </head>
 
@@ -741,9 +750,21 @@ Comprendre le lien entre :
 <div style="margin-top:18px;">
   <label>Déplacement réel du moteur (mils)</label>
   <input id="trainSlider" type="range" min="-50" max="50" step="1" value="0">
-  <div id="dialBlock">
-  <canvas id="trainCanvas" width="260" height="260"></canvas>
-  <div id="trainInfo"></div>
+ <div id="dialBlock" style="display:flex; flex-direction:column; align-items:center;">
+
+  <canvas id="trainDial" width="260" height="260"
+    style="background:#000;border-radius:50%;border:3px solid #666;">
+  </canvas>
+
+  <div id="dialValue"
+    style="margin-top:10px;font-weight:900;font-size:16px;text-align:center;">
+    0.00 mil
+  </div>
+
+  <div id="trainingExplain"
+    style="margin-top:8px;text-align:center;font-size:13px;">
+  </div>
+
 </div>
   <div style="display:flex; justify-content:space-between; font-size:12px;">
     <span>-50</span>
@@ -879,7 +900,7 @@ function drawDial(value){
   }
 
   // aiguille
-  const angle = (value * 0.15) * Math.PI / 180;
+  const angle = (value * 1.2) * Math.PI / 180;
 
   ctx.save();
   ctx.translate(130,130);
