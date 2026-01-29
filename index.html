@@ -711,93 +711,60 @@ function printHelp(){
 
 function buildTrainingHTML(){
   return `
-
-<h3>🎓 Entraînement — Cadran interactif</h3>
+<h3>Mode entraînement — Compréhension du cadran</h3>
 
 <div class="box">
-<b>Objectif pédagogique :</b><br>
-Comprendre concrètement :
+<b>But pédagogique :</b><br>
+Comprendre le lien entre :
 <ul>
-<li>La compression / décompression du comparateur</li>
-<li>Le lien mécanique réel avec le déplacement moteur</li>
-<li>Le sens physique des corrections</li>
+<li>Déplacement réel du moteur</li>
+<li>Position du comparateur</li>
+<li>Lecture au cadran (directe ou inversée)</li>
 </ul>
 </div>
 
 <div class="box">
-<b>Configuration :</b>
 
-<div style="display:grid; gap:10px; margin-top:10px;">
+<div class="row">
+  <div>
+    <label>Montage du cadran</label>
+    <select id="trainMount">
+      <option value="motor">Monté sur le moteur</option>
+      <option value="pump">Monté sur la pompe</option>
+    </select>
+  </div>
 
   <div>
-    <label>Type de défaut :</label>
-    <select id="trainType" style="width:100%; padding:8px; border-radius:8px;">
-      <option value="angV">Angularité verticale</option>
+    <label>Type de défaut</label>
+    <select id="trainType">
       <option value="parV">Parallélisme vertical</option>
-      <option value="angH">Angularité horizontale</option>
+      <option value="angV">Angularité verticale</option>
       <option value="parH">Parallélisme horizontal</option>
+      <option value="angH">Angularité horizontale</option>
     </select>
   </div>
+</div>
 
-  <div>
-    <label>Position du comparateur :</label>
-    <select id="trainMount" style="width:100%; padding:8px; border-radius:8px;">
-      <option value="motor">Cadran sur le moteur</option>
-      <option value="pump">Cadran sur la pompe</option>
-    </select>
+<div style="margin-top:18px;">
+  <label>Déplacement réel du moteur (mils)</label>
+  <input id="trainSlider" type="range" min="-50" max="50" step="1" value="0">
+  <div style="display:flex; justify-content:space-between; font-size:12px;">
+    <span>-50</span>
+    <span>0</span>
+    <span>+50</span>
   </div>
-
-</div>
-</div>
-
-<div class="box">
-
-<b>Déplacement du moteur :</b>
-
-<input id="trainSlider"
-       type="range"
-       min="-20"
-       max="20"
-       value="0"
-       step="0.1"
-       style="width:100%; margin-top:10px;">
-
-<div style="display:flex; justify-content:space-between; font-size:12px; opacity:.8;">
-  <span>⬅ Négatif</span>
-  <span>0</span>
-  <span>Positif ➡</span>
 </div>
 
 </div>
 
-<div class="box" style="text-align:center;">
-
-<b>Lecture du comparateur</b>
-
-<canvas id="dialCanvas"
-        width="260"
-        height="260"
-        style="background:#111; border-radius:50%; border:2px solid #444;">
-</canvas>
-
-<div id="dialValue"
-     style="margin-top:10px; font-size:18px; font-weight:900;">
-0.0 mil
+<div style="margin-top:18px; text-align:center;">
+  <canvas id="trainDial" width="280" height="280"
+    style="background:#fff;border-radius:50%;"></canvas>
 </div>
 
+<div id="trainInfo" class="noteBox" style="margin-top:14px;text-align:center;">
+—
 </div>
-
-<div class="box" id="trainingExplain">
-
-<b>Interprétation :</b><br>
-Déplace le curseur pour observer :
-<ul>
-<li>le sens de rotation de l’aiguille</li>
-<li>le lien mécanique réel</li>
-</ul>
-
-</div>
-
 `;
 }
 function openTraining(){
