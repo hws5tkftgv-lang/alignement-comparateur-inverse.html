@@ -2058,6 +2058,13 @@ const sideCanvas = document.getElementById("sideView");
 const topCtx = topCanvas.getContext("2d");
 const sideCtx = sideCanvas.getContext("2d");
 
+// ===== CONTEXTES ZONE TEST =====
+const topCanvasTest  = document.getElementById("topViewTest");
+const sideCanvasTest = document.getElementById("sideViewTest");
+
+const topCtxTest  = topCanvasTest?.getContext("2d");
+const sideCtxTest = sideCanvasTest?.getContext("2d");
+
 function resizeCanvas(canvas, ctx){
   const dpr = window.devicePixelRatio || 1;
 
@@ -2514,6 +2521,9 @@ ctx.fillText(labelFoot("C"), P.C.x, P.C.y + labelOffset + 6);
   ctx.fillText("POMPE (fixe)", pumpX + pumpW/2, baseCy - pumpH/2 - 18);
 }
 
+
+
+
 function drawSideView(){
 
   currentView = "side";
@@ -2686,6 +2696,20 @@ ctx.restore();
   ctx.textAlign="center";
   ctx.fillText("MOTEUR (mobile)", cx, cy - motorH/2 - 14);
   ctx.fillText("POMPE (fixe)", pumpX + pumpW/2, baseCy - pumpH/2 - 14);
+
+// ===== VUES TEST (ZONE PÉDAGOGIQUE) =====
+
+function drawTopViewTest(){
+  if(!topCtxTest) return;
+  drawTopViewGeneric(topCtxTest);
+}
+
+function drawSideViewTest(){
+  if(!sideCtxTest) return;
+  drawSideViewGeneric(sideCtxTest);
+}
+
+
 
   // ===============================
   //   MESURES GÉOMÉTRIQUES
