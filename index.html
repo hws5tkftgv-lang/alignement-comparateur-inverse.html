@@ -2548,144 +2548,29 @@ window.addEventListener("load", () => {
   const btnHelp = document.getElementById("btnHelp");
   const btnHelpClose = document.getElementById("btnHelpClose");
   const btnHelpPrint = document.getElementById("btnHelpPrint");
-  const backdrop = document.getElementById("helpBackdrop");
+  const helpBackdrop = document.getElementById("helpBackdrop");
 
   if(btnHelp) btnHelp.addEventListener("click", openHelp);
   if(btnHelpClose) btnHelpClose.addEventListener("click", closeHelp);
   if(btnHelpPrint) btnHelpPrint.addEventListener("click", printHelp);
-  if(backdrop) backdrop.addEventListener("click", closeHelp);
+  if(helpBackdrop) helpBackdrop.addEventListener("click", closeHelp);
 
   document.addEventListener("keydown", (e) => {
-    if(e.key === "Escape") closeHelp();
+    if(e.key === "Escape"){
+      closeHelp();
+      closeTraining();
+    }
   });
-  
-  // ============================
-// 🎓 TRAINING — LOGIQUE CADRAN
-// ============================
 
-const trainingModal = document.getElementById("trainingModal");
-const trainingBackdrop = document.getElementById("trainingBackdrop");
-const btnTrainingClose = document.getElementById("btnTrainingClose");
+  // ===== 🎓 TRAINING =====
+  const btnTraining = document.getElementById("btnTraining");
+  const btnTrainingClose = document.getElementById("btnTrainingClose");
+  const trainingBackdrop = document.getElementById("trainingBackdrop");
 
-const trainMount = document.getElementById("trainMount");
-const trainMode  = document.getElementById("trainMode");
-const trainSlider= document.getElementById("trainSlider");
-const trainInfo  = document.getElementById("trainInfo");
+  if(btnTraining) btnTraining.addEventListener("click", openTraining);
+  if(btnTrainingClose) btnTrainingClose.addEventListener("click", closeTraining);
+  if(trainingBackdrop) trainingBackdrop.addEventListener("click", closeTraining);
 
-const trainCanvas = document.getElementById("trainDial");
-const trainCtx    = trainCanvas.getContext("2d");
-
-// ouvrir modal
-btnTraining.addEventListener("click", () => {
-  trainingModal.style.display = "block";
-  drawTrainingDial();
-});
-
-// fermer modal
-btnTrainingClose.addEventListener("click", closeTraining);
-trainingBackdrop.addEventListener("click", closeTraining);
-
-function closeTraining(){
-  trainingModal.style.display = "none";
-}
-
-// mise à jour
-[trainMount, trainMode, trainSlider].forEach(el=>{
-  el.addEventListener("input", drawTrainingDial);
-});
-
-// logique mécanique réelle
-function computeDialReading(){
-  const motorMove = parseFloat(trainSlider.value);
-
-  if(trainMount.value === "motor"){
-    return -motorMove;
-  }else{
-    return motorMove;
-  }
-}
-
-// dessin cadran
-function drawTrainingDial(){
-
-  const ctx = trainCtx;
-  const w = trainCanvas.width;
-  const h = trainCanvas.height;
-
-  ctx.clearRect(0,0,w,h);
-
-  const cx = w/2;
-  const cy = h/2;
-  const r  = 100;
-
-  // fond
-  ctx.fillStyle = "#fff";
-  ctx.beginPath();
-  ctx.arc(cx,cy,r,0,Math.PI*2);
-  ctx.fill();
-
-  // cercle
-  ctx.strokeStyle="#000";
-  ctx.lineWidth=3;
-  ctx.beginPath();
-  ctx.arc(cx,cy,r,0,Math.PI*2);
-  ctx.stroke();
-
-  // graduations 0–100
-  for(let i=0;i<=100;i+=10){
-    const ang = (i/100)*2*Math.PI - Math.PI/2;
-    const x1 = cx + Math.cos(ang)*(r-10);
-    const y1 = cy + Math.sin(ang)*(r-10);
-    const x2 = cx + Math.cos(ang)*r;
-    const y2 = cy + Math.sin(ang)*r;
-
-    ctx.strokeStyle="#000";
-    ctx.lineWidth=2;
-    ctx.beginPath();
-    ctx.moveTo(x1,y1);
-    ctx.lineTo(x2,y2);
-    ctx.stroke();
-
-    ctx.fillStyle="#000";
-    ctx.font="12px Arial";
-    ctx.textAlign="center";
-    ctx.textBaseline="middle";
-    ctx.fillText(i, cx + Math.cos(ang)*(r-25), cy + Math.sin(ang)*(r-25));
-  }
-
-  // lecture réelle
-  const dial = computeDialReading();
-  const ang = (dial/100)*2*Math.PI - Math.PI/2;
-
-  // aiguille
-  ctx.strokeStyle="red";
-  ctx.lineWidth=3;
-  ctx.beginPath();
-  ctx.moveTo(cx,cy);
-  ctx.lineTo(cx + Math.cos(ang)*(r-20), cy + Math.sin(ang)*(r-20));
-  ctx.stroke();
-
-  // centre
-  ctx.fillStyle="#000";
-  ctx.beginPath();
-  ctx.arc(cx,cy,5,0,Math.PI*2);
-  ctx.fill();
-
-  trainInfo.innerHTML =
-`Déplacement moteur : ${trainSlider.value} mil
-Lecture cadran : ${dial.toFixed(1)} mil
-
-${trainMount.value === "motor"
-? "📍 Cadran sur le MOTEUR → lecture INVERSE"
-: "📍 Cadran sur la POMPE → lecture DIRECTE"}`;
-}
-
- 
-// ===== 🎓 TRAINING BUTTON =====
-const btnTraining = document.getElementById("btnTraining");
-if(btnTraining){
-  btnTraining.addEventListener("click", openTraining);
-}
   renderAll();
 });
 
