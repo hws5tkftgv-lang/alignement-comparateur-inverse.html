@@ -817,7 +817,132 @@ function closeTraining(){
   modal.style.display = "none";
   document.body.classList.remove("modal-open");
 }
+/* =====================================================
+   TRAINING — MOTEUR DU CADRAN
+===================================================== */
 
+let trainValue = 0;
+let trainType  = "angV";
+let trainMount = "motor";
+
+const DIAL = {
+  center: 130,
+  radius: 110,
+  needle: 90
+};
+
+function drawDial(value){
+
+  const canvas = document.getElementById("dialCanvas");
+  if(!canvas) return;
+
+  const ctx = canvas.getContext("2d");
+  const w = canvas.width;
+  const h = canvas.height;
+
+  ctx.clearRect(0,0,w,h);
+
+  // fond
+  ctx.fillStyle = "#000";
+  ctx.beginPath();
+  ctx.arc(130,130,120,0,Math.PI*2);
+  ctx.fill();
+
+  // cercles
+  ctx.strokeStyle = "#888";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(130,130,110,0,Math.PI*2);
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.arc(130,130,6,0,Math.PI*2);
+  ctx.fillStyle="#fff";
+  ctx.fill();
+
+  // graduations
+  ctx.strokeStyle = "#aaa";
+  for(let i=0;i<60;i++){
+    const ang = (i/60)*Math.PI*2;
+    const r1 = (i%5===0)?90:98;
+    const r2 = 110;
+
+    ctx.beginPath();
+    ctx.moveTo(
+      130 + Math.cos(ang)*r1,
+      130 + Math.sin(ang)*r1
+    );
+    ctx.lineTo(
+      130 + Math.cos(ang)*r2,
+      130 + Math.sin(ang)*r2
+    );
+    ctx.stroke();
+  }
+
+  // aiguille
+  const angle = (value * 0.15) * Math.PI / 180;
+
+  ctx.save();
+  ctx.translate(130,130);
+  ctx.rotate(angle);
+
+  ctx.strokeStyle = "#ff5252";
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(0,0);
+  ctx.lineTo(0,-DIAL.needle);
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+function computeDialReading(){
+
+  let val = trainValue;
+
+  if(trainMount === "pump"){
+    val = -val;
+  }
+
+  if(trainType === "parV" || trainType === "parH"){
+    val = val / 2;
+  }
+
+  return val;
+}
+
+function updateTraining(){
+
+  const reading = computeDialReading();
+
+  drawDial(reading);
+
+  const txt = document.getElementById("dialValue");
+  if(txt){
+    txt.textContent = `${reading.toFixed(2)} mil`;
+  }
+
+  const explain = document.getElementById("trainingExplain");
+  if(explain){
+
+    let msg = "<b>Interprétation mécanique :</b><br>";
+
+    msg += `Déplacement moteur : <b>${trainValue.toFixed(2)} mil</b><br>`;
+    msg += `Lecture cadran : <b>${reading.toFixed(2)} mil</b><br><br>`;
+
+    if(trainType.startsWith("par")){
+      msg += "📏 Parallélisme → le comparateur lit la moitié du déplacement réel.";
+    }else{
+      msg += "📐 Angularité → la lecture dépend du bras de levier.";
+    }
+
+    if(trainMount === "pump"){
+      msg += "<br>🔁 Cadran monté sur la pompe → lecture inversée.";
+    }
+
+    explain.innerHTML = msg;
+  }
+}
 
 /* =====================================================
    MAPPING PATTES (lettres ↔ coins)
@@ -2623,6 +2748,34 @@ window.addEventListener("load", () => {
   if(btnTraining) btnTraining.addEventListener("click", openTraining);
   if(btnTrainingClose) btnTrainingClose.addEventListener("click", closeTraining);
   if(trainingBackdrop) trainingBackdrop.addEventListener("click", closeTraining);
+
+
+  // ===== 🎓 TRAINING INTERACTIF =====
+  const trainSlider = document.getElementById("trainSlider");
+  const trainTypeSel = document.getElementById("trainType");
+  const trainMountSel = document.getElementById("trainMount");
+
+  if(trainSlider){
+    trainSlider.addEventListener("input", () => {
+      trainValue = parseFloat(trainSlider.value);
+      updateTraining();
+    });
+  }
+
+  if(trainTypeSel){
+    trainTypeSel.addEventListener("change", () => {
+      trainType = trainTypeSel.value;
+      updateTraining();
+    });
+  }
+
+  if(trainMountSel){
+    trainMountSel.addEventListener("change", () => {
+      trainMount = trainMountSel.value;
+      updateTraining();
+    });
+  }
+
 
   renderAll();
 });
