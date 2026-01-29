@@ -401,6 +401,11 @@ canvas{
       style="flex:0; padding:6px 10px; border-radius:10px; border:none; background:rgba(255,255,255,.15); color:#fff; font-weight:900; cursor:pointer;">
       ℹ️
     </button>
+    <button id="btnTraining"
+  type="button"
+  style="flex:0; padding:6px 12px; border-radius:10px; border:none; background:#4caf50; color:#fff; font-weight:900; cursor:pointer;">
+  🎓 Training
+</button>
   </div>
 </div>
 
@@ -2417,6 +2422,13 @@ window.addEventListener("load", () => {
   document.addEventListener("keydown", (e) => {
     if(e.key === "Escape") closeHelp();
   });
+  // ===== 🎓 TRAINING BUTTON =====
+const btnTraining = document.getElementById("btnTraining");
+if(btnTraining){
+  btnTraining.addEventListener("click", () => {
+    window.location.href = "training.html";
+  });
+}
   renderAll();
 });
 </script>
