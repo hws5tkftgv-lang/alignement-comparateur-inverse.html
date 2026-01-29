@@ -772,8 +772,43 @@ function openTraining(){
   content.innerHTML = buildTrainingHTML();
   modal.style.display = "block";
   document.body.classList.add("modal-open");
-}
 
+  // ===============================
+  // INIT TRAINING (ÉTAPE 3)
+  // ===============================
+
+  const slider = document.getElementById("trainSlider");
+  const mount  = document.getElementById("trainMount");
+  const type   = document.getElementById("trainType");
+
+  if(slider){
+    slider.addEventListener("input", () => {
+      trainValue = parseFloat(slider.value);
+      updateTraining();
+    });
+  }
+
+  if(type){
+    type.addEventListener("change", () => {
+      trainType = type.value;
+      updateTraining();
+    });
+  }
+
+  if(mount){
+    mount.addEventListener("change", () => {
+      trainMount = mount.value;
+      updateTraining();
+    });
+  }
+
+  // premier affichage
+  trainValue = parseFloat(slider?.value || 0);
+  trainType  = type?.value || "angV";
+  trainMount = mount?.value || "motor";
+
+  updateTraining();
+}
 function closeTraining(){
   const modal = document.getElementById("trainingModal");
   if(!modal) return;
