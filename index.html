@@ -304,7 +304,31 @@ canvas{
   border-radius:4px;
   font-size:13px;
 }
-  
+  #trainingModal{
+  position:fixed;
+  inset:0;
+  z-index:9998;
+}
+
+#trainingBackdrop{
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,.65);
+}
+
+#trainingPanel{
+  position:relative;
+  width:min(920px, calc(100% - 24px));
+  max-height:calc(100% - 24px);
+  margin:12px auto;
+  background:#0b1436;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:14px;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  box-shadow:0 10px 40px rgba(0,0,0,.35);
+}
   
 /* ==========================
    MODE IMPRESSION — PRO
@@ -489,6 +513,28 @@ Les pattes A / B / C / D seront affichées ici.
      MODAL AIDE / FORMULES
 ========================= -->
 <div id="helpModal" class="print-scope" style="display:none;">
+  <!-- =========================
+     MODAL TRAINING
+========================= -->
+<div id="trainingModal" style="display:none;">
+  <div id="trainingBackdrop"></div>
+
+  <div id="trainingPanel">
+    <div class="helpHeader">
+      <div class="helpTitle">🎓 Mode entraînement — Comparateur</div>
+
+      <div class="helpActions">
+        <button id="btnTrainingClose" type="button" class="helpBtn secondary">
+          Fermer ✕
+        </button>
+      </div>
+    </div>
+
+    <div id="trainingContent" class="helpContent">
+      <!-- injecté par JS -->
+    </div>
+  </div>
+</div>
   <div id="helpBackdrop"></div>
 
   <div id="helpPanel" role="dialog" aria-modal="true" aria-label="Aide et formules">
@@ -634,6 +680,69 @@ function printHelp(){
   }
   window.print();
 }
+
+/* =====================================================
+   TRAINING — MODE ENTRAÎNEMENT
+===================================================== */
+
+function buildTrainingHTML(){
+  return `
+<h3>Mode entraînement interactif</h3>
+
+<div class="box">
+<b>But :</b><br>
+Comprendre le lien entre :
+<ul>
+<li>Position du cadran</li>
+<li>Compression / décompression</li>
+<li>Direction réelle du déplacement du moteur</li>
+</ul>
+</div>
+
+<div class="box">
+<b>Choix du montage :</b><br>
+• Cadran monté sur le <b>moteur</b><br>
+• Cadran monté sur la <b>pompe</b>
+</div>
+
+<div class="box">
+<b>Choix du type :</b><br>
+• Angularité verticale<br>
+• Parallélisme vertical<br>
+• Angularité horizontale<br>
+• Parallélisme horizontal
+</div>
+
+<div class="box">
+<b>Utilisation :</b><br>
+Un curseur déplacera le moteur et le cadran réagira dynamiquement.
+</div>
+
+<div style="margin-top:14px; text-align:center; font-weight:900; opacity:.85">
+🚧 Module interactif en construction
+</div>
+`;
+}
+
+function openTraining(){
+  const modal = document.getElementById("trainingModal");
+  const content = document.getElementById("trainingContent");
+  if(!modal || !content) return;
+
+  content.innerHTML = buildTrainingHTML();
+  modal.style.display = "block";
+  document.body.classList.add("modal-open");
+}
+
+function closeTraining(){
+  const modal = document.getElementById("trainingModal");
+  if(!modal) return;
+
+  modal.style.display = "none";
+  document.body.classList.remove("modal-open");
+}
+
+
 /* =====================================================
    MAPPING PATTES (lettres ↔ coins)
    Coins = TL (haut-gauche), TR (haut-droite),
@@ -649,6 +758,10 @@ const FOOT_SCHEMES = {
 
 // mode actif
 let footSchemeKey = "standard";
+
+
+
+
 
 
 // retourne l'étiquette (texte) à afficher pour un coin
@@ -2425,9 +2538,7 @@ window.addEventListener("load", () => {
   // ===== 🎓 TRAINING BUTTON =====
 const btnTraining = document.getElementById("btnTraining");
 if(btnTraining){
-  btnTraining.addEventListener("click", () => {
-    window.location.href = "training.html";
-  });
+  btnTraining.addEventListener("click", openTraining);
 }
   renderAll();
 });
