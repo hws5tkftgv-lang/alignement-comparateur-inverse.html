@@ -803,10 +803,7 @@ Comprendre le lien entre :
 
 </div>
 
-<div style="margin-top:18px; text-align:center;">
-  <canvas id="trainDial" width="280" height="280"
-    style="background:#fff;border-radius:50%;"></canvas>
-</div>
+
 
 <div id="trainInfo" class="noteBox" style="margin-top:14px;text-align:center;">
 —
@@ -2790,6 +2787,16 @@ function drawSideViewTest(){
   if(!sideCtxTest) return;
   drawSideViewGeneric(sideCtxTest);
 }
+
+// ===== WRAPPERS PRINCIPAUX =====
+function drawTopView(){
+  drawTopViewGeneric(topCtx);
+}
+
+function drawSideView(){
+  drawSideViewGeneric(sideCtx);
+}
+
 function renderAll(){
   refreshUI();
   drawTopView();
