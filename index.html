@@ -789,7 +789,9 @@ Comprendre le lien entre :
 </div>
 `;
 }
+
 function openTraining(){
+  trainingMode = true;
   const modal = document.getElementById("trainingModal");
   const content = document.getElementById("trainingContent");
   if(!modal || !content) return;
@@ -825,11 +827,13 @@ if(tc && sc){
   const type   = document.getElementById("trainType");
 
   if(slider){
-    slider.addEventListener("input", () => {
-      trainValue = parseFloat(slider.value);
-      updateTraining();
-    });
-  }
+  slider.addEventListener("input", () => {
+    trainValue = parseFloat(slider.value);
+    trainingOffset = trainValue;   // ← LIAISON GÉOMÉTRIQUE
+    updateTraining();
+    renderAll();                   // ← force redraw des vues
+  });
+}
 
   if(type){
     type.addEventListener("change", () => {
@@ -853,6 +857,7 @@ if(tc && sc){
   updateTraining();
 }
 function closeTraining(){
+  trainingMode = false;
   const modal = document.getElementById("trainingModal");
   if(!modal) return;
 
@@ -866,6 +871,8 @@ function closeTraining(){
 let trainValue = 0;
 let trainType  = "angV";
 let trainMount = "motor";
+let trainingOffset = 0;
+let trainingMode = false;
 
 const DIAL = {
   center: 130,
@@ -2771,25 +2778,23 @@ ctx.restore();
 
 // ===== VUES TEST (ZONE PÉDAGOGIQUE) =====
 
-function drawTopViewTest(){
-  if(!topCtxTest) return;
-  drawTopViewGeneric(topCtxTest);
-}
-
-function drawSideViewTest(){
-  if(!sideCtxTest) return;
-  drawSideViewGeneric(sideCtxTest);
-}
 
 // ===== WRAPPERS PRINCIPAUX =====
 function drawTopView(){
-  drawTopViewGeneric(topCtx);
+  if(trainingMode && window.topCtxTest){
+    drawTopViewGeneric(window.topCtxTest);
+  }else{
+    drawTopViewGeneric(topCtx);
+  }
 }
 
 function drawSideView(){
-  drawSideViewGeneric(sideCtx);
+  if(trainingMode && window.sideCtxTest){
+    drawSideViewGeneric(window.sideCtxTest);
+  }else{
+    drawSideViewGeneric(sideCtx);
+  }
 }
-
 function renderAll(){
   refreshUI();
   drawTopView();
