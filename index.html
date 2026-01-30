@@ -471,14 +471,18 @@ body.modal-open{
 
 #dialWrap{
   width:100%;
-  max-width:200px;
-  aspect-ratio:1/1;
+  max-width:220px;
+  aspect-ratio:1 / 1;
   margin:6px auto 4px auto;
+  display:flex;
+  justify-content:center;
+  align-items:center;
 }
 
 #trainDial{
   width:100%;
   height:100%;
+  display:block;
   background:#000;
   border-radius:50%;
   border:3px solid #666;
@@ -806,19 +810,12 @@ Comprendre le lien entre :
 
   <div id="dialBlock" style="display:flex; flex-direction:column; align-items:center; margin-top:10px;">
 
-  <div id="dialWrap">
+<div id="dialWrap">
   <canvas id="trainDial"></canvas>
 </div>
 
-    <div id="dialValue"
-      style="margin-top:10px;font-weight:900;font-size:16px;text-align:center;">
-      0.00 mil
-    </div>
-
-    <div id="trainingExplain"
-      style="margin-top:8px;text-align:center;font-size:13px;">
-    </div>
-
+<div id="dialValue">0.00 mil</div>
+<div id="trainingExplain"></div>
   </div>
 
   <div style="display:flex; justify-content:space-between; font-size:12px;">
@@ -960,74 +957,72 @@ const DIAL = {
 function drawDial(value){
 
   const canvas = document.getElementById("trainDial");
-  if(!canvas) return;
-
   const ctx = canvas.getContext("2d");
-  const w = canvas.width;
-  const h = canvas.height;
+
+  const wrap = document.getElementById("dialWrap");
+  const size = Math.min(wrap.clientWidth, 220);
+
+  const dpr = window.devicePixelRatio || 1;
+
+  canvas.width  = size * dpr;
+  canvas.height = size * dpr;
+
+  canvas.style.width  = size + "px";
+  canvas.style.height = size + "px";
+
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+
+  const w = size;
+  const h = size;
+  const cx = w/2;
+  const cy = h/2;
+  const r  = w*0.45;
 
   ctx.clearRect(0,0,w,h);
 
-  // fond
+  // === Fond ===
   ctx.fillStyle = "#000";
   ctx.beginPath();
-  ctx.arc(130,130,120,0,Math.PI*2);
+  ctx.arc(cx,cy,r,0,Math.PI*2);
   ctx.fill();
 
-  // cercles
-  ctx.strokeStyle = "#888";
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.arc(130,130,110,0,Math.PI*2);
+  // === Cercle extérieur ===
+  ctx.strokeStyle="#888";
+  ctx.lineWidth=3;
   ctx.stroke();
 
+  // === Graduations ===
+  for(let i=0;i<100;i++){
+    const a = (-140 + i*2.8) * Math.PI/180;
+    const len = i%5===0 ? 14 : 7;
+    const r1 = r-len;
+    const r2 = r-2;
+
+    ctx.strokeStyle="#ddd";
+    ctx.lineWidth=i%5===0?2:1;
+
+    ctx.beginPath();
+    ctx.moveTo(cx + r1*Math.cos(a), cy + r1*Math.sin(a));
+    ctx.lineTo(cx + r2*Math.cos(a), cy + r2*Math.sin(a));
+    ctx.stroke();
+  }
+
+  // === Aiguille ===
+  const ang = (-140 + (value+100)*1.4) * Math.PI/180;
+
+  ctx.strokeStyle="red";
+  ctx.lineWidth=3;
   ctx.beginPath();
-  ctx.arc(130,130,6,0,Math.PI*2);
+  ctx.moveTo(cx,cy);
+  ctx.lineTo(cx + r*0.8*Math.cos(ang), cy + r*0.8*Math.sin(ang));
+  ctx.stroke();
+
+  // === Moyeu ===
   ctx.fillStyle="#fff";
+  ctx.beginPath();
+  ctx.arc(cx,cy,5,0,Math.PI*2);
   ctx.fill();
-
- // graduations
-ctx.strokeStyle = "#aaa";
-for(let i=0;i<=100;i++){
-  const ang = (i/100)*Math.PI*2;
-  let r1 = 96;
-
-  if(i % 10 === 0) r1 = 86;   // grosses divisions (10 mil)
-  if(i % 50 === 0) r1 = 78;   // ultra grosses divisions (50 mil)
-
-  const r2 = 110;
-
-  ctx.beginPath();
-  ctx.moveTo(
-    130 + Math.cos(ang)*r1,
-    130 + Math.sin(ang)*r1
-  );
-  ctx.lineTo(
-    130 + Math.cos(ang)*r2,
-    130 + Math.sin(ang)*r2
-  );
-  ctx.stroke();
 }
-
-
-  // aiguille
- const angle = (value / 100) * Math.PI * 2;
-
-
-  ctx.save();
-  ctx.translate(130,130);
-  ctx.rotate(angle);
-
-  ctx.strokeStyle = "#ff5252";
-  ctx.lineWidth = 4;
-  ctx.beginPath();
-  ctx.moveTo(0,0);
-  ctx.lineTo(0,-DIAL.needle);
-  ctx.stroke();
-
-  ctx.restore();
-}
-
 function computeDialReading(){
 
   let val = trainValue;
