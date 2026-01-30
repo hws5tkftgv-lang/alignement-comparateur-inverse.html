@@ -802,9 +802,6 @@ const sc = document.getElementById("sideViewTest");
 
 console.log("topViewTest:", tc);
 console.log("sideViewTest:", sc);
-  // ===== INIT CANVAS SANDBOX =====
-const tc = document.getElementById("topViewTest");
-const sc = document.getElementById("sideViewTest");
 
 if(tc && sc){
   window.topCanvasTest  = tc;
@@ -2059,11 +2056,7 @@ const topCtx = topCanvas.getContext("2d");
 const sideCtx = sideCanvas.getContext("2d");
 
 // ===== CONTEXTES ZONE TEST =====
-const topCanvasTest  = document.getElementById("topViewTest");
-const sideCanvasTest = document.getElementById("sideViewTest");
 
-const topCtxTest  = topCanvasTest?.getContext("2d");
-const sideCtxTest = sideCanvasTest?.getContext("2d");
 
 function resizeCanvas(canvas, ctx){
   const dpr = window.devicePixelRatio || 1;
