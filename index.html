@@ -2315,7 +2315,7 @@ const {w,h} = resizeCanvas(canvas, ctxTarget);
 const ctx = ctxTarget;
   clear(ctx,w,h);
 
-  const scale   = visualGain;
+  const scale = trainingMode ? visualGain * 0.35 : visualGain;
   const rotGain = visualGain * 0.00035;
   // ====================================================
 //   MODE TRAINING — SURCHARGE DES VALEURS MÉCANIQUES
@@ -2577,7 +2577,7 @@ const {w,h} = resizeCanvas(canvas, ctxTarget);
 const ctx = ctxTarget;
   clear(ctx,w,h);
 
-  const scale   = visualGain;
+  const scale = trainingMode ? visualGain * 0.35 : visualGain;
   const rotGain = visualGain * 0.00035;
   // ====================================================
 //   MODE TRAINING — SURCHARGE DES VALEURS MÉCANIQUES
