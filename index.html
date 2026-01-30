@@ -815,6 +815,15 @@ Comprendre le lien entre :
 </div>
 
 <div id="dialValue">0.00 mil</div>
+
+<!-- 🔘 BOUTON ZÉRO CADRAN -->
+  <button id="zeroDialBtn"
+    style="padding:6px 14px; font-size:13px; border-radius:10px;
+           border:none; background:#ff9800; color:#000; font-weight:900;">
+    Zéro cadran
+  </button>
+
+
 <div id="trainingExplain"></div>
   </div>
 
@@ -893,6 +902,23 @@ requestAnimationFrame(() => {
   const slider = document.getElementById("trainSlider");
   const mount  = document.getElementById("trainMount");
   const type   = document.getElementById("trainType");
+  
+  
+  const zeroBtn = document.getElementById("zeroDialBtn");
+
+if(zeroBtn){
+  zeroBtn.addEventListener("click", () => {
+
+    // Lecture actuelle du cadran (avant zéro)
+    const currentReading = computeDialReading();
+
+    // Décalage du zéro
+    dialZeroOffset += currentReading;
+
+    // Redessiner immédiatement
+    updateTraining();
+  });
+}
 
   if(slider){
   slider.addEventListener("input", () => {
@@ -923,6 +949,8 @@ requestAnimationFrame(() => {
 trainType  = type?.value || "angV";
 trainMount = mount?.value || "motor";
 
+dialZeroOffset = 0;   // 🔑 RESET ZÉRO AU DÉPART
+
 if(slider) slider.value = 0;
 
 updateTraining();
@@ -944,6 +972,7 @@ let trainType  = "angV";
 let trainMount = "motor";
 let trainingOffset = 0;
 let trainingMode = false;
+let dialZeroOffset = 0;
 
 const DIAL = {
   center: 130,
@@ -1088,7 +1117,7 @@ function computeDialReading(){
     reading = -reading;
   }
 
-  return reading;
+  return reading - dialZeroOffset;
 }
 
 
