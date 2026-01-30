@@ -2346,7 +2346,7 @@ if(trainingMode){
 //   MOTEUR MOBILE — PARALLÉLISME HORIZONTAL (DÉPLACEMENT EN X)
 // ====================================================
 const maxShift = 60;
-const shift = Math.max(-maxShift, Math.min(maxShift, state.parH * scale));
+const shift = Math.max(-maxShift, Math.min(maxShift, parH * scale));
 
 const motorCx = baseCx;
 
@@ -2387,9 +2387,9 @@ if(STEPS[state.step].id === "parH"){
   //   PARAMÈTRE ANGULAIRE (ANGULARITÉ HORIZONTALE)
   // ====================================================
   const ang =
-    STEPS[state.step].id === "angH"
-      ? state.angH * dialSign * rotGain
-      : 0;
+  STEPS[state.step].id === "angH"
+    ? angH * dialSign * rotGain
+    : 0;
 
   // ====================================================
   //   COORDONNÉES DES PATTES (EN POSITION MOTEUR)
@@ -2597,10 +2597,10 @@ if(trainingMode){
   let baseCx = w * 0.30;
 
   let cy = baseCy + (
-    STEPS[state.step].id === "parV"
-      ? state.parV * scale
-      : 0
-  );
+  STEPS[state.step].id === "parV"
+    ? parV * scale
+    : 0
+);
 
   let cx = baseCx;
 
@@ -2633,10 +2633,9 @@ if(trainingMode){
   //   PARAMÈTRE ANGULAIRE
   // ====================================================
   const ang =
-    STEPS[state.step].id === "angV"
-      ? -state.angV * dialSign * rotGain
-      : 0;
-
+  STEPS[state.step].id === "angV"
+    ? -angV * dialSign * rotGain
+    : 0;
   // ====================================================
   //   POMPE FIXE + ARBRE + ½ ACCOUPLEMENT
   // ====================================================
