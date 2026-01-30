@@ -1057,7 +1057,7 @@ nv = Math.max(-100, Math.min(100, nv));
 
   // aiguille — 1 tour complet à ±100
   const ang = (-Math.PI/2 - Math.PI/2) + (nv/100) * (Math.PI*2);
-  ctx.rotate(ang);
+  ctx.rotate(-Math.PI / 2 + ang);
 
   ctx.strokeStyle="#ff3b30";
   ctx.lineWidth=4;
