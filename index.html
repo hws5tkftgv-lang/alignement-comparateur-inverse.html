@@ -954,74 +954,118 @@ const DIAL = {
   needle: 90
 };
 
-function drawDial(value){
+function drawDial(needleVal, displayVal){
 
   const canvas = document.getElementById("trainDial");
+  if(!canvas) return;
+
   const ctx = canvas.getContext("2d");
 
-  const wrap = document.getElementById("dialWrap");
-  const size = Math.min(wrap.clientWidth, 220);
-
+  // Canvas responsive + net (retina)
+/*  (Si tu gardes width/height HTML = 260, ça marche pareil,
+    mais ici ça s’adapte si tu changes le CSS plus tard.) */
   const dpr = window.devicePixelRatio || 1;
-
-  canvas.width  = size * dpr;
-  canvas.height = size * dpr;
-
-  canvas.style.width  = size + "px";
-  canvas.style.height = size + "px";
-
+  const rect = canvas.getBoundingClientRect();
+  const size = Math.max(200, Math.min(360, rect.width || 260)); // clamp visuel
+  canvas.width  = Math.round(size * dpr);
+  canvas.height = Math.round(size * dpr);
   ctx.setTransform(dpr,0,0,dpr,0,0);
 
-  const w = size;
-  const h = size;
-  const cx = w/2;
-  const cy = h/2;
-  const r  = w*0.45;
+  const w = size, h = size;
+  const cx = w/2, cy = h/2;
 
+  const R  = w * 0.44;  // rayon ticks
+  const R1 = w * 0.41;  // rayon intérieur
+  const R2 = w * 0.47;  // rayon extérieur
+
+  // clamp aiguille (1 tour complet à ±100)
+  const nv = Math.max(-100, Math.min(100, needleVal || 0));
+
+  // fond
   ctx.clearRect(0,0,w,h);
+  ctx.fillStyle = "#0b1436";
+  ctx.fillRect(0,0,w,h);
 
-  // === Fond ===
-  ctx.fillStyle = "#000";
+  // disque noir
   ctx.beginPath();
-  ctx.arc(cx,cy,r,0,Math.PI*2);
+  ctx.arc(cx,cy, w*0.46, 0, Math.PI*2);
+  ctx.fillStyle = "#000";
   ctx.fill();
 
-  // === Cercle extérieur ===
-  ctx.strokeStyle="#888";
-  ctx.lineWidth=3;
+  // anneaux
+  ctx.lineWidth = 6;
+  ctx.strokeStyle = "rgba(255,255,255,.20)";
+  ctx.beginPath();
+  ctx.arc(cx,cy, w*0.46, 0, Math.PI*2);
   ctx.stroke();
 
-  // === Graduations ===
-  for(let i=0;i<100;i++){
-    const a = (-140 + i*2.8) * Math.PI/180;
-    const len = i%5===0 ? 14 : 7;
-    const r1 = r-len;
-    const r2 = r-2;
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = "rgba(255,255,255,.35)";
+  ctx.beginPath();
+  ctx.arc(cx,cy, w*0.40, 0, Math.PI*2);
+  ctx.stroke();
 
-    ctx.strokeStyle="#ddd";
-    ctx.lineWidth=i%5===0?2:1;
+  // graduations 0..100 tout le tour
+  // 0 en haut (12h), CW = positif
+  ctx.save();
+  ctx.translate(cx,cy);
 
+  for(let i=0; i<=100; i++){
+    const a = (-Math.PI/2) + (i/100) * (Math.PI*2);
+
+    let len = 10;                 // petites
+    let lw  = 2;
+
+    if(i % 5 === 0){ len = 16; lw = 2.5; }     // moyennes
+    if(i % 10 === 0){ len = 24; lw = 3.5; }    // grosses
+    if(i % 50 === 0){ len = 30; lw = 4.5; }    // ultra (0 et 50)
+
+    const x1 = Math.cos(a) * (R2 - len);
+    const y1 = Math.sin(a) * (R2 - len);
+    const x2 = Math.cos(a) * (R2);
+    const y2 = Math.sin(a) * (R2);
+
+    ctx.strokeStyle = "rgba(255,255,255,.75)";
+    ctx.lineWidth = lw;
     ctx.beginPath();
-    ctx.moveTo(cx + r1*Math.cos(a), cy + r1*Math.sin(a));
-    ctx.lineTo(cx + r2*Math.cos(a), cy + r2*Math.sin(a));
+    ctx.moveTo(x1,y1);
+    ctx.lineTo(x2,y2);
     ctx.stroke();
+
+    // chiffres aux 10
+    if(i % 10 === 0){
+      const tx = Math.cos(a) * (R1 - 10);
+      const ty = Math.sin(a) * (R1 - 10);
+      ctx.fillStyle = "rgba(255,255,255,.85)";
+      ctx.font = "bold 12px Arial";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(String(i === 100 ? 0 : i), tx, ty); // 100 = 0 en haut (évite doublon)
+    }
   }
 
-  // === Aiguille ===
-  const ang = (-Math.PI/2) + (value / 100) * (2 * Math.PI);
+  // aiguille — 1 tour complet à ±100
+  const ang = (-Math.PI/2) + (nv/100) * (Math.PI*2);
 
-  ctx.strokeStyle="red";
-  ctx.lineWidth=3;
+  // aiguille
+  ctx.rotate(ang);
+  ctx.strokeStyle = "#ff3b30";
+  ctx.lineWidth = 4;
   ctx.beginPath();
-  ctx.moveTo(cx,cy);
-  ctx.lineTo(cx + r*0.8*Math.cos(ang), cy + r*0.8*Math.sin(ang));
+  ctx.moveTo(0, 10);
+  ctx.lineTo(0, -R * 0.92);
   ctx.stroke();
 
-  // === Moyeu ===
-  ctx.fillStyle="#fff";
+  // hub
+  ctx.rotate(-ang);
+  ctx.fillStyle = "#fff";
   ctx.beginPath();
-  ctx.arc(cx,cy,5,0,Math.PI*2);
+  ctx.arc(0,0, 7, 0, Math.PI*2);
   ctx.fill();
+
+  ctx.restore();
+
+  // (displayVal est juste pour ton texte dessous; on ne l’écrit pas ici)
 }
 function computeDialReading(){
 
@@ -1058,7 +1102,8 @@ function updateTraining(){
   if(trainType === "angH") state.angH = trainValue;
 }
 
-    drawDial(reading);
+    const needleVal = (trainType === "parV" || trainType === "parH") ? (reading * 2) : reading;
+drawDial(needleVal, reading);
 
   // Un seul redraw : renderAll() sait déjà dessiner sur les canvas de training
   renderAll();
