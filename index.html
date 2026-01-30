@@ -922,14 +922,13 @@ document.body.classList.add("modal-open");
     });
   }
 
-  // premier affichage
-  // premier affichage
-trainValue = parseFloat(slider?.value || 0);
+  trainValue = 0;
 trainType  = type?.value || "angV";
 trainMount = mount?.value || "motor";
 
-setTimeout(() => updateTraining(), 0);
-}
+if(slider) slider.value = 0;
+
+updateTraining();
 function closeTraining(){
   trainingMode = false;
   const modal = document.getElementById("trainingModal");
