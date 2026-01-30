@@ -1056,8 +1056,11 @@ nv = Math.max(-100, Math.min(100, nv));
   }
 
   // aiguille — 1 tour complet à ±100
-  const ang = (-Math.PI/2 - Math.PI/2) + (nv/100) * (Math.PI*2);
-  ctx.rotate(-Math.PI / 2 + ang);
+  // ===== AIGUILLE – RÉFÉRENCE MÉCANIQUE =====
+const ang = (nv / 100) * (Math.PI * 2); // ±100 = 1 tour complet
+
+ctx.rotate(-Math.PI / 2); // 0 mécanique à 12h
+ctx.rotate(ang);
 
   ctx.strokeStyle="#ff3b30";
   ctx.lineWidth=4;
