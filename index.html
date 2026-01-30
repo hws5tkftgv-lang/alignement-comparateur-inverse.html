@@ -827,10 +827,17 @@ document.body.classList.add("modal-open");
 
   if(slider){
   slider.addEventListener("input", () => {
+
     trainValue = parseFloat(slider.value);
-    
-    setTimeout(() => updateTraining(), 0);
-    renderAll();                   // ← force redraw des vues
+
+    // Injection directe dans le modèle mécanique réel
+    if(trainType === "parV") offsetV = trainValue;
+    if(trainType === "parH") offsetH = trainValue;
+    if(trainType === "angV") angV = trainValue;
+    if(trainType === "angH") angH = trainValue;
+
+    updateTraining();
+    renderAll();
   });
 }
 
