@@ -1077,25 +1077,23 @@ function computeDialReading(){
 
 function updateTraining(){
 
-  const reading = computeDialReading();
-
   // ===== INJECTION DU TRAINING DANS LA GÉOMÉTRIE =====
-  if(trainingMode){
+if(trainingMode){
 
-  // reset
   state.parV = 0;
   state.parH = 0;
   state.angV = 0;
   state.angH = 0;
 
-  // injection pédagogique DIRECTE
   if(trainType === "parV") state.parV = trainValue;
   if(trainType === "parH") state.parH = trainValue;
   if(trainType === "angV") state.angV = trainValue;
   if(trainType === "angH") state.angH = trainValue;
 }
 
-    drawDial(trainValue, reading);
+const reading = computeDialReading();
+
+    drawDial(reading, reading);
   // Un seul redraw : renderAll() sait déjà dessiner sur les canvas de training
   renderAll();
   
