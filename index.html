@@ -829,7 +829,7 @@ document.body.classList.add("modal-open");
   slider.addEventListener("input", () => {
     trainValue = parseFloat(slider.value);
     
-    updateTraining();
+    setTimeout(() => updateTraining(), 0);
     renderAll();                   // ← force redraw des vues
   });
 }
@@ -849,11 +849,12 @@ document.body.classList.add("modal-open");
   }
 
   // premier affichage
-  trainValue = parseFloat(slider?.value || 0);
-  trainType  = type?.value || "angV";
-  trainMount = mount?.value || "motor";
+  // premier affichage
+trainValue = parseFloat(slider?.value || 0);
+trainType  = type?.value || "angV";
+trainMount = mount?.value || "motor";
 
-  updateTraining();
+setTimeout(() => updateTraining(), 0);
 }
 function closeTraining(){
   trainingMode = false;
