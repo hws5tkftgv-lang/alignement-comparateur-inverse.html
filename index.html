@@ -1089,8 +1089,10 @@ if(trainingMode){
 
 const reading = computeDialReading();
 
-    drawDial(reading, reading);
-  // Un seul redraw : renderAll() sait déjà dessiner sur les canvas de training
+    // Position réelle du comparateur → aiguille
+const dialNeedle = (reading / 100) * 100;
+
+drawDial(dialNeedle, reading);
   renderAll();
   
   const txt = document.getElementById("dialValue");
