@@ -445,6 +445,30 @@ body.modal-open{
   position: fixed;
   width: 100%;
 }
+
+#dialWrap{
+  width:100%;
+  max-width:260px;
+  aspect-ratio:1/1;
+  margin:auto;
+}
+
+#trainDial{
+  width:100%;
+  height:100%;
+  background:#000;
+  border-radius:50%;
+  border:3px solid #666;
+}
+
+@media (max-width: 600px){
+  #dialWrap{ max-width:200px; }
+}
+
+@media (min-width: 1200px){
+  #dialWrap{ max-width:220px; }
+}
+
 </style>
 </head>
 
@@ -748,9 +772,9 @@ Comprendre le lien entre :
 
   <div id="dialBlock" style="display:flex; flex-direction:column; align-items:center; margin-top:10px;">
 
-    <canvas id="trainDial" width="260" height="260"
-      style="background:#000;border-radius:50%;border:3px solid #666;">
-    </canvas>
+  <div id="dialWrap">
+  <canvas id="trainDial"></canvas>
+</div>
 
     <div id="dialValue"
       style="margin-top:10px;font-weight:900;font-size:16px;text-align:center;">
