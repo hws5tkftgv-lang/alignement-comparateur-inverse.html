@@ -795,6 +795,20 @@ function openTraining(){
   if(!modal || !content) return;
 
   content.innerHTML = buildTrainingHTML();
+  // ===== INIT CANVAS SANDBOX =====
+const tc = document.getElementById("topViewTest");
+const sc = document.getElementById("sideViewTest");
+
+if(tc && sc){
+  window.topCanvasTest  = tc;
+  window.sideCanvasTest = sc;
+
+  window.topCtxTest  = tc.getContext("2d");
+  window.sideCtxTest = sc.getContext("2d");
+
+  drawTopViewTest();
+  drawSideViewTest();
+}
   modal.style.display = "block";
   document.body.classList.add("modal-open");
 
