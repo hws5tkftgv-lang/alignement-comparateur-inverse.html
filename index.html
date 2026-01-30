@@ -899,17 +899,7 @@ requestAnimationFrame(() => {
 
     trainValue = parseFloat(slider.value);
 
-    // RESET total
-    state.parV = 0;
-    state.parH = 0;
-    state.angV = 0;
-    state.angH = 0;
-
-    // Injection directe dans la mécanique réelle
-    if(trainType === "parV") state.parV = trainValue;
-    if(trainType === "parH") state.parH = trainValue;
-    if(trainType === "angV") state.angV = trainValue;
-    if(trainType === "angH") state.angH = trainValue;
+    
 
     updateTraining();
     
@@ -1123,7 +1113,7 @@ const reading = computeDialReading();
     // Position réelle du comparateur → aiguille
 
 
-drawDial(dialNeedle, reading);
+drawDial(reading, reading);
   renderAll();
   
   const txt = document.getElementById("dialValue");
