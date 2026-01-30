@@ -828,7 +828,7 @@ renderAll();   // ← C'EST TOUT
   if(slider){
   slider.addEventListener("input", () => {
     trainValue = parseFloat(slider.value);
-    trainingOffset = trainValue;   // ← LIAISON GÉOMÉTRIQUE
+    
     updateTraining();
     renderAll();                   // ← force redraw des vues
   });
