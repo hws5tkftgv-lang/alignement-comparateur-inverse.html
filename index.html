@@ -1096,7 +1096,7 @@ function updateTraining(){
   if(trainType === "angH") state.angH = trainValue;
 }
 
-    drawDial(reading, reading);
+    drawDial(trainValue, reading);
   // Un seul redraw : renderAll() sait déjà dessiner sur les canvas de training
   renderAll();
   
