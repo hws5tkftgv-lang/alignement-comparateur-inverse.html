@@ -1055,39 +1055,34 @@ nv = Math.max(-100, Math.min(100, nv));
     }
   }
 
-  // aiguille — 1 tour complet à ±100
-  // ===== AIGUILLE – RÉFÉRENCE MÉCANIQUE =====
-const ang = (nv / 100) * (Math.PI * 2); // ±100 = 1 tour complet
+  // ================= AIGUILLE =================
+ctx.save();
 
-ctx.rotate(-Math.PI / 2); // 0 mécanique à 12h
+// 🔑 centre du cadran
+ctx.translate(cx, cy);
+
+// 0 mécanique à 12h
+ctx.rotate(-Math.PI / 2);
+
+// 1 tour complet à ±100
+const ang = (nv / 100) * (Math.PI * 2);
 ctx.rotate(ang);
 
-  ctx.strokeStyle="#ff3b30";
-  ctx.lineWidth=4;
-  ctx.beginPath();
-  ctx.moveTo(0,12);
-  ctx.lineTo(0,-R_needle);
-  ctx.stroke();
+// dessin aiguille
+ctx.strokeStyle = "#ff3b30";
+ctx.lineWidth = 4;
+ctx.beginPath();
+ctx.moveTo(0, 12);
+ctx.lineTo(0, -R * 0.92);
+ctx.stroke();
 
-  ctx.rotate(-ang);
+// hub
+ctx.fillStyle = "#fff";
+ctx.beginPath();
+ctx.arc(0, 0, 7, 0, Math.PI * 2);
+ctx.fill();
 
-  ctx.fillStyle="#fff";
-  ctx.beginPath();
-  ctx.arc(0,0,7,0,Math.PI*2);
-  ctx.fill();
-
-  ctx.restore();
-}
-function computeDialReading(){
-
-  let val = trainValue;
-
-  if(trainMount === "pump"){
-    val = -val;
-  }
-
-  return val;
-}
+ctx.restore();
 function updateTraining(){
 
   // ===== INJECTION DU TRAINING DANS LA GÉOMÉTRIE =====
