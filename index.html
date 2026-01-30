@@ -969,11 +969,27 @@ function updateTraining(){
 
   const reading = computeDialReading();
 
+  // ===== INJECTION DU TRAINING DANS LA GÉOMÉTRIE =====
+  if(trainingMode){
+
+    motorOffsetX = 0;
+    motorOffsetY = 0;
+    motorAngleV  = 0;
+    motorAngleH  = 0;
+
+    const v = trainValue * 0.01;
+
+    if(trainType === "parV") motorOffsetY = v;
+    if(trainType === "parH") motorOffsetX = v;
+    if(trainType === "angV") motorAngleV  = v;
+    if(trainType === "angH") motorAngleH  = v;
+  }
+
   drawDial(reading);
-  
+
   drawTopViewTest();
   drawSideViewTest();
-
+  
   const txt = document.getElementById("dialValue");
   if(txt){
     txt.textContent = `${reading.toFixed(2)} mil`;
