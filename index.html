@@ -843,7 +843,7 @@ document.body.classList.add("modal-open");
     if(trainType === "angH") state.angH = trainValue;
 
     updateTraining();
-    renderAll();
+    
   });
 }
   if(type){
@@ -998,14 +998,10 @@ function updateTraining(){
   if(trainType === "angH") state.angH = trainValue;
 }
 
-  drawDial(reading);
+    drawDial(reading);
 
-// redraw global
-renderAll();
-
-// redraw sandbox
-drawTopViewTest();
-drawSideViewTest();
+  // Un seul redraw : renderAll() sait déjà dessiner sur les canvas de training
+  renderAll();
   
   const txt = document.getElementById("dialValue");
   if(txt){
