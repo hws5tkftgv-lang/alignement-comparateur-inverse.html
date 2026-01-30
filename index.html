@@ -877,6 +877,13 @@ if(tc && sc){
 
 modal.style.display = "block";
 document.body.classList.add("modal-open");
+// ✅ iPhone/Safari: forcer le layout du modal avant de dessiner le cadran
+requestAnimationFrame(() => {
+  requestAnimationFrame(() => {
+    drawDial(0, 0);      // reset visuel immédiat
+    updateTraining();    // redraw avec la vraie taille
+  });
+});
 
 
   // ===============================
@@ -977,7 +984,7 @@ function drawDial(needleVal, displayVal){
   const R_text  = w * 0.36;
   const R_needle= w * 0.40;
 
-  const nv = Math.max(-100, Math.min(100, needleVal || 0));
+  const nv = Math.max(-100, Math.min(100, Number(needleVal) || 0));
 
   ctx.clearRect(0,0,w,h);
 
