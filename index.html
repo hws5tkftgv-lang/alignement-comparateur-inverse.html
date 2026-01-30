@@ -1010,40 +1010,41 @@ function drawDial(needleVal, displayVal){
   ctx.save();
   ctx.translate(cx,cy);
 
-  for(let i=0; i<=100; i++){
-    const a = (-Math.PI/2) + (i/100) * (Math.PI*2);
+  for(let i=0; i<100; i++){
 
-    let len = 10;                 // petites
-    let lw  = 2;
+  const a = (-Math.PI/2) + (i/100) * (Math.PI*2);
 
-    if(i % 5 === 0){ len = 16; lw = 2.5; }     // moyennes
-    if(i % 10 === 0){ len = 24; lw = 3.5; }    // grosses
-    if(i % 50 === 0){ len = 30; lw = 4.5; }    // ultra (0 et 50)
+  let len = 8;      // fines
+  let lw  = 1.4;
 
-    const x1 = Math.cos(a) * (R2 - len);
-    const y1 = Math.sin(a) * (R2 - len);
-    const x2 = Math.cos(a) * (R2);
-    const y2 = Math.sin(a) * (R2);
+  if(i % 5  === 0){ len = 14; lw = 2.2; }  // moyennes
+  if(i % 10 === 0){ len = 22; lw = 3.2; }  // grosses
+  if(i % 50 === 0){ len = 28; lw = 4.5; }  // ultra (0 et 50)
 
-    ctx.strokeStyle = "rgba(255,255,255,.75)";
-    ctx.lineWidth = lw;
-    ctx.beginPath();
-    ctx.moveTo(x1,y1);
-    ctx.lineTo(x2,y2);
-    ctx.stroke();
+  const x1 = Math.cos(a) * (R2 - len);
+  const y1 = Math.sin(a) * (R2 - len);
+  const x2 = Math.cos(a) * R2;
+  const y2 = Math.sin(a) * R2;
 
-    // chiffres aux 10
-    if(i % 10 === 0){
-      const tx = Math.cos(a) * (R1 - 10);
-      const ty = Math.sin(a) * (R1 - 10);
-      ctx.fillStyle = "rgba(255,255,255,.85)";
-      ctx.font = "bold 12px Arial";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText(String(i === 100 ? 0 : i), tx, ty); // 100 = 0 en haut (évite doublon)
-    }
+  ctx.strokeStyle = "rgba(255,255,255,.85)";
+  ctx.lineWidth = lw;
+
+  ctx.beginPath();
+  ctx.moveTo(x1,y1);
+  ctx.lineTo(x2,y2);
+  ctx.stroke();
+
+  // chiffres seulement aux 10
+  if(i % 10 === 0){
+    const tx = Math.cos(a) * (R1 - 14);
+    const ty = Math.sin(a) * (R1 - 14);
+    ctx.fillStyle = "rgba(255,255,255,.9)";
+    ctx.font = "bold 12px Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(i === 0 ? "0" : i, tx, ty);
   }
-
+}
   // aiguille — 1 tour complet à ±100
   const ang = (-Math.PI/2) + (nv/100) * (Math.PI*2);
 
