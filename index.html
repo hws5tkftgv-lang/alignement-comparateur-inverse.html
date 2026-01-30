@@ -2321,6 +2321,20 @@ const ctx = ctxTarget;
 
   const scale   = visualGain;
   const rotGain = visualGain * 0.00035;
+  // ====================================================
+//   MODE TRAINING — SURCHARGE DES VALEURS MÉCANIQUES
+// ====================================================
+let parH = state.parH;
+let angH = state.angH;
+let parV = state.parV;
+let angV = state.angV;
+
+if(trainingMode){
+  if(trainType === "parH") parH = trainValue;
+  if(trainType === "angH") angH = trainValue;
+  if(trainType === "parV") parV = trainValue;
+  if(trainType === "angV") angV = trainValue;
+}
 
   // ====================================================
   //   RÉFÉRENCES FIXES (POMPE + SOCLE)
@@ -2568,6 +2582,16 @@ const ctx = ctxTarget;
 
   const scale   = visualGain;
   const rotGain = visualGain * 0.00035;
+  // ====================================================
+//   MODE TRAINING — SURCHARGE DES VALEURS MÉCANIQUES
+// ====================================================
+let parV = state.parV;
+let angV = state.angV;
+
+if(trainingMode){
+  if(trainType === "parV") parV = trainValue;
+  if(trainType === "angV") angV = trainValue;
+}
 
   let baseCy = h * 0.55;
   let baseCx = w * 0.30;
