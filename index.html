@@ -1008,7 +1008,7 @@ function drawDial(value){
   }
 
   // === Aiguille ===
-  const ang = (-140 + (value+100)*1.4) * Math.PI/180;
+  const ang = (-Math.PI/2) + (value / 100) * (2 * Math.PI);
 
   ctx.strokeStyle="red";
   ctx.lineWidth=3;
