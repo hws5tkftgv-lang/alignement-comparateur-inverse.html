@@ -2861,32 +2861,7 @@ window.addEventListener("load", () => {
   if(trainingBackdrop) trainingBackdrop.addEventListener("click", closeTraining);
 
 
-  // ===== 🎓 TRAINING INTERACTIF =====
-  const trainSlider = document.getElementById("trainSlider");
-  const trainTypeSel = document.getElementById("trainType");
-  const trainMountSel = document.getElementById("trainMount");
-
-  if(trainSlider){
-    trainSlider.addEventListener("input", () => {
-      trainValue = parseFloat(trainSlider.value);
-      updateTraining();
-    });
-  }
-
-  if(trainTypeSel){
-    trainTypeSel.addEventListener("change", () => {
-      trainType = trainTypeSel.value;
-      updateTraining();
-    });
-  }
-
-  if(trainMountSel){
-    trainMountSel.addEventListener("change", () => {
-      trainMount = trainMountSel.value;
-      updateTraining();
-    });
-  }
-
+  
 
   renderAll();
 });
