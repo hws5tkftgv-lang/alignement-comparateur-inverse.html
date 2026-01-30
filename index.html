@@ -830,17 +830,22 @@ document.body.classList.add("modal-open");
 
     trainValue = parseFloat(slider.value);
 
-    // Injection directe dans le modèle mécanique réel
-    if(trainType === "parV") offsetV = trainValue;
-    if(trainType === "parH") offsetH = trainValue;
-    if(trainType === "angV") angV = trainValue;
-    if(trainType === "angH") angH = trainValue;
+    // RESET total
+    state.parV = 0;
+    state.parH = 0;
+    state.angV = 0;
+    state.angH = 0;
+
+    // Injection directe dans la mécanique réelle
+    if(trainType === "parV") state.parV = trainValue;
+    if(trainType === "parH") state.parH = trainValue;
+    if(trainType === "angV") state.angV = trainValue;
+    if(trainType === "angH") state.angH = trainValue;
 
     updateTraining();
     renderAll();
   });
 }
-
   if(type){
     type.addEventListener("change", () => {
       trainType = type.value;
