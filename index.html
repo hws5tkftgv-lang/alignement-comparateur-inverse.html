@@ -984,7 +984,14 @@ function drawDial(needleVal, displayVal){
   const R_text  = w * 0.36;
   const R_needle= w * 0.40;
 
-  const nv = Math.max(-100, Math.min(100, Number(needleVal) || 0));
+  let nv = Number(needleVal);
+
+if (isNaN(nv)) nv = 0;
+
+// snap parfait au zéro (évite les résidus flottants Safari)
+if (Math.abs(nv) < 0.001) nv = 0;
+
+nv = Math.max(-100, Math.min(100, nv));
 
   ctx.clearRect(0,0,w,h);
 
