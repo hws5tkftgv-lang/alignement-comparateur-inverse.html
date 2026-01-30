@@ -2347,7 +2347,8 @@ const shift = Math.max(-maxShift, Math.min(maxShift, parH * scale));
 const motorCx = baseCx;
 
 const motorCy = baseCy + (
-  STEPS[state.step].id === "parH"
+  (trainingMode && trainType === "parH") ||
+  (!trainingMode && STEPS[state.step].id === "parH")
     ? shift
     : 0
 );
@@ -2383,10 +2384,10 @@ if(STEPS[state.step].id === "parH"){
   //   PARAMÈTRE ANGULAIRE (ANGULARITÉ HORIZONTALE)
   // ====================================================
   const ang =
-  STEPS[state.step].id === "angH"
+  (trainingMode && trainType === "angH") ||
+  (!trainingMode && STEPS[state.step].id === "angH")
     ? angH * dialSign * rotGain
     : 0;
-
   // ====================================================
   //   COORDONNÉES DES PATTES (EN POSITION MOTEUR)
   //   IMPORTANT: utiliser motorCx / motorCy (pas baseCy)
@@ -2593,11 +2594,11 @@ if(trainingMode){
   let baseCx = w * 0.30;
 
   let cy = baseCy + (
-  STEPS[state.step].id === "parV"
+  (trainingMode && trainType === "parV") ||
+  (!trainingMode && STEPS[state.step].id === "parV")
     ? parV * scale
     : 0
 );
-
   let cx = baseCx;
 
   const axisPumpY  = baseCy;   // axe pompe = FIXE
@@ -2629,7 +2630,8 @@ if(trainingMode){
   //   PARAMÈTRE ANGULAIRE
   // ====================================================
   const ang =
-  STEPS[state.step].id === "angV"
+  (trainingMode && trainType === "angV") ||
+  (!trainingMode && STEPS[state.step].id === "angV")
     ? -angV * dialSign * rotGain
     : 0;
   // ====================================================
