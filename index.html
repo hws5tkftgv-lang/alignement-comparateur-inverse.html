@@ -972,18 +972,18 @@ function updateTraining(){
   // ===== INJECTION DU TRAINING DANS LA GÉOMÉTRIE =====
   if(trainingMode){
 
-    motorOffsetX = 0;
-    motorOffsetY = 0;
-    motorAngleV  = 0;
-    motorAngleH  = 0;
+  // reset
+  state.parV = 0;
+  state.parH = 0;
+  state.angV = 0;
+  state.angH = 0;
 
-    const v = trainValue * 0.01;
-
-    if(trainType === "parV") motorOffsetY = v;
-    if(trainType === "parH") motorOffsetX = v;
-    if(trainType === "angV") motorAngleV  = v;
-    if(trainType === "angH") motorAngleH  = v;
-  }
+  // injection pédagogique DIRECTE
+  if(trainType === "parV") state.parV = trainValue;
+  if(trainType === "parH") state.parH = trainValue;
+  if(trainType === "angV") state.angV = trainValue;
+  if(trainType === "angH") state.angH = trainValue;
+}
 
   drawDial(reading);
 
