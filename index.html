@@ -987,8 +987,12 @@ function updateTraining(){
 
   drawDial(reading);
 
-  drawTopViewTest();
-  drawSideViewTest();
+// redraw global
+renderAll();
+
+// redraw sandbox
+drawTopViewTest();
+drawSideViewTest();
   
   const txt = document.getElementById("dialValue");
   if(txt){
