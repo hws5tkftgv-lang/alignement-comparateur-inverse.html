@@ -1058,17 +1058,11 @@ nv = Math.max(-100, Math.min(100, nv));
   // ================= AIGUILLE =================
 ctx.save();
 
-// 🔑 centre du cadran
-
-
-// 0 mécanique à 12h
-ctx.rotate(-Math.PI / 2);
-
 // 1 tour complet à ±100
 const ang = (nv / 100) * (Math.PI * 2);
 ctx.rotate(ang);
 
-// dessin aiguille
+// dessin aiguille (0 = 12h car on dessine vers le haut)
 ctx.strokeStyle = "#ff3b30";
 ctx.lineWidth = 4;
 ctx.beginPath();
@@ -1084,6 +1078,30 @@ ctx.fill();
 
 ctx.restore();
 } 
+
+function computeDialReading(){
+
+  let reading = 0;
+
+  // Parallélisme = lecture = 2 × déplacement réel
+  if(trainType === "parV" || trainType === "parH"){
+    reading = trainValue * 2;
+  }
+
+  // Angularité = lecture directe (simplification pédagogique)
+  if(trainType === "angV" || trainType === "angH"){
+    reading = trainValue;
+  }
+
+  // Inversion si cadran monté sur la pompe
+  if(trainMount === "pump"){
+    reading = -reading;
+  }
+
+  return reading;
+}
+
+
 function updateTraining(){
 
   // ===== INJECTION DU TRAINING DANS LA GÉOMÉTRIE =====
@@ -1103,7 +1121,7 @@ if(trainingMode){
 const reading = computeDialReading();
 
     // Position réelle du comparateur → aiguille
-const dialNeedle = (reading / 100) * 100;
+
 
 drawDial(dialNeedle, reading);
   renderAll();
