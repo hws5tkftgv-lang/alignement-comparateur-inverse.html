@@ -650,6 +650,16 @@ body.modal-open{
 #trainingModal #trainingPanel h2:first-of-type{
   display: none !important;
 }
+
+/* =====================================================
+   TRAINING — SUPPRESSION DU TITRE INTRO (DÉFINITIF)
+===================================================== */
+
+/* Supprime le tout premier bloc texte du contenu training */
+#trainingModal #trainingPanel > *:not(.headerBar):first-child{
+  display: none !important;
+}
+
 </style>
 </head>
 
