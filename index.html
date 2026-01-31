@@ -428,11 +428,11 @@ canvas{
 
 
 #dialBlock{
-  margin-top:12px;
-  padding:14px;
-  background:#0b1436;
-  border-radius:14px;
-  border:1px solid rgba(255,255,255,.15);
+  width:100%;
+  max-width:320px;
+  margin:6px auto;
+  padding:10px;
+  box-sizing:border-box;
 }
 #dialBlock,
 #dialBlock *{
@@ -448,9 +448,12 @@ body.modal-open{
 
 #dialWrap{
   width:100%;
-  max-width:260px;
-  aspect-ratio:1/1;
-  margin:auto;
+  max-width:220px;
+  aspect-ratio:1 / 1;
+  margin:4px auto;
+  display:flex;
+  justify-content:center;
+  align-items:center;
 }
 
 #trainDial{
@@ -461,23 +464,6 @@ body.modal-open{
   border:3px solid #666;
 }
 
-@media (max-width: 600px){
-  #dialWrap{ max-width:200px; }
-}
-
-@media (min-width: 1200px){
-  #dialWrap{ max-width:220px; }
-}
-
-#dialWrap{
-  width:100%;
-  max-width:220px;
-  aspect-ratio:1 / 1;
-  margin:6px auto 4px auto;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-}
 
 #trainDial{
   width:100%;
@@ -522,11 +508,7 @@ body.modal-open{
 
   /* ================= DIAL ================= */
 
-  #dialWrap{
-    width: 200px;
-    height: 200px;
-    margin: 6px auto;
-  }
+  
 
   #trainDial{
     width: 100% !important;
