@@ -633,6 +633,24 @@ body.modal-open{
   }
 }
 
+/* =====================================================
+   TRAINING — COMPRESSION FINALE −15 % (MOBILE SEULEMENT)
+   SANS IMPACT SUR LA PAGE PRINCIPALE
+===================================================== */
+@media (max-width: 768px){
+
+  /* Réduction globale VISUELLE du contenu training */
+  #trainingModal #trainingPanel{
+    transform: scale(0.85);
+    transform-origin: top center;
+  }
+
+  /* Compensation pour éviter l’espace blanc en bas */
+  #trainingModal{
+    overflow: hidden;
+  }
+}
+
 </style>
 </head>
 
