@@ -505,7 +505,76 @@ body.modal-open{
   margin-top:6px !important;
 }
 
+/* =====================================================
+   MODE TRAINING — COMPACT MOBILE (SANS SCROLL)
+   ===================================================== */
+@media (max-width: 768px){
 
+  /* Le panneau training doit tout contenir */
+  #trainingPanel{
+    max-height: 100vh;
+    overflow: hidden;
+  }
+
+  #trainingContent{
+    padding: 10px 10px 14px;
+  }
+
+  /* ================= DIAL ================= */
+
+  #dialWrap{
+    width: 200px;
+    height: 200px;
+    margin: 6px auto;
+  }
+
+  #trainDial{
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  #dialValue{
+    font-size: 14px;
+    margin-top: 4px;
+  }
+
+  #zeroDialBtn{
+    margin-top: 6px;
+    padding: 6px 14px;
+    font-size: 13px;
+  }
+
+  #trainingExplain{
+    font-size: 12px;
+    line-height: 1.2;
+    margin-top: 6px;
+  }
+
+  /* ================= DESSINS ================= */
+
+  .canvasGrid{
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .canvasCard{
+    height: 140px;
+    padding: 6px;
+  }
+
+  #topViewTest,
+  #sideViewTest{
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  /* ================= SLIDER ================= */
+
+  input[type="range"]{
+    margin: 6px 0;
+  }
+}
 
 </style>
 </head>
