@@ -692,8 +692,45 @@ body.training-on .canvasCard canvas{
     transform-origin: top center;
     margin-top: -40px;
   }
+  
 
 }
+
+@media (max-width: 768px){
+
+  /* ============================
+     DESSINS – RÉDUCTION RÉELLE
+  ============================ */
+
+  #trainingModal .canvasCard{
+    height: 160px;          /* AVANT ≈ 220–240px */
+    padding: 6px;
+  }
+
+  #trainingModal canvas{
+    height: 100% !important;
+  }
+
+}
+@media (max-width: 768px){
+
+  /* ============================
+     SLIDER – RÉDUCTION ESPACE
+  ============================ */
+
+  #trainingModal input[type="range"]{
+    margin-top: 6px;
+    margin-bottom: 6px;
+  }
+
+  #trainingModal .rangeLabels,
+  #trainingModal .sliderLabels{
+    font-size: 11px;
+    margin-top: 2px;
+  }
+
+}
+
 </style>
 </head>
 
