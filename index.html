@@ -730,7 +730,29 @@ body.training-on .canvasCard canvas{
   }
 
 }
+/* ==================================================
+   COMPRESSION RÉELLE – MODE TRAINING MOBILE
+================================================== */
+@media (max-width: 768px){
 
+  /* 1️⃣ Réduction de la zone pédagogique complète */
+  #trainingModal .canvasGrid{
+    gap: 6px !important;
+  }
+
+  /* 2️⃣ Réduction de CHAQUE carte de dessin */
+  #trainingModal .canvasCard{
+    height: 140px !important;
+    padding: 4px !important;
+  }
+
+  /* 3️⃣ Le canvas occupe exactement la carte */
+  #trainingModal canvas{
+    height: 100% !important;
+    max-height: 100% !important;
+  }
+
+}
 </style>
 </head>
 
