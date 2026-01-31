@@ -909,17 +909,27 @@ requestAnimationFrame(() => {
 if(zeroBtn){
   zeroBtn.addEventListener("click", () => {
 
-    // Lecture actuelle du cadran (avant zéro)
-    const currentReading = computeDialReading();
+    // ===== RESET TOTAL =====
 
-    // Décalage du zéro
-    dialZeroOffset += currentReading;
+    // 1) Slider
+    trainValue = 0;
+    if(slider){
+      slider.value = 0;
+    }
 
-    // Redessiner immédiatement
+    // 2) Zéro cadran (aiguille)
+    dialZeroOffset = 0;
+
+    // 3) RESET mécanique (dessins)
+    state.parV = 0;
+    state.parH = 0;
+    state.angV = 0;
+    state.angH = 0;
+
+    // 4) Redessin complet
     updateTraining();
   });
 }
-
   if(slider){
   slider.addEventListener("input", () => {
 
