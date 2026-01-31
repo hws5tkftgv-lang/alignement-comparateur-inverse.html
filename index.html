@@ -570,6 +570,58 @@ body.training-on .canvasCard canvas{
     height:130px;
   }
 }
+
+/* =========================================
+   TRAINING — COMPACT iPHONE (CRITIQUE)
+========================================= */
+@media (max-width: 600px){
+
+  /* Modal training : utiliser TOUT l’écran */
+  body.training-on #trainingPanel{
+    margin: 0;
+    width: 100%;
+    max-height: 100vh;
+    border-radius: 0;
+  }
+
+  /* Contenu interne : enlever l'effet "page blanche" */
+  body.training-on #trainingContent{
+    padding: 10px 10px 6px 10px;
+    max-width: 100%;
+  }
+
+  /* Bloc cadran : resserrer */
+  body.training-on #dialBlock{
+    margin-top: 6px;
+    padding: 10px;
+  }
+
+  /* Cadran plus petit */
+  body.training-on #dialWrap{
+    max-width: 180px;
+  }
+
+  /* Slider + texte */
+  body.training-on #trainingExplain{
+    font-size: 11px;
+    max-height: 48px;
+  }
+
+  /* Bloc visualisation pédagogique */
+  body.training-on .card{
+    margin-top: 8px;
+  }
+
+  body.training-on .canvasHeader{
+    font-size: 11px;
+    padding: 4px 6px;
+  }
+
+  body.training-on .canvasCard canvas{
+    height: 110px;
+  }
+}
+
 </style>
 </head>
 
