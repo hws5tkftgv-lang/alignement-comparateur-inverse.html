@@ -621,7 +621,55 @@ body.training-on .canvasCard canvas{
     height: 110px;
   }
 }
+/* =====================================================
+   TRAINING — MOBILE COMPACT (CTRL - VISUEL)
+===================================================== */
+@media (max-width: 600px){
 
+  /* === 1. SUPPRESSION DU SUPERFLU === */
+  body.training-on.mobile-compact h3,
+  body.training-on.mobile-compact .box:first-of-type{
+    display: none !important;
+  }
+
+  /* === 2. GARDER SEULEMENT LES 2 SELECT === */
+  body.training-on.mobile-compact .row{
+    margin-top: 6px;
+  }
+
+  /* === 3. COMPRESSION GLOBALE (≈ -25 %) === */
+  body.training-on.mobile-compact #dialBlock{
+    transform: scale(0.75);
+    transform-origin: top center;
+    margin-top: -20px;
+  }
+
+  /* === 4. SLIDER PLUS COMPACT === */
+  body.training-on.mobile-compact input[type="range"]{
+    margin-top: 6px;
+    margin-bottom: 6px;
+  }
+
+  /* === 5. VISUALISATION PÉDAGOGIQUE PLUS PETITE === */
+  body.training-on.mobile-compact .canvasCard canvas{
+    height: 140px;
+  }
+
+  body.training-on.mobile-compact .canvasHeader{
+    font-size: 11px;
+    padding: 4px 8px;
+  }
+
+  /* === 6. RÉDUIRE LES TEXTES DU CADRAN === */
+  body.training-on.mobile-compact #dialValue{
+    font-size: 12px;
+  }
+
+  body.training-on.mobile-compact #trainingExplain{
+    font-size: 11px;
+    max-height: 44px;
+  }
+}
 </style>
 </head>
 
@@ -1002,6 +1050,7 @@ if(tc && sc){
 modal.style.display = "block";
 document.body.classList.add("modal-open");
 document.body.classList.add("training-on");
+document.body.classList.add("training-on", "mobile-compact");
 // ✅ iPhone/Safari: forcer le layout du modal avant de dessiner le cadran
 requestAnimationFrame(() => {
   requestAnimationFrame(() => {
@@ -1089,6 +1138,7 @@ function closeTraining(){
   modal.style.display = "none";
   document.body.classList.remove("modal-open");
   document.body.classList.remove("training-on");
+  document.body.classList.remove("training-on", "mobile-compact");
 }
 /* =====================================================
    TRAINING — MOTEUR DU CADRAN
