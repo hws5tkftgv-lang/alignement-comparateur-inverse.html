@@ -537,6 +537,39 @@ body.modal-open{
     max-width:220px;
   }
 }
+
+
+/* ============================
+   TRAINING — CANVAS RÉDUITS
+============================ */
+
+/* Agit SEULEMENT quand le training est ouvert */
+body.training-on .canvasGrid{
+  gap:6px;
+}
+
+/* cartes canvas plus compactes */
+body.training-on .canvasCard{
+  border-radius:10px;
+}
+
+/* TITRES plus petits */
+body.training-on .canvasHeader{
+  font-size:12px;
+  padding:6px 8px;
+}
+
+/* CANVAS réduits */
+body.training-on .canvasCard canvas{
+  height:160px;
+}
+
+/* Mobile : encore plus compact */
+@media (max-width:600px){
+  body.training-on .canvasCard canvas{
+    height:130px;
+  }
+}
 </style>
 </head>
 
@@ -916,6 +949,7 @@ if(tc && sc){
 
 modal.style.display = "block";
 document.body.classList.add("modal-open");
+document.body.classList.add("training-on");
 // ✅ iPhone/Safari: forcer le layout du modal avant de dessiner le cadran
 requestAnimationFrame(() => {
   requestAnimationFrame(() => {
@@ -1002,6 +1036,7 @@ function closeTraining(){
 
   modal.style.display = "none";
   document.body.classList.remove("modal-open");
+  document.body.classList.remove("training-on");
 }
 /* =====================================================
    TRAINING — MOTEUR DU CADRAN
