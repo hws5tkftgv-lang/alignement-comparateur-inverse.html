@@ -570,6 +570,69 @@ body.modal-open{
   }
 }
 
+
+/* =====================================================
+   TRAINING — NETTOYAGE CONTENU INUTILE (MOBILE SEULEMENT)
+===================================================== */
+@media (max-width: 768px){
+
+  /* Titre "Mode entraînement — Compréhension du cadran" */
+  #trainingModal h2{
+    display: none !important;
+  }
+
+  /* Bloc "But pédagogique" (le cadre blanc) */
+  #trainingModal .helpContent > .box:first-of-type{
+    display: none !important;
+  }
+}
+@media (max-width: 768px){
+
+  #trainingModal #dialWrap{
+    max-width: 165px;   /* ≈ -25 % */
+  }
+
+  #trainingModal #dialValue{
+    font-size: 12px;
+  }
+
+  #trainingModal #trainingExplain{
+    font-size: 11px;
+    line-height: 1.2;
+    max-height: 48px;
+  }
+}
+@media (max-width: 768px){
+
+  /* Slider */
+  #trainingModal input[type="range"]{
+    margin-top: 6px;
+    margin-bottom: 4px;
+    height: 24px;
+  }
+
+  /* Labels -100 / 0 / +100 */
+  #trainingModal .rangeLabels{
+    font-size: 11px;
+    margin-top: 2px;
+  }
+}
+@media (max-width: 768px){
+
+  #trainingModal .canvasCard{
+    padding: 6px;
+  }
+
+  #trainingModal .canvasHeader{
+    font-size: 11px;
+    padding: 4px 6px;
+  }
+
+  #trainingModal .canvasCard canvas{
+    height: 180px;   /* ≈ -25 % */
+  }
+}
+
 </style>
 </head>
 
