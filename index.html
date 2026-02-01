@@ -792,7 +792,21 @@ body.modal-open{
 }
 
 
+/* =========================================
+   MODE TEST — COMPACT GLOBAL (iPhone)
+   Réduction proportionnelle SANS scroll
+========================================= */
+@media (max-width: 600px){
 
+  body.training-on #trainingPanel{
+    transform: scale(0.85);          /* ← AJUSTE ICI (0.80 à 0.90) */
+    transform-origin: top center;
+
+    /* compensation pour éviter le scroll */
+    height: calc(100vh / 0.85);
+  }
+
+}
 
 </style>
 </head>
