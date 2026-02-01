@@ -1529,29 +1529,53 @@ function computeDialReading(){
 function updateTraining(){
 
   // ===== INJECTION DU TRAINING DANS LA GÉOMÉTRIE =====
-// ===== MODE TEST — MODIFICATION INCRÉMENTALE =====
-if(trainingMode){
+  if(trainingMode){
 
-  // Mise à jour UNIQUEMENT du défaut actif
-  if(trainType === "angV") testState.angV = trainValue;
-  if(trainType === "parV") testState.parV = trainValue;
-  if(trainType === "angH") testState.angH = trainValue;
-  if(trainType === "parH") testState.parH = trainValue;
+    if(trainType === "angV") testState.angV = trainValue;
+    if(trainType === "parV") testState.parV = trainValue;
+    if(trainType === "angH") testState.angH = trainValue;
+    if(trainType === "parH") testState.parH = trainValue;
 
-  // Injection COMPLÈTE dans l’état machine
-  state.angV = testState.angV;
-  state.parV = testState.parV;
-  state.angH = testState.angH;
-  state.parH = testState.parH;
-}
-}
-const reading = computeDialReading();
+    state.angV = testState.angV;
+    state.parV = testState.parV;
+    state.angH = testState.angH;
+    state.parH = testState.parH;
+  }
 
-    // Position réelle du comparateur → aiguille
+  // ===== CADRAN =====
+  const reading = computeDialReading();
+  drawDial(reading, reading);
 
-
-drawDial(reading, reading);
+  // ===== RENDU VISUEL =====
   renderAll();
+
+  // ===== TEXTE =====
+  const txt = document.getElementById("dialValue");
+  if(txt){
+    txt.textContent = `${reading.toFixed(2)} mil`;
+  }
+
+  const explain = document.getElementById("trainingExplain");
+  if(explain){
+
+    let msg = "<b>Interprétation mécanique :</b><br>";
+
+    msg += `Déplacement moteur : <b>${trainValue.toFixed(2)} mil</b><br>`;
+    msg += `Lecture cadran : <b>${reading.toFixed(2)} mil</b><br><br>`;
+
+    if(trainType.startsWith("par")){
+      msg += "📏 Parallélisme → le comparateur lit la moitié du déplacement réel.";
+    }else{
+      msg += "📐 Angularité → la lecture dépend du bras de levier.";
+    }
+
+    if(trainMount === "pump"){
+      msg += "<br>🔁 Cadran monté sur la pompe → lecture inversée.";
+    }
+
+    explain.innerHTML = msg;
+  }
+}
   
   const txt = document.getElementById("dialValue");
   if(txt){
