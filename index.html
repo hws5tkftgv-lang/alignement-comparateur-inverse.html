@@ -2838,18 +2838,21 @@ if(trainingMode){
   // ====================================================
 //   MOTEUR MOBILE — PARALLÉLISME HORIZONTAL (DÉPLACEMENT EN X)
 // ====================================================
+// ====================================================
+//   MOTEUR MOBILE — TOUJOURS DESSINÉ
+// ====================================================
 const maxShift = 60;
 const shift = Math.max(-maxShift, Math.min(maxShift, parH * scale));
 
 const motorCx = baseCx;
 
-const motorCy = baseCy + (
+// 🔑 PATCH : on applique le shift UNIQUEMENT en parH,
+// mais le moteur est TOUJOURS dessiné
+const motorCy =
   (trainingMode && trainType === "parH") ||
   (!trainingMode && STEPS[state.step].id === "parH")
-    ? shift
-    : 0
-);
-
+    ? baseCy + shift
+    : baseCy;
   const { motorW, motorH, pumpW, pumpH, gap, shaftH, coupW, coupH } = GEOM;
   // ====================================================
 //   PATTES À POUSSER — PARALLÉLISME HORIZONTAL
@@ -2885,6 +2888,16 @@ if(STEPS[state.step].id === "parH"){
   (!trainingMode && STEPS[state.step].id === "angH")
     ? angH * dialSign * rotGain
     : 0;
+    // ====================================================
+//   FALLBACK : vue neutre si aucune étape active
+// ====================================================
+if(
+  !["parH","angH"].includes(STEPS[state.step].id) &&
+  !trainingMode
+){
+  // on force une vue neutre lisible
+  // (le moteur reste visible, sans déplacement)
+}
   // ====================================================
   //   COORDONNÉES DES PATTES (EN POSITION MOTEUR)
   //   IMPORTANT: utiliser motorCx / motorCy (pas baseCy)
