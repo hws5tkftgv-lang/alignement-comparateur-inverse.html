@@ -458,7 +458,12 @@ body.modal-open{
   width: 100%;
 }
 
-
+#dialWrap{
+  width:100%;
+  max-width:260px;
+  aspect-ratio:1/1;
+  margin:auto;
+}
 
 #trainDial{
   width:100%;
@@ -468,9 +473,23 @@ body.modal-open{
   border:3px solid #666;
 }
 
+@media (max-width: 600px){
+  #dialWrap{ max-width:200px; }
+}
 
+@media (min-width: 1200px){
+  #dialWrap{ max-width:220px; }
+}
 
-
+#dialWrap{
+  width:100%;
+  max-width:220px;
+  aspect-ratio:1 / 1;
+  margin:6px auto 4px auto;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
 
 #trainDial{
   width:100%;
@@ -515,7 +534,10 @@ body.modal-open{
     padding:10px;
   }
 
-  
+  body.training-on #dialWrap{
+    max-width:165px;   /* ~ -25 % réel */
+    margin:4px auto;
+  }
 
   body.training-on #dialValue{
     font-size:12px;
@@ -576,6 +598,11 @@ body.modal-open{
     display: none !important;
   }
 }
+@media (max-width: 768px){
+
+  #trainingModal #dialWrap{
+    max-width: 165px;   /* ≈ -25 % */
+  }
 
   #trainingModal #dialValue{
     font-size: 12px;
@@ -778,103 +805,48 @@ body.modal-open{
   }
 }
 
+
 /* ===============================
-   CADRAN — RÈGLE UNIQUE
+   MODE TEST — CADRAN COMPACT (iPhone)
    =============================== */
-#dialWrap{
-  width:100%;
-  max-width:165px;   /* ← c’est ICI que tu ajustes */
-  aspect-ratio:1 / 1;
-  margin:6px auto;
-  display:flex;
-  justify-content:center;
-  align-items:center;
+@media (max-width: 600px) {
+
+  #dialBlock{
+    transform: scale(0.78);     /* ~22 % plus petit */
+    transform-origin: top center;
+    margin-top: -20px;          /* remonte visuellement */
+    margin-bottom: -30px;       /* récupère de la hauteur */
+  }
+
+}
+/* ===============================
+   MODE TEST — DESSINS COMPACTS
+   =============================== */
+@media (max-width: 600px) {
+
+  .visualisation-pedagogique,
+  #visualisationPedagogique,
+  .pedagoBox{
+    transform: scale(0.80);     /* ~20 % plus petit */
+    transform-origin: top center;
+    margin-top: -15px;
+    margin-bottom: -25px;
+  }
+
+}
+
+/* ================================
+   RÉDUCTION PROPORTIONNELLE BLOCS
+   ================================ */
+
+/* BOÎTE CADRAN */
+#dialBlock{
+  transform: scale(0.65);          /* ← ajuste ici (0.80 à 0.90) */
+  transform-origin: top center;
+  margin-bottom: -40px;            /* compense l'espace vide */
 }
 
 
-/* =========================================
-   MODE TEST — COMPACT GLOBAL (iPhone)
-   Contenu réduit, page pleine hauteur
-========================================= */
-@media (max-width: 600px){
-
-  body.training-on{
-
-    /* variables de compression */
-    --gap: 8px;
-    --pad: 4px;
-    --dial: 200px;
-    --canvas: 50px;
-    --font: 0.92;
-
-  }
-
-  /* PANEL = TOUJOURS PLEINE PAGE */
-  body.training-on #trainingPanel{
-    height: 100vh;
-    max-height: 100vh;
-    overflow: hidden;
-  }
-
-  /* CONTENU */
-  body.training-on #trainingContent{
-    overflow-y: auto;
-    padding-bottom: 8px;
-  }
-
-  /* CADRAN */
-  body.training-on #dialWrap{
-    max-width: var(--dial);
-    margin: 6px auto;
-  }
-
-  body.training-on #dialValue{
-    font-size: calc(14px * var(--font));
-  }
-
-  body.training-on #trainingExplain{
-    font-size: calc(12px * var(--font));
-    line-height: 1.2;
-    max-height: 48px;
-  }
-
-  /* VISUALISATIONS */
-  body.training-on .canvasGrid{
-    gap: var(--gap);
-  }
-
-  body.training-on .canvasCard{
-    padding: 0;
-  }
-
-  body.training-on canvas{
-    height: var(--canvas);
-  }
-
-  body.training-on .canvasHeader{
-    font-size: calc(12px * var(--font));
-    padding: 4px 8px;
-  }
-
-  /* SLIDERS */
-  body.training-on #trainingControls{
-    padding: var(--pad);
-  }
-
-  body.training-on #trainingControls label{
-    font-size: calc(11px * var(--font));
-  }
-
-  body.training-on input[type="range"]{
-    height: 22px;
-    margin: 4px 0;
-  }
-
-  body.training-on #btnResetTraining{
-    padding: 9px;
-    font-size: 13px;
-  }
-}
 
 </style>
 </head>
@@ -1053,12 +1025,6 @@ Les pattes A / B / C / D seront affichées ici.
 /* =====================================================
    AIDE / FORMULES (BULLE ℹ️) + IMPRESSION
 ===================================================== */
-const testState = {
-  angV: 0,
-  parV: 0,
-  angH: 0,
-  parH: 0
-};
 
 // 1) contenu HTML de la fiche
 function buildHelpHTML(){
@@ -1317,7 +1283,11 @@ if(zeroBtn){
     // 2) Zéro cadran (aiguille)
     dialZeroOffset = 0;
 
-    
+    // 3) RESET mécanique (dessins)
+    state.parV = 0;
+    state.parH = 0;
+    state.angV = 0;
+    state.angH = 0;
 
     // 4) Redessin complet
     updateTraining();
@@ -1529,53 +1499,26 @@ function computeDialReading(){
 function updateTraining(){
 
   // ===== INJECTION DU TRAINING DANS LA GÉOMÉTRIE =====
-  if(trainingMode){
+if(trainingMode){
 
-    if(trainType === "angV") testState.angV = trainValue;
-    if(trainType === "parV") testState.parV = trainValue;
-    if(trainType === "angH") testState.angH = trainValue;
-    if(trainType === "parH") testState.parH = trainValue;
+  state.parV = 0;
+  state.parH = 0;
+  state.angV = 0;
+  state.angH = 0;
 
-    state.angV = testState.angV;
-    state.parV = testState.parV;
-    state.angH = testState.angH;
-    state.parH = testState.parH;
-  }
-
-  // ===== CADRAN =====
-  const reading = computeDialReading();
-  drawDial(reading, reading);
-
-  // ===== RENDU VISUEL =====
-  renderAll();
-
-  // ===== TEXTE =====
-  const txt = document.getElementById("dialValue");
-  if(txt){
-    txt.textContent = `${reading.toFixed(2)} mil`;
-  }
-
-  const explain = document.getElementById("trainingExplain");
-  if(explain){
-
-    let msg = "<b>Interprétation mécanique :</b><br>";
-
-    msg += `Déplacement moteur : <b>${trainValue.toFixed(2)} mil</b><br>`;
-    msg += `Lecture cadran : <b>${reading.toFixed(2)} mil</b><br><br>`;
-
-    if(trainType.startsWith("par")){
-      msg += "📏 Parallélisme → le comparateur lit la moitié du déplacement réel.";
-    }else{
-      msg += "📐 Angularité → la lecture dépend du bras de levier.";
-    }
-
-    if(trainMount === "pump"){
-      msg += "<br>🔁 Cadran monté sur la pompe → lecture inversée.";
-    }
-
-    explain.innerHTML = msg;
-  }
+  if(trainType === "parV") state.parV = trainValue;
+  if(trainType === "parH") state.parH = trainValue;
+  if(trainType === "angV") state.angV = trainValue;
+  if(trainType === "angH") state.angH = trainValue;
 }
+
+const reading = computeDialReading();
+
+    // Position réelle du comparateur → aiguille
+
+
+drawDial(reading, reading);
+  renderAll();
   
   const txt = document.getElementById("dialValue");
   if(txt){
@@ -2900,6 +2843,12 @@ let angH = state.angH;
 let parV = state.parV;
 let angV = state.angV;
 
+if(trainingMode){
+  if(trainType === "parH") parH = trainValue;
+  if(trainType === "angH") angH = trainValue;
+  if(trainType === "parV") parV = trainValue;
+  if(trainType === "angV") angV = trainValue;
+}
 
   // ====================================================
   //   RÉFÉRENCES FIXES (POMPE + SOCLE)
@@ -3154,6 +3103,10 @@ const ctx = ctxTarget;
 let parV = state.parV;
 let angV = state.angV;
 
+if(trainingMode){
+  if(trainType === "parV") parV = trainValue;
+  if(trainType === "angV") angV = trainValue;
+}
 
   let baseCy = h * 0.55;
   let baseCx = w * 0.30;
