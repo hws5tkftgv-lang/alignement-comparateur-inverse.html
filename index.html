@@ -2895,7 +2895,8 @@ if(STEPS[state.step].id === "parH"){
     D:{x: motorCx - motorW/2 + 24, y: motorCy + motorH/2 - 18},
     C:{x: motorCx + motorW/2 - 24, y: motorCy + motorH/2 - 18},
   };
-
+// ✅ PATCH — appliquer l’orientation des pattes
+const PM = mapFeetByScheme(P.A, P.B, P.C, P.D, footLayout);
   // ====================================================
   //   PIVOT MÉCANIQUE (OPTIONNEL)
   //   - ang > 0  => pivot coin extérieur C
