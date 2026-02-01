@@ -425,7 +425,9 @@ canvas{
   max-height:90vh;
   overflow:hidden;
 }
-
+#trainingPanel{
+  padding-bottom: env(safe-area-inset-bottom);
+}
 
 #dialBlock{
   margin-top:12px;
@@ -694,6 +696,21 @@ body.modal-open{
   font-size:13px;
   padding:6px 8px;
   border-radius:8px;
+}
+
+
+#trainingContent{
+  overflow-y:auto;
+  flex:1;
+  padding-bottom:16px;
+}
+
+#trainingControls{
+  position:sticky;
+  bottom:0;
+  background:#0b1436;
+  padding:12px 0 16px;
+  border-top:1px solid rgba(255,255,255,.15);
 }
 </style>
 </head>
