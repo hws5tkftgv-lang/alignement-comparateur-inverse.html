@@ -1527,19 +1527,27 @@ function computeDialReading(){
 function updateTraining(){
 
   // ===== INJECTION DU TRAINING DANS LA GÉOMÉTRIE =====
+// ===== MODE TEST — MODIFICATION INCRÉMENTALE =====
 if(trainingMode){
 
-  state.parV = 0;
-  state.parH = 0;
-  state.angV = 0;
-  state.angH = 0;
+  switch(trainType){
+    case "parV":
+      state.parV = trainValue;
+      break;
 
-  if(trainType === "parV") state.parV = trainValue;
-  if(trainType === "parH") state.parH = trainValue;
-  if(trainType === "angV") state.angV = trainValue;
-  if(trainType === "angH") state.angH = trainValue;
+    case "parH":
+      state.parH = trainValue;
+      break;
+
+    case "angV":
+      state.angV = trainValue;
+      break;
+
+    case "angH":
+      state.angH = trainValue;
+      break;
+  }
 }
-
 const reading = computeDialReading();
 
     // Position réelle du comparateur → aiguille
