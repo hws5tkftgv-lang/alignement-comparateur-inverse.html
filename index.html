@@ -1317,11 +1317,7 @@ if(zeroBtn){
     // 2) Zéro cadran (aiguille)
     dialZeroOffset = 0;
 
-    // 3) RESET mécanique (dessins)
-    state.parV = 0;
-    state.parH = 0;
-    state.angV = 0;
-    state.angH = 0;
+    
 
     // 4) Redessin complet
     updateTraining();
@@ -1536,23 +1532,18 @@ function updateTraining(){
 // ===== MODE TEST — MODIFICATION INCRÉMENTALE =====
 if(trainingMode){
 
-  switch(trainType){
-    case "parV":
-      state.parV = trainValue;
-      break;
+  // Mise à jour UNIQUEMENT du défaut actif
+  if(trainType === "angV") testState.angV = trainValue;
+  if(trainType === "parV") testState.parV = trainValue;
+  if(trainType === "angH") testState.angH = trainValue;
+  if(trainType === "parH") testState.parH = trainValue;
 
-    case "parH":
-      state.parH = trainValue;
-      break;
-
-    case "angV":
-      state.angV = trainValue;
-      break;
-
-    case "angH":
-      state.angH = trainValue;
-      break;
-  }
+  // Injection COMPLÈTE dans l’état machine
+  state.angV = testState.angV;
+  state.parV = testState.parV;
+  state.angH = testState.angH;
+  state.parH = testState.parH;
+}
 }
 const reading = computeDialReading();
 
