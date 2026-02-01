@@ -2904,9 +2904,8 @@ const PM = mapFeetByScheme(P.A, P.B, P.C, P.D, footLayout);
   //   - ang = 0  => pivot centre
   // ====================================================
   let pivot = {x: motorCx, y: motorCy};
-  if(ang > 0) pivot = P.C;
-  if(ang < 0) pivot = P.D;
-
+if(ang > 0) pivot = PM.C;
+if(ang < 0) pivot = PM.D;
   // ====================================================
   //   BLOC MOTEUR (MOBILE) : MOTEUR + ARBRE + ½ ACCOUPLEMENT + AXE
   // ====================================================
@@ -2920,15 +2919,13 @@ const PM = mapFeetByScheme(P.A, P.B, P.C, P.D, footLayout);
   ctx.fillRect(motorCx - motorW/2, motorCy - motorH/2, motorW, motorH);
 
   function drawPad(letter){
-  const {x,y} = P[letter];
+  const {x,y} = PM[letter];
   let col = footColor(letter);
-
   if(flashFeet.includes(letter)){
     if(typeof blinkColor === "function"){
       col = blinkColor(col);
     }
   }
-
   ctx.fillStyle = col;
   ctx.fillRect(x - footW/2, y - footH/2, footW, footH);
 }
@@ -2978,14 +2975,14 @@ if(STEPS[state.step].id === "angH"){
 
     // A → pousser vers le BAS
     drawArrow(ctx,
-      P.A.x, P.A.y - len,
-      P.A.x, P.A.y
+      PM.A.x, PM.A.y - len,
+      PM.A.x, PM.A.y
     );
 
     // C → pousser vers le HAUT
     drawArrow(ctx,
-      P.C.x, P.C.y + len,
-      P.C.x, P.C.y
+      PM.C.x,PM.C.y + len,
+      PM.C.x, PM.C.y
     );
   }
 
@@ -2994,14 +2991,14 @@ if(STEPS[state.step].id === "angH"){
 
     // B → pousser vers le BAS
     drawArrow(ctx,
-      P.B.x, P.B.y - len,
-      P.B.x, P.B.y
+      PM.B.x, PM.B.y - len,
+      PM.B.x, PM.B.y
     );
 
     // D → pousser vers le HAUT
     drawArrow(ctx,
-      P.D.x, P.D.y + len,
-      P.D.x, P.D.y
+      PM.D.x, PM.D.y + len,
+      PM.D.x, PM.D.y
     );
   }
 }
@@ -3052,10 +3049,10 @@ if(STEPS[state.step].id === "angH"){
   ctx.textAlign = "center";
 
   const labelOffset = 26;
-  ctx.fillText(labelFoot("A"), P.A.x, P.A.y - labelOffset);
-ctx.fillText(labelFoot("B"), P.B.x, P.B.y - labelOffset);
-ctx.fillText(labelFoot("D"), P.D.x, P.D.y + labelOffset + 6);
-ctx.fillText(labelFoot("C"), P.C.x, P.C.y + labelOffset + 6);
+  ctx.fillText(labelFoot("A"), PM.A.x, PM.A.y - labelOffset);
+ctx.fillText(labelFoot("B"), PM.B.x, PM.B.y - labelOffset);
+ctx.fillText(labelFoot("D"), PM.D.x, PM.D.y + labelOffset + 6);
+ctx.fillText(labelFoot("C"), PM.C.x, PM.C.y + labelOffset + 6);
   // ====================================================
   //   TITRES
   // ====================================================
