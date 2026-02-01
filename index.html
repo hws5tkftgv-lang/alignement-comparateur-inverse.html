@@ -712,6 +712,46 @@ body.modal-open{
   padding:12px 0 16px;
   border-top:1px solid rgba(255,255,255,.15);
 }
+
+/* =====================================================
+   MODE TEST — SLIDERS ULTRA COMPACTS (MOBILE SAFARI)
+===================================================== */
+
+@media (max-width: 768px){
+
+  /* Zone complète des contrôles TEST */
+  #trainingControls{
+    padding: 6px 10px !important;
+  }
+
+  /* Met les 2 sliders sur UNE SEULE LIGNE */
+  #trainingControls .row{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  /* Labels plus petits */
+  #trainingControls label{
+    font-size: 11px;
+    margin-bottom: 2px;
+  }
+
+  /* Sliders beaucoup moins hauts */
+  #trainingControls input[type="range"]{
+    height: 22px;
+    margin: 2px 0;
+  }
+
+  /* Bouton reset compact */
+  #btnResetTraining{
+    margin-top: 6px;
+    padding: 8px;
+    font-size: 13px;
+    border-radius: 10px;
+  }
+}
+
 </style>
 </head>
 
