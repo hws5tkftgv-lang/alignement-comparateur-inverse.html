@@ -2896,7 +2896,20 @@ if(STEPS[state.step].id === "parH"){
     C:{x: motorCx + motorW/2 - 24, y: motorCy + motorH/2 - 18},
   };
 // ✅ PATCH — appliquer l’orientation des pattes
-const PM = mapFeetByScheme(P.A, P.B, P.C, P.D, footLayout);
+// ✅ PATCH STABLE — mapping via FOOT_SCHEMES (soft-foot)
+const scheme = FOOT_SCHEMES[footSchemeKey];
+
+const PM = {
+  A: P[scheme.TL],
+  B: P[scheme.TR],
+  C: P[scheme.BR],
+  D: P[scheme.BL],
+};
+
+if(!PM.A || !PM.B || !PM.C || !PM.D){
+  console.warn("PM invalide — fallback standard");
+  PM.A = P.A; PM.B = P.B; PM.C = P.C; PM.D = P.D;
+}
   // ====================================================
   //   PIVOT MÉCANIQUE (OPTIONNEL)
   //   - ang > 0  => pivot coin extérieur C
