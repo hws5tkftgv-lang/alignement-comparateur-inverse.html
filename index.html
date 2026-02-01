@@ -795,6 +795,36 @@ body.modal-open{
   }
 }
 
+
+/* ===============================
+   MODE TEST — CADRAN COMPACT (iPhone)
+   =============================== */
+@media (max-width: 600px) {
+
+  #dialBlock{
+    transform: scale(0.78);     /* ~22 % plus petit */
+    transform-origin: top center;
+    margin-top: -20px;          /* remonte visuellement */
+    margin-bottom: -30px;       /* récupère de la hauteur */
+  }
+
+}
+/* ===============================
+   MODE TEST — DESSINS COMPACTS
+   =============================== */
+@media (max-width: 600px) {
+
+  .visualisation-pedagogique,
+  #visualisationPedagogique,
+  .pedagoBox{
+    transform: scale(0.80);     /* ~20 % plus petit */
+    transform-origin: top center;
+    margin-top: -15px;
+    margin-bottom: -25px;
+  }
+
+}
+
 </style>
 </head>
 
