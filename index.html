@@ -751,6 +751,49 @@ body.modal-open{
     border-radius: 10px;
   }
 }
+/* ===============================
+   TRAINING TEST — SLIDERS COMPACTS
+   =============================== */
+
+#trainingControls{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:8px;
+}
+
+#trainingControls label{
+  font-size:11px;
+  opacity:.85;
+}
+
+#trainingControls input[type="range"]{
+  margin:4px 0 0 0;
+}
+
+/* Bouton reset centré et compact */
+#btnResetTraining{
+  grid-column:1 / -1;
+  margin-top:8px;
+  padding:10px;
+  font-size:14px;
+}
+
+/* iPhone : encore plus compact */
+@media (max-width:600px){
+  #trainingControls{
+    gap:8px;
+  }
+
+  #trainingControls label{
+    font-size:10.5px;
+  }
+
+  #btnResetTraining{
+    padding:9px;
+    font-size:13px;
+  }
+}
 
 </style>
 </head>
