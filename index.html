@@ -3355,19 +3355,11 @@ ctx.restore();
 
 // ===== WRAPPERS PRINCIPAUX =====
 function drawTopView(){
-  if(trainingMode && window.topCtxTest){
-    drawTopViewGeneric(window.topCtxTest);
-  }else{
-    drawTopViewGeneric(topCtx);
-  }
+  drawTopViewGeneric(topCtx);
 }
 
 function drawSideView(){
-  if(trainingMode && window.sideCtxTest){
-    drawSideViewGeneric(window.sideCtxTest);
-  }else{
-    drawSideViewGeneric(sideCtx);
-  }
+  drawSideViewGeneric(sideCtx);
 }
 function renderAll(){
   refreshUI();
