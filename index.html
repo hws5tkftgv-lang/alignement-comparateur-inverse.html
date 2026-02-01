@@ -825,6 +825,25 @@ body.modal-open{
 
 }
 
+/* ================================
+   RÉDUCTION PROPORTIONNELLE BLOCS
+   ================================ */
+
+/* BOÎTE CADRAN */
+#dialBlock{
+  transform: scale(0.85);          /* ← ajuste ici (0.80 à 0.90) */
+  transform-origin: top center;
+  margin-bottom: -40px;            /* compense l'espace vide */
+}
+
+/* BOÎTE VISUALISATION (DESSINS) */
+.visualisation,
+.visualBox{
+  transform: scale(0.85);
+  transform-origin: top center;
+  margin-bottom: -60px;
+}
+
 </style>
 </head>
 
