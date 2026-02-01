@@ -458,12 +458,7 @@ body.modal-open{
   width: 100%;
 }
 
-#dialWrap{
-  width:100%;
-  max-width:260px;
-  aspect-ratio:1/1;
-  margin:auto;
-}
+
 
 #trainDial{
   width:100%;
@@ -473,23 +468,9 @@ body.modal-open{
   border:3px solid #666;
 }
 
-@media (max-width: 600px){
-  #dialWrap{ max-width:200px; }
-}
 
-@media (min-width: 1200px){
-  #dialWrap{ max-width:220px; }
-}
 
-#dialWrap{
-  width:100%;
-  max-width:220px;
-  aspect-ratio:1 / 1;
-  margin:6px auto 4px auto;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-}
+
 
 #trainDial{
   width:100%;
@@ -534,10 +515,7 @@ body.modal-open{
     padding:10px;
   }
 
-  body.training-on #dialWrap{
-    max-width:165px;   /* ~ -25 % réel */
-    margin:4px auto;
-  }
+  
 
   body.training-on #dialValue{
     font-size:12px;
@@ -598,11 +576,6 @@ body.modal-open{
     display: none !important;
   }
 }
-@media (max-width: 768px){
-
-  #trainingModal #dialWrap{
-    max-width: 165px;   /* ≈ -25 % */
-  }
 
   #trainingModal #dialValue{
     font-size: 12px;
@@ -805,46 +778,19 @@ body.modal-open{
   }
 }
 
-
 /* ===============================
-   MODE TEST — CADRAN COMPACT (iPhone)
+   CADRAN — RÈGLE UNIQUE
    =============================== */
-@media (max-width: 600px) {
-
-  #dialBlock{
-    transform: scale(0.78);     /* ~22 % plus petit */
-    transform-origin: top center;
-    margin-top: -20px;          /* remonte visuellement */
-    margin-bottom: -30px;       /* récupère de la hauteur */
-  }
-
-}
-/* ===============================
-   MODE TEST — DESSINS COMPACTS
-   =============================== */
-@media (max-width: 600px) {
-
-  .visualisation-pedagogique,
-  #visualisationPedagogique,
-  .pedagoBox{
-    transform: scale(0.80);     /* ~20 % plus petit */
-    transform-origin: top center;
-    margin-top: -15px;
-    margin-bottom: -25px;
-  }
-
+#dialWrap{
+  width:100%;
+  max-width:165px;   /* ← c’est ICI que tu ajustes */
+  aspect-ratio:1 / 1;
+  margin:6px auto;
+  display:flex;
+  justify-content:center;
+  align-items:center;
 }
 
-/* ================================
-   RÉDUCTION PROPORTIONNELLE BLOCS
-   ================================ */
-
-/* BOÎTE CADRAN */
-#dialBlock{
-  transform: scale(0.65);          /* ← ajuste ici (0.80 à 0.90) */
-  transform-origin: top center;
-  margin-bottom: -40px;            /* compense l'espace vide */
-}
 
 
 
