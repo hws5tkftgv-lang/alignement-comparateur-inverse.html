@@ -2590,18 +2590,14 @@ const sideCtx = sideCanvas.getContext("2d");
 
 
 function resizeCanvas(canvas, ctx){
-  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
 
-  const parent = canvas.parentElement;
-  const rect = parent.getBoundingClientRect();
+  // 🛑 PROTECTION CRITIQUE
+  const w = Math.max(1, Math.floor(rect.width));
+  const h = Math.max(1, Math.floor(rect.height));
 
-  const w = Math.max(240, rect.width);
-  const h = Math.max(240, rect.height);
-
-  canvas.width  = Math.round(w * dpr);
-  canvas.height = Math.round(h * dpr);
-
-  ctx.setTransform(dpr,0,0,dpr,0,0);
+  if (canvas.width !== w) canvas.width = w;
+  if (canvas.height !== h) canvas.height = h;
 
   return { w, h };
 }
