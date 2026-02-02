@@ -2085,13 +2085,17 @@ if(stepId === "angH"){
     return "✔️ Angularité horizontale conforme.";
   }
 
-  const v = Math.abs(state.angH);                 // lecture cadran (mil)
-const D = geometry.couplingDiameter;            // Ø accouplement (po)
-const a = geometry.distDialToFront;             // cadran → patte avant
-const b = geometry.distFrontToRear;             // patte avant → patte arrière
+  const v = Math.abs(state.angH);          // mil
+  const D = geometry.couplingDiameter;     // po
+  const a = geometry.distDialToFront;      // po
+  const b = geometry.distFrontToRear;      // po
 
-  const front = (Math.abs(v) * a / D).toFixed(2);
-  const rear  = (Math.abs(v) * (a + b) / D).toFixed(2);
+  if(D <= 0 || a <= 0){
+    return "❌ Données géométriques invalides (Ø ou distances nulles).";
+  }
+
+  const front = (v * a / D).toFixed(2);
+  const rear  = (v * (a + b) / D).toFixed(2);
 
   msg += "↔️ Angularité horizontale\n\n";
 
@@ -2103,12 +2107,12 @@ const b = geometry.distFrontToRear;             // patte avant → patte arrièr
 
   msg += "Formules :\n";
   msg += "Avant   = (v × a) / D\n";
-  msg += "Arrière = (v × (a+b)) / D\n\n";
+  msg += "Arrière = (v × (a + b)) / D\n\n";
 
-  msg += `Avant   = (${Math.abs(v).toFixed(2)} × ${a}) / ${D} = ${front} mil\n`;
-  msg += `Arrière = (${Math.abs(v).toFixed(2)} × ${a+b}) / ${D} = ${rear} mil\n\n`;
+  msg += `Avant   = (${v.toFixed(2)} × ${a}) / ${D} = ${front} mil\n`;
+  msg += `Arrière = (${v.toFixed(2)} × ${a + b}) / ${D} = ${rear} mil\n\n`;
 
-  if(v > 0){
+  if(state.angH > 0){
     msg += "📈 Lecture POSITIVE → moteur incliné vers la DROITE\n\n";
     msg += "Correction mécanique :\n";
     msg += `👉 Tirer sur ${labelFeet(["B","D"])}\n`;
@@ -2116,7 +2120,7 @@ const b = geometry.distFrontToRear;             // patte avant → patte arrièr
     msg += `👉 Pousser sur ${labelFeet(["A","C"])}\n`;
   }
 
-  if(v < 0){
+  if(state.angH < 0){
     msg += "📉 Lecture NÉGATIVE → moteur incliné vers la GAUCHE\n\n";
     msg += "Correction mécanique :\n";
     msg += `👉 Tirer sur ${labelFeet(["A","C"])}\n`;
@@ -2127,7 +2131,6 @@ const b = geometry.distFrontToRear;             // patte avant → patte arrièr
   return msg;
 }
 return "";
-}
 /* =====================================================
    UI — Inputs par étape (avec IDs)
 ===================================================== */
