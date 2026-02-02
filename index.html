@@ -2085,10 +2085,10 @@ if(stepId === "angH"){
     return "✔️ Angularité horizontale conforme.";
   }
 
-  const v = state.angH * dialSign;
-  const D = geometry.couplingDiameter;
-  const a = GEOM.centerToFrontFeet;
-  const b = GEOM.frontToRearFeet;
+  const v = Math.abs(state.angH);                 // lecture cadran (mil)
+const D = geometry.couplingDiameter;            // Ø accouplement (po)
+const a = geometry.distDialToFront;             // cadran → patte avant
+const b = geometry.distFrontToRear;             // patte avant → patte arrière
 
   const front = (Math.abs(v) * a / D).toFixed(2);
   const rear  = (Math.abs(v) * (a + b) / D).toFixed(2);
