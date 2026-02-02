@@ -2132,8 +2132,8 @@ if(stepId === "angH"){
 
   const v = Math.abs(state.angH);          // mil
   const D = geometry.couplingDiameter;     // po
-  const a = geometry.distDialToFront;      // po
-  const b = geometry.distFrontToRear;      // po
+  const a = geometry.centerToFrontFeet;
+const b = geometry.frontToRearFeet;
 
   if(D <= 0 || a <= 0 || b < 0){
     return "❌ Données géométriques invalides (Ø ou distances manquantes).";
@@ -2221,7 +2221,7 @@ return "";
 ===================================================== */
 function renderInputsForCurrentStep(){
   const id = STEPS[state.step].id;
-  updateNote(stepId);
+  updateNote(id);
 
   // IMPORTANT: valeurs par défaut = 0, tolérances ≠ 0
   if(id === "runout"){
@@ -2346,14 +2346,7 @@ if(id === "measures"){
         </div>
       </div>
 
-    <div class="row" style="margin-top:10px;">
-  <div>
-    <label>Note</label>
-    <div class="noteBox" id="noteBox">
-      —
-    </div>
-  </div>
-</div>
+ 
     `;
   }
 
