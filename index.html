@@ -2052,39 +2052,38 @@ msg += `Arrière = (${Math.abs(v).toFixed(2)} / ${D}) × ${a + b} = ${rear} mil\
   }
 
   // ---------- PARALLÉLISME VERTICAL ----------
-  if(stepId === "parV"){
-    if(ok(state.parV, state.parVTol)){
-      return "✔️ Parallélisme vertical conforme.";
-    }
-
-    const v   = state.parV;
-    const amt = Math.abs(v).toFixed(2);
-
-    msg += "↕️ Parallélisme vertical\n\n";
-
-    if(v > 0){
-      msg += "Lecture NÉGATIVE → moteur trop BAS\n\n";
-      msg += "Action mécanique : remonter le moteur\n\n";
-      msg += "Correction :\n";
-      msg += `➕ Ajouter +${amt} mil sous :\n`;
-      msg += "👉 A + B + C + D\n";
-      msg += "(même quantité sur les 4 pattes)";
-    }
-
-    if(v < 0){
-      msg += "Lecture POSITIVE → moteur trop HAUT\n\n";
-      msg += "Action mécanique : abaisser le moteur\n\n";
-      msg += "Correction :\n";
-      msg += `➖ Enlever ${amt} mil sous :\n`;
-      msg += "👉 A + B + C + D\n";
-      msg += "(même quantité sur les 4 pattes)";
-    }
-
-    return msg;
+if(stepId === "parV"){
+  if(ok(state.parV, state.parVTol)){
+    return "✔️ Parallélisme vertical conforme.";
   }
 
-  // ---------- ANGULARITÉ HORIZONTALE ----------
-// ---------- ANGULARITÉ HORIZONTALE ----------
+  const v = state.parV;                    // lecture comparateur (mil)
+  const realMove = Math.abs(v) / 2;        // correction réelle
+
+  let msg = "⬆️ Parallélisme vertical\n\n";
+
+  msg += `Lecture = ${v.toFixed(2)} mil\n`;
+  msg += `Tolérance = ${state.parVTol} mil\n\n`;
+  msg += `Correction réelle recommandée = ${realMove.toFixed(2)} mil\n\n`;
+
+  if(v > 0){
+    msg += "📈 Lecture POSITIVE → moteur trop BAS\n\n";
+    msg += "Correction mécanique :\n";
+    msg += `👉 Ajouter ${realMove.toFixed(2)} mil sous A + B + C + D\n`;
+    msg += "(montée uniforme du moteur)\n";
+  }
+
+  if(v < 0){
+    msg += "📉 Lecture NÉGATIVE → moteur trop HAUT\n\n";
+    msg += "Correction mécanique :\n";
+    msg += `👉 Retirer ${realMove.toFixed(2)} mil sous A + B + C + D\n`;
+    msg += "(descente uniforme du moteur)\n";
+  }
+
+  return msg;
+}
+
+  
 // ---------- ANGULARITÉ HORIZONTALE ----------
 if(stepId === "angH"){
 
