@@ -847,7 +847,18 @@ body.modal-open{
 }
 
 
+/* ===== NOTE CLIGNOTANTE (parallélisme) ===== */
+@keyframes blinkNote {
+  0%   { opacity: 1; }
+  50%  { opacity: 0.25; }
+  100% { opacity: 1; }
+}
 
+.note-blink{
+  animation: blinkNote 1.1s infinite;
+  border-left: 4px solid #ff5252;
+  padding-left: 10px;
+}
 </style>
 </head>
 
@@ -1713,6 +1724,9 @@ function updateNote(stepId){
   const note = document.getElementById("noteBox");
   if(!note) return;
 
+  // reset visuel
+  note.classList.remove("note-blink");
+
   switch(stepId){
 
     case "softfoot":
@@ -1722,22 +1736,24 @@ function updateNote(stepId){
 
     case "angV":
       note.textContent =
-        "Angularité verticale : correction par ajout ou retrait de cales (shims).";
+        "Angularité verticale : correction par ajout ou retrait de cales selon le signe.";
       break;
 
     case "parV":
       note.textContent =
-        "Parallélisme vertical : correction uniforme sur les 4 pattes.";
+        "⚠️ Parallélisme vertical : la correction réelle à appliquer est la lecture ÷ 2, répartie uniformément sur les 4 pattes (A + B + C + D).";
+      note.classList.add("note-blink");
       break;
 
     case "angH":
       note.textContent =
-        "Angularité horizontale : correction par déplacement différentiel des pattes.";
+        "Angularité horizontale : correction par déplacement différentiel des pattes selon le sens.";
       break;
 
     case "parH":
       note.textContent =
-        "Parallélisme horizontal : correction réelle = lecture ÷ 2.";
+        "⚠️ Parallélisme horizontal : la correction réelle du moteur est la lecture ÷ 2 (on corrige une seule machine).";
+      note.classList.add("note-blink");
       break;
 
     default:
