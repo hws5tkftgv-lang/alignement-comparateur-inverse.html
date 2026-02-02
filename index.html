@@ -2092,13 +2092,15 @@ if(stepId === "angH"){
     return "✔️ Angularité horizontale conforme.";
   }
 
+  let msg = "";
+
   const v = Math.abs(state.angH);          // mil
   const D = geometry.couplingDiameter;     // po
   const a = geometry.distDialToFront;      // po
   const b = geometry.distFrontToRear;      // po
 
-  if(D <= 0 || a <= 0){
-    return "❌ Données géométriques invalides (Ø ou distances nulles).";
+  if(D <= 0 || a <= 0 || b < 0){
+    return "❌ Données géométriques invalides (Ø ou distances manquantes).";
   }
 
   const front = (v * a / D).toFixed(2);
@@ -2118,6 +2120,10 @@ if(stepId === "angH"){
 
   msg += `Avant   = (${v.toFixed(2)} × ${a}) / ${D} = ${front} mil\n`;
   msg += `Arrière = (${v.toFixed(2)} × ${a + b}) / ${D} = ${rear} mil\n\n`;
+
+  msg += "Application des corrections :\n";
+  msg += `• Patte AVANT : ${front} mil\n`;
+  msg += `• Patte ARRIÈRE : ${rear} mil\n\n`;
 
   if(state.angH > 0){
     msg += "📈 Lecture POSITIVE → moteur incliné vers la DROITE\n\n";
