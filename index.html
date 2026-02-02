@@ -1662,6 +1662,13 @@ const geometry = {
   centerToFrontFeet: 6,    // Centre → pattes AVANT
   frontToRearFeet: 10      // Pattes AVANT → ARRIÈRE
 };
+// Sécurité : distances géométriques toujours définies
+if(!Number.isFinite(geometry.distDialToFront)) {
+  geometry.distDialToFront = 6;
+}
+if(!Number.isFinite(geometry.distFrontToRear)) {
+  geometry.distFrontToRear = 10;
+}
 /* =====================================================
    DÉFINITION DES ÉTAPES
 ===================================================== */
