@@ -2143,6 +2143,40 @@ if(stepId === "angH"){
 
   return msg;
 }
+
+
+// ---------- PARALLÉLISME HORIZONTAL ----------
+if(stepId === "parH"){
+  if(ok(state.parH, state.parHTol)){
+    return "✔️ Parallélisme horizontal conforme.";
+  }
+
+  const v = state.parH;
+
+  let msg = "↔️ Parallélisme horizontal\n\n";
+
+  msg += `Lecture = ${v.toFixed(2)} mil\n`;
+  msg += `Tolérance = ${state.parHTol} mil\n\n`;
+
+  if(v > 0){
+    msg += "📈 Lecture POSITIVE → moteur décalé vers la DROITE\n\n";
+    msg += "Correction mécanique :\n";
+    msg += `👉 Tirer sur ${labelFeet(["A","B"])}\n`;
+    msg += "OU\n";
+    msg += `👉 Pousser sur ${labelFeet(["C","D"])}\n`;
+  }
+
+  if(v < 0){
+    msg += "📉 Lecture NÉGATIVE → moteur décalé vers la GAUCHE\n\n";
+    msg += "Correction mécanique :\n";
+    msg += `👉 Tirer sur ${labelFeet(["C","D"])}\n`;
+    msg += "OU\n";
+    msg += `👉 Pousser sur ${labelFeet(["A","B"])}\n`;
+  }
+
+  return msg;
+}
+
 return "";
 }
 /* =====================================================
