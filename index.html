@@ -1625,12 +1625,8 @@ const GEOM = {
   coupH: 56,
   coupW: 10,
 
-  // ===== DIMENSIONS GÉOMÉTRIQUES POUR CALCULS =====
-  dialSpan: 12,          // D = distance entre comparateurs
-  centerToFrontFeet: 6, // a = centre → pattes avant
-  frontToRearFeet: 10   // b = pattes avant → arrière
-};
   
+  }
 /* =====================================================
    ÉTAT GLOBAL (mils)
 ===================================================== */
@@ -2090,7 +2086,7 @@ if(stepId === "angH"){
   }
 
   const v = state.angH * dialSign;
-  const D = GEOM.dialSpan;
+  const D = geometry.couplingDiameter;
   const a = GEOM.centerToFrontFeet;
   const b = GEOM.frontToRearFeet;
 
