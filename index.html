@@ -2150,7 +2150,7 @@ if(stepId === "parH"){
   if(ok(state.parH, state.parHTol)){
     return "✔️ Parallélisme horizontal conforme.";
   }
-
+const realMove = Math.abs(state.parH) / 2;
   const v = state.parH;
 
   let msg = "↔️ Parallélisme horizontal\n\n";
@@ -2158,21 +2158,22 @@ if(stepId === "parH"){
   msg += `Lecture = ${v.toFixed(2)} mil\n`;
   msg += `Tolérance = ${state.parHTol} mil\n\n`;
 
-  if(v > 0){
-    msg += "📈 Lecture POSITIVE → moteur décalé vers la DROITE\n\n";
-    msg += "Correction mécanique :\n";
-    msg += `👉 Tirer sur ${labelFeet(["A","B"])}\n`;
-    msg += "OU\n";
-    msg += `👉 Pousser sur ${labelFeet(["C","D"])}\n`;
-  }
-
+    if(v > 0){
+  msg += "📈 Lecture POSITIVE → moteur décalé vers la DROITE\n\n";
+  msg += `Correction réelle recommandée = ${realMove.toFixed(2)} mil\n\n`;
+  msg += "Correction mécanique :\n";
+  msg += `👉 Tirer sur ${labelFeet(["A","B"])} de ${realMove.toFixed(2)} mil\n`;
+  msg += "OU\n";
+  msg += `👉 Pousser sur ${labelFeet(["C","D"])} de ${realMove.toFixed(2)} mil\n`;
+}
   if(v < 0){
-    msg += "📉 Lecture NÉGATIVE → moteur décalé vers la GAUCHE\n\n";
-    msg += "Correction mécanique :\n";
-    msg += `👉 Tirer sur ${labelFeet(["C","D"])}\n`;
-    msg += "OU\n";
-    msg += `👉 Pousser sur ${labelFeet(["A","B"])}\n`;
-  }
+  msg += "📉 Lecture NÉGATIVE → moteur décalé vers la GAUCHE\n\n";
+  msg += `Correction réelle recommandée = ${realMove.toFixed(2)} mil\n\n`;
+  msg += "Correction mécanique :\n";
+  msg += `👉 Tirer sur ${labelFeet(["C","D"])} de ${realMove.toFixed(2)} mil\n`;
+  msg += "OU\n";
+  msg += `👉 Pousser sur ${labelFeet(["A","B"])} de ${realMove.toFixed(2)} mil\n`;
+}
 
   return msg;
 }
