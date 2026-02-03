@@ -2567,11 +2567,11 @@ if(id === "parV"){
 if(id === "thermal"){
   ui.inputsArea.innerHTML = `
 
-  <!-- Température ambiante (globale) -->
+  <!-- Température ambiante -->
   <div class="card">
     <label>Température ambiante (°F)</label>
     <input type="number"
-           value="${state.tempAmb ?? 68}"
+           value="${state.tempAmb}"
            oninput="state.tempAmb = Number(this.value)">
   </div>
 
@@ -2583,21 +2583,21 @@ if(id === "thermal"){
       <div>
         <label>Température d’opération (°F)</label>
         <input type="number"
-               value="${state.motorTempOp ?? 90}"
-               oninput="state.motorTempOp = Number(this.value)">
+               value="${state.motor.tempOp}"
+               oninput="state.motor.tempOp = Number(this.value)">
       </div>
 
       <div>
         <label>Hauteur d’axe (po)</label>
         <input type="number"
-               value="${state.motorAxisHeight ?? 6}"
-               oninput="state.motorAxisHeight = Number(this.value)">
+               value="${state.motor.axisHeight}"
+               oninput="state.motor.axisHeight = Number(this.value)">
       </div>
     </div>
 
     <label>Matériau</label>
-    <select onchange="state.motorMaterial = this.value">
-      ${materialOptions(state.motorMaterial)}
+    <select onchange="state.motor.material = this.value">
+      ${materialOptions(state.motor.material)}
     </select>
   </div>
 
@@ -2609,49 +2609,28 @@ if(id === "thermal"){
       <div>
         <label>Température d’opération (°F)</label>
         <input type="number"
-               value="${state.pumpTempOp ?? 200}"
-               oninput="state.pumpTempOp = Number(this.value)">
+               value="${state.pump.tempOp}"
+               oninput="state.pump.tempOp = Number(this.value)">
       </div>
 
       <div>
         <label>Hauteur d’axe (po)</label>
         <input type="number"
-               value="${state.pumpAxisHeight ?? 10}"
-               oninput="state.pumpAxisHeight = Number(this.value)">
+               value="${state.pump.axisHeight}"
+               oninput="state.pump.axisHeight = Number(this.value)">
       </div>
     </div>
 
     <label>Matériau</label>
-    <select onchange="state.pumpMaterial = this.value">
-      ${materialOptions(state.pumpMaterial)}
+    <select onchange="state.pump.material = this.value">
+      ${materialOptions(state.pump.material)}
     </select>
   </div>
   `;
-}
-
-  // Sélections
-  document.getElementById("in_motor_material").value = state.motor.material;
-  document.getElementById("in_pump_material").value  = state.pump.material;
-
-  // Coefficients visibles
-  document.getElementById("motor_coeff").value =
-  formatCoefficient(MATERIAL_COEFF[state.motor.material]);
-
-document.getElementById("pump_coeff").value =
-  formatCoefficient(MATERIAL_COEFF[state.pump.material]);
-  wireInputs([
-    ["in_motor_tempOp",     v => state.motor.tempOp = Number(v)],
-    ["in_motor_axisHeight", v => state.motor.axisHeight = Number(v)],
-    ["in_motor_material",   v => state.motor.material = v],
-
-    ["in_pump_tempOp",      v => state.pump.tempOp = Number(v)],
-    ["in_pump_axisHeight",  v => state.pump.axisHeight = Number(v)],
-    ["in_pump_material",    v => state.pump.material = v],
-  ]);
-
   return;
 }
-}
+
+
 function buildFormulaSoftFoot(){
   const sf = computeSoftFoot();
 
