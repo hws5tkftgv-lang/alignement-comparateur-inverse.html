@@ -2639,22 +2639,32 @@ function wireInputs(pairs){
     const input = document.getElementById(inputId);
     if(!input) return;
 
-    // Autoriser la saisie libre sans calcul immédiat
+    const isSelect = input.tagName === "SELECT";
+
     input.addEventListener("input", () => {
-      // Ne rien faire ici → saisie fluide
+      // saisie libre
     });
 
-    // Validation sur ENTER
     input.addEventListener("keydown", (e) => {
       if(e.key === "Enter"){
-        input.blur();   // force validation
+        input.blur();
       }
     });
 
-    // Validation finale quand on quitte le champ
     input.addEventListener("blur", () => {
-      let raw = input.value.trim();
+      let raw = input.value;
 
+      // 🟢 CAS SELECT (matériau)
+      if(isSelect){
+        setter(raw);
+        refreshUI();
+        drawTopView();
+        drawSideView();
+        return;
+      }
+
+      // 🔵 CAS NUMÉRIQUE
+      raw = raw.trim();
       if(raw === ""){
         raw = "0";
         input.value = "0";
