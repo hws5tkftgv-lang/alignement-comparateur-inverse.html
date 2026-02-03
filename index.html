@@ -1673,11 +1673,20 @@ const state = {
   parH: 0,
   parHTol: 2,
   
-  // Dilatation thermique
+  // 🌡️ Dilatation thermique — modèle comparatif
 tempAmb: 68,
-tempOp: 90,
-material: "aluminium",
-axisHeight: 6
+
+motor: {
+  material: "aluminium",
+  axisHeight: 6,
+  tempOp: 90
+},
+
+pump: {
+  material: "inox",
+  axisHeight: 10,
+  tempOp: 200
+},
 };
 /* =====================================================
    PARAMÈTRES GÉOMÉTRIQUES (pouces)
