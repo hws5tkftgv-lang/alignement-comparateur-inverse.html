@@ -1591,7 +1591,7 @@ function computeDialReading(){
 
 
 function updateTraining(){
-
+if(!trainingMode) return;
   const reading = computeDialReading();
 
   // 🔑 CRITIQUE — synchroniser la taille des canvas AVANT dessin
@@ -1602,13 +1602,11 @@ function updateTraining(){
     resizeCanvas(window.sideCanvasTest, window.sideCtxTest);
   }
 
-  // Dessins
   drawDial(reading, reading);
-  drawTrainingViews();
 
-  // ⚠️ renderAll APRÈS (UI, pas canvas training)
-  renderAll();
-
+// 🔑 TRAINING = CANVAS ISOLÉS
+forceResizeTrainingCanvases();
+drawTrainingViews();
   const txt = document.getElementById("dialValue");
   if(txt){
     txt.textContent = `${reading.toFixed(2)} mil`;
