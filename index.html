@@ -2612,12 +2612,19 @@ else if(id === "thermal"){
       </div>
     </div>
 
-    <label>Matériau</label>
-    <select onchange="state.motor.material = this.value;
-       refreshUI();
-      ">
-      ${materialOptions(state.motor.material)}
-    </select>
+  <label style="display:flex; justify-content:space-between; align-items:center;">
+  <span>Matériau</span>
+  <span style="font-size:12px; color:rgba(234,241,255,.75);">
+    Coeff : <b>${formatCoefficient(MATERIAL_COEFF[state.motor.material])}</b> /°F
+  </span>
+</label>
+
+<select onchange="
+  state.motor.material = this.value;
+  refreshUI();
+">
+  ${materialOptions(state.motor.material)}
+</select>
   </div>
 
   <!-- POMPE -->
@@ -2640,13 +2647,19 @@ else if(id === "thermal"){
       </div>
     </div>
 
-    <label>Matériau</label>
-  <select onchange="
+ <label style="display:flex; justify-content:space-between; align-items:center;">
+  <span>Matériau</span>
+  <span style="font-size:12px; color:rgba(234,241,255,.75);">
+    Coeff : <b>${formatCoefficient(MATERIAL_COEFF[state.pump.material])}</b> /°F
+  </span>
+</label>
+
+<select onchange="
   state.pump.material = this.value;
   refreshUI();
 ">
-      ${materialOptions(state.pump.material)}
-    </select>
+  ${materialOptions(state.pump.material)}
+</select>
   </div>
   `;
   return;
