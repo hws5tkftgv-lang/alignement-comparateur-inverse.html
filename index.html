@@ -1017,7 +1017,13 @@ Les pattes A / B / C / D seront affichées ici.
 /* =====================================================
    AIDE / FORMULES (BULLE ℹ️) + IMPRESSION
 ===================================================== */
-
+const MATERIAL_COEFF = {
+  Aluminium: 0.0000124,
+  "Acier au carbone": 0.0000063,
+  "Acier inoxydable": 0.0000095,
+  Fonte: 0.0000065,
+  Bronze: 0.0000100
+};
 // 1) contenu HTML de la fiche
 function buildHelpHTML(){
   // ⚠️ Ici on écrit LA référence pédagogique (une seule source de vérité)
@@ -3245,15 +3251,16 @@ ctx.fillText(labelFoot("C"), PM.C.x, PM.C.y + labelOffset + 6);
 }
 
 
-function calcThermalGrowth(heightInch, materialKey, tempOp, tempAmb){
-  const coeff = THERMAL_COEFF[materialKey];
+function calcThermalGrowth(axisHeight, material, tempOp, tempAmb){
+  const coeff = MATERIAL_COEFF[material];
 
-  if(!coeff) return NaN;
+  if(!coeff){
+    return 0; // sécurité pédagogique
+  }
 
-  const deltaInch = heightInch * coeff * (tempOp - tempAmb);
+  const deltaInch = axisHeight * coeff * (tempOp - tempAmb);
   return deltaInch * 1000; // pouces → mils
 }
-
 function drawSideViewGeneric(ctxTarget){
 
   currentView = "side";
