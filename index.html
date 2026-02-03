@@ -1025,6 +1025,23 @@ const MATERIAL_COEFF = {
   bronze:    0.0000100
 };
 
+
+function materialOptions(selected){
+  return Object.keys(MATERIAL_COEFF)
+    .map(key => {
+      const label =
+        key === "aluminium" ? "Aluminium" :
+        key === "acier"     ? "Acier au carbone" :
+        key === "inox"      ? "Acier inoxydable" :
+        key === "fonte"     ? "Fonte" :
+        key === "bronze"    ? "Bronze" :
+        key;
+
+      return `<option value="${key}" ${key === selected ? "selected" : ""}>${label}</option>`;
+    })
+    .join("");
+}
+
 // ========================================
 // FORMATAGE D’AFFICHAGE — COEFFICIENT
 // (⚠️ affichage seulement, PAS de calcul)
