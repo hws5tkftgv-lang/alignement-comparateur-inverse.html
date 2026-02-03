@@ -1932,6 +1932,7 @@ function computeParallelHorizontal(){
   return null;
 }
 
+
 function buildThermalStep(){
   const deltaMil = calcThermalGrowth(
     state.axisHeight,
@@ -1951,14 +1952,6 @@ function buildThermalStep(){
   msg += "Formule :\n";
   msg += "ΔH = hauteur × coefficient × (T_op − T_amb)\n\n";
 
-  // 🔒 Sécurité si le coefficient est invalide
-  if (isNaN(deltaMil)) {
-    msg += "❌ ERREUR DE CALCUL\n";
-    msg += "Coefficient de dilatation invalide pour le matériau sélectionné.\n";
-    msg += "Vérifiez le matériau.\n";
-    return msg;
-  }
-
   msg += "Résultat :\n";
   msg += `ΔH = ${deltaMil.toFixed(2)} mil (vers le haut)\n\n`;
 
@@ -1971,6 +1964,8 @@ function buildThermalStep(){
 
   return msg;
 }
+
+
 /* =====================================================
    CALCUL CORRECTION ANGULAIRE (mils réels)
    B × C / A
@@ -3251,16 +3246,19 @@ ctx.fillText(labelFoot("C"), PM.C.x, PM.C.y + labelOffset + 6);
 }
 
 
-function calcThermalGrowth(axisHeight, material, tempOp, tempAmb){
+function calcThermalGrowth(heightIn, material, tOp, tAmb){
   const coeff = MATERIAL_COEFF[material];
 
-  if(!coeff){
-    return 0; // sécurité pédagogique
+  if(!coeff || isNaN(heightIn) || isNaN(tOp) || isNaN(tAmb)){
+    return 0;
   }
 
-  const deltaInch = axisHeight * coeff * (tempOp - tempAmb);
-  return deltaInch * 1000; // pouces → mils
+  const deltaIn = heightIn * coeff * (tOp - tAmb);
+  return deltaIn * 1000; // pouces → mils
 }
+
+
+
 function drawSideViewGeneric(ctxTarget){
 
   currentView = "side";
