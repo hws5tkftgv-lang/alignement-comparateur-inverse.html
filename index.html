@@ -1928,29 +1928,37 @@ function computeParallelHorizontal(){
 
 
 function buildThermalStep(){
-  const deltaMil = calcThermalGrowth(
-    state.axisHeight,
-    state.material,
-    state.tempOp,
+
+  const r = calcRelativeThermalShim(
+    state.motor,
+    state.pump,
     state.tempAmb
   );
 
-  let msg = "🌡️ Compensation de dilatation thermique\n\n";
+  if(!r){
+    return "❌ Données invalides pour la dilatation thermique.";
+  }
 
-  msg += "Données :\n";
-  msg += `• Matériau : ${state.material}\n`;
-  msg += `• Hauteur d’axe : ${state.axisHeight} po\n`;
-  msg += `• Température ambiante : ${state.tempAmb} °F\n`;
-  msg += `• Température d’opération : ${state.tempOp} °F\n\n`;
+  let msg = "🌡️ Comparaison de dilatation thermique\n\n";
 
-  msg += "Formule :\n";
-  msg += "ΔH = hauteur × coefficient × (T_op − T_amb)\n\n";
+  msg += "MOTEUR\n";
+  msg += `• Matériau : ${state.motor.material}\n`;
+  msg += `• ΔH moteur = ${r.motorGrowth.toFixed(2)} mil\n\n`;
 
-  msg += "Résultat :\n";
-  msg += `ΔH = ${deltaMil.toFixed(2)} mil (vers le haut)\n\n`;
+  msg += "POMPE\n";
+  msg += `• Matériau : ${state.pump.material}\n`;
+  msg += `• ΔH pompe = ${r.pumpGrowth.toFixed(2)} mil\n\n`;
 
-  msg += "🔧 Correction à l’alignement :\n";
-  msg += `👉 Retirer ${deltaMil.toFixed(2)} mil de cales sous le moteur\n\n`;
+  msg += "COMPARAISON\n";
+  msg += `ΔH relatif = ${r.relative.toFixed(2)} mil\n\n`;
+
+  msg += "🔧 CORRECTION À FROID\n";
+
+  if(r.action === "ADD"){
+    msg += `👉 Ajouter +${r.shim.toFixed(2)} mil de cales sous le moteur\n\n`;
+  }else{
+    msg += `👉 Retirer ${r.shim.toFixed(2)} mil de cales sous le moteur\n\n`;
+  }
 
   msg += "⚠️ NOTE IMPORTANTE :\n";
   msg += "Cette correction ne modifie PAS les lectures au cadran.\n";
@@ -1958,8 +1966,6 @@ function buildThermalStep(){
 
   return msg;
 }
-
-
 /* =====================================================
    CALCUL CORRECTION ANGULAIRE (mils réels)
    B × C / A
@@ -2540,67 +2546,88 @@ if(id === "parV"){
   }
 if(id === "thermal"){
   ui.inputsArea.innerHTML = `
-    <div class="row">
-      <div>
-        <label>Température ambiante (°F)</label>
-        <input id="in_tempAmb" type="number" value="${state.tempAmb}">
+    <div class="card" style="margin-bottom:10px">
+      <h3>Moteur</h3>
+      <div class="row">
+        <div>
+          <label>Température d’opération (°F)</label>
+          <input id="in_motor_tempOp" type="number" value="${state.motor.tempOp}">
+        </div>
+        <div>
+          <label>Hauteur d’axe (po)</label>
+          <input id="in_motor_axisHeight" type="number" step="0.1" value="${state.motor.axisHeight}">
+        </div>
       </div>
-      <div>
-        <label>Température d’opération (°F)</label>
-        <input id="in_tempOp" type="number" value="${state.tempOp}">
+
+      <div class="row" style="margin-top:6px">
+        <div>
+          <label>Matériau</label>
+          <select id="in_motor_material">
+            <option value="aluminium">Aluminium</option>
+            <option value="acier">Acier carbone</option>
+            <option value="inox">Acier inoxydable</option>
+            <option value="fonte">Fonte</option>
+            <option value="bronze">Bronze</option>
+          </select>
+        </div>
+        <div>
+          <label>Coefficient (po/po/°F)</label>
+          <input type="text" id="motor_coeff" disabled>
+        </div>
       </div>
     </div>
 
-    <div class="row" style="margin-top:8px;">
-      <div>
-        <label>Hauteur d’axe (po)</label>
-        <input id="in_axisHeight" type="number" step="0.1" value="${state.axisHeight}">
+    <div class="card">
+      <h3>Pompe</h3>
+      <div class="row">
+        <div>
+          <label>Température d’opération (°F)</label>
+          <input id="in_pump_tempOp" type="number" value="${state.pump.tempOp}">
+        </div>
+        <div>
+          <label>Hauteur d’axe (po)</label>
+          <input id="in_pump_axisHeight" type="number" step="0.1" value="${state.pump.axisHeight}">
+        </div>
       </div>
-   <div>
-  <label>Matériau</label>
-  <div style="display:flex; align-items:center; gap:8px;">
-    <select id="in_material">
-      <option value="aluminium">Aluminium</option>
-      <option value="acier">Acier carbone</option>
-      <option value="inox">Acier inoxydable</option>
-      <option value="fonte">Fonte</option>
-      <option value="bronze">Bronze</option>
-    </select>
-    <span id="matCoeff"
-          style="font-size:12px; opacity:.75; white-space:nowrap;">
-      —
-    </span>
-  </div>
-</div>
+
+      <div class="row" style="margin-top:6px">
+        <div>
+          <label>Matériau</label>
+          <select id="in_pump_material">
+            <option value="aluminium">Aluminium</option>
+            <option value="acier">Acier carbone</option>
+            <option value="inox">Acier inoxydable</option>
+            <option value="fonte">Fonte</option>
+            <option value="bronze">Bronze</option>
+          </select>
+        </div>
+        <div>
+          <label>Coefficient (po/po/°F)</label>
+          <input type="text" id="pump_coeff" disabled>
+        </div>
+      </div>
     </div>
   `;
 
-  // ✅ IMPORTANT : forcer la valeur sélectionnée après injection HTML
-  const sel = document.getElementById("in_material");
-  if(sel) sel.value = state.material;
-  const coeffSpan = document.getElementById("matCoeff");
-if(coeffSpan){
-  const c = MATERIAL_COEFF[state.material];
-  coeffSpan.textContent = c
-    ? `α = ${c} /°F`
-    : "";
-}
+  // Sélections
+  document.getElementById("in_motor_material").value = state.motor.material;
+  document.getElementById("in_pump_material").value  = state.pump.material;
+
+  // Coefficients visibles
+  document.getElementById("motor_coeff").value =
+    MATERIAL_COEFF[state.motor.material].toExponential(2);
+
+  document.getElementById("pump_coeff").value =
+    MATERIAL_COEFF[state.pump.material].toExponential(2);
 
   wireInputs([
-    ["in_tempAmb",    v => state.tempAmb = Number(v)],
-    ["in_tempOp",     v => state.tempOp = Number(v)],
-    ["in_axisHeight", v => state.axisHeight = Number(v)],
-   ["in_material", v => {
-  state.material = v;
+    ["in_motor_tempOp",     v => state.motor.tempOp = Number(v)],
+    ["in_motor_axisHeight", v => state.motor.axisHeight = Number(v)],
+    ["in_motor_material",   v => state.motor.material = v],
 
-  const coeffSpan = document.getElementById("matCoeff");
-  if(coeffSpan){
-    const c = MATERIAL_COEFF[v];
-    coeffSpan.textContent = c
-      ? `α = ${c} /°F`
-      : "";
-  }
-}],
+    ["in_pump_tempOp",      v => state.pump.tempOp = Number(v)],
+    ["in_pump_axisHeight",  v => state.pump.axisHeight = Number(v)],
+    ["in_pump_material",    v => state.pump.material = v],
   ]);
 
   return;
@@ -3290,7 +3317,30 @@ function calcThermalGrowth(heightIn, material, tOp, tAmb){
   return deltaIn * 1000; // pouces → mils
 }
 
+function calcRelativeThermalShim(motor, pump, tempAmb){
+  const motorCoeff = MATERIAL_COEFF[motor.material];
+  const pumpCoeff  = MATERIAL_COEFF[pump.material];
 
+  if(!motorCoeff || !pumpCoeff){
+    return null;
+  }
+
+  const dH_motor =
+    motor.axisHeight * motorCoeff * (motor.tempOp - tempAmb) * 1000;
+
+  const dH_pump =
+    pump.axisHeight * pumpCoeff * (pump.tempOp - tempAmb) * 1000;
+
+  const deltaRelative = dH_motor - dH_pump;
+
+  return {
+    motorGrowth: dH_motor,        // mil
+    pumpGrowth:  dH_pump,         // mil
+    relative:    deltaRelative,   // mil
+    action: deltaRelative < 0 ? "ADD" : "REMOVE",
+    shim: Math.abs(deltaRelative)
+  };
+}
 
 function drawSideViewGeneric(ctxTarget){
 
