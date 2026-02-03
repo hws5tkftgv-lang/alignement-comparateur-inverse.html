@@ -1688,13 +1688,7 @@ const geometry = {
   frontToRearFeet: 10      // Pattes AVANT → ARRIÈRE
 
 };
-const thermalCoeff = {
-  aluminium: 0.0000124,
-  acier: 0.0000063,
-  inox: 0.0000095,
-  fonte: 0.0000065,
-  bronze: 0.0000100
-};
+
 // Sécurité : distances géométriques toujours définies
 if(!Number.isFinite(geometry.distDialToFront)) {
   geometry.distDialToFront = 6;
@@ -2544,40 +2538,46 @@ if(id === "parV"){
     ]);
     return;
   }
-  if(id === "thermal"){
+if(id === "thermal"){
   ui.inputsArea.innerHTML = `
     <div class="row">
-      <label>Température ambiante (°F)</label>
-      <input id="in_tempAmb" type="number" value="68">
+      <div>
+        <label>Température ambiante (°F)</label>
+        <input id="in_tempAmb" type="number" value="${state.tempAmb}">
+      </div>
+      <div>
+        <label>Température d’opération (°F)</label>
+        <input id="in_tempOp" type="number" value="${state.tempOp}">
+      </div>
     </div>
 
-    <div class="row">
-      <label>Température d’opération (°F)</label>
-      <input id="in_tempOp" type="number" value="90">
-    </div>
-
-    <div class="row">
-      <label>Hauteur d’axe (po)</label>
-      <input id="in_axisHeight" type="number" value="6">
-    </div>
-
-    <div class="row">
-      <label>Matériau</label>
-      <select id="in_material">
-        <option value="aluminium">Aluminium</option>
-        <option value="acier">Acier carbone</option>
-        <option value="inox">Acier inoxydable</option>
-        <option value="fonte">Fonte</option>
-        <option value="bronze">Bronze</option>
-      </select>
+    <div class="row" style="margin-top:8px;">
+      <div>
+        <label>Hauteur d’axe (po)</label>
+        <input id="in_axisHeight" type="number" step="0.1" value="${state.axisHeight}">
+      </div>
+      <div>
+        <label>Matériau</label>
+        <select id="in_material">
+          <option value="aluminium">Aluminium</option>
+          <option value="acier">Acier carbone</option>
+          <option value="inox">Acier inoxydable</option>
+          <option value="fonte">Fonte</option>
+          <option value="bronze">Bronze</option>
+        </select>
+      </div>
     </div>
   `;
 
+  // ✅ IMPORTANT : forcer la valeur sélectionnée après injection HTML
+  const sel = document.getElementById("in_material");
+  if(sel) sel.value = state.material;
+
   wireInputs([
-    ["in_tempAmb", v => state.tempAmb = +v],
-    ["in_tempOp", v => state.tempOp = +v],
-    ["in_axisHeight", v => state.axisHeight = +v],
-    ["in_material", v => state.material = v]
+    ["in_tempAmb",    v => state.tempAmb = Number(v)],
+    ["in_tempOp",     v => state.tempOp = Number(v)],
+    ["in_axisHeight", v => state.axisHeight = Number(v)],
+    ["in_material",   v => state.material = v],
   ]);
 
   return;
