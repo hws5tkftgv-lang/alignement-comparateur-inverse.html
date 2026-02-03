@@ -1024,6 +1024,17 @@ const MATERIAL_COEFF = {
   fonte:     0.0000065,
   bronze:    0.0000100
 };
+
+// ========================================
+// FORMATAGE D’AFFICHAGE — COEFFICIENT
+// (⚠️ affichage seulement, PAS de calcul)
+// ========================================
+function formatCoefficient(coef){
+  if(!Number.isFinite(coef)) return "—";
+  return coef.toFixed(7); // ex: 0.0000124
+}
+
+
 // 1) contenu HTML de la fiche
 function buildHelpHTML(){
   // ⚠️ Ici on écrit LA référence pédagogique (une seule source de vérité)
@@ -2624,11 +2635,10 @@ if(id === "thermal"){
 
   // Coefficients visibles
   document.getElementById("motor_coeff").value =
-    MATERIAL_COEFF[state.motor.material].toExponential(2);
+  formatCoefficient(MATERIAL_COEFF[state.motor.material]);
 
-  document.getElementById("pump_coeff").value =
-    MATERIAL_COEFF[state.pump.material].toExponential(2);
-
+document.getElementById("pump_coeff").value =
+  formatCoefficient(MATERIAL_COEFF[state.pump.material]);
   wireInputs([
     ["in_motor_tempOp",     v => state.motor.tempOp = Number(v)],
     ["in_motor_axisHeight", v => state.motor.axisHeight = Number(v)],
