@@ -3440,7 +3440,8 @@ if(trainingMode){
   if(trainType === "angV") angV = trainValue;
 }
 
-  let baseCy = h * 0.55;
+  const bottomSafeMargin = 40;   // ← marge visuelle pour lettres & pattes
+let baseCy = (h - bottomSafeMargin) * 0.55;
   let baseCx = w * 0.30;
 
   let cy = baseCy + (
@@ -3546,8 +3547,13 @@ ctx.fillRect(frontFootX - footW/2, cy + motorH/2 - 2, footW, footH);
 ctx.fillStyle = "#fff";
 ctx.font = "14px Arial";
 ctx.textAlign = "center";
-ctx.fillText("D", rearFootX,  cy + motorH/2 + 24);
-ctx.fillText("C", frontFootX, cy + motorH/2 + 24);
+const labelY = Math.min(
+  cy + motorH/2 + 24,
+  h - 12            // empêche de sortir du canvas
+);
+
+ctx.fillText("D", rearFootX,  labelY);
+ctx.fillText("C", frontFootX, labelY);
 
 // ---- ARBRE MOTEUR ----
 ctx.fillStyle = "#bbbbbb";
