@@ -1655,17 +1655,17 @@ const state = {
   
   footScheme: "standard",
 
-  angV: 3,
-  angVTol: 3,
+  angV: 0,
+  angVTol: 2,
 
-  parV: 3,
-  parVTol: 3,
+  parV: 0,
+  parVTol: 2,
 
-  angH: 3,
-  angHTol: 3,
+  angH: 0,
+  angHTol: 2,
 
-  parH: 3,
-  parHTol: 3,
+  parH: 0,
+  parHTol: 2,
   
   // Dilatation thermique
 tempAmb: 68,
@@ -1709,6 +1709,8 @@ const STEPS = [
 
   { id:"angH",    label:"6 — Angularité horizontale" },
   { id:"parH",    label:"7 — Parallélisme horizontal" }
+  
+  { id:"thermal", label:"8 — Dilatation thermique" }
 ];
 /* =====================================================
    UTILITAIRES
@@ -1769,7 +1771,12 @@ function updateNote(stepId){
         "⚠️ Parallélisme horizontal : la correction réelle du moteur est la lecture ÷ 2 (on corrige une seule machine).";
       note.classList.add("note-blink");
       break;
-
+      
+    case "thermal":
+      note.textContent =
+        "La dilatation thermique se calcule APRÈS l’alignement à froid. Elle ne modifie pas les lectures au cadran.";
+      break;
+      
     default:
       note.textContent = "—";
   }
@@ -2022,7 +2029,8 @@ function isStepOK(stepIndex){
 
   if(id === "angH")    return ok(state.angH, state.angHTol);
   if(id === "parH")    return ok(state.parH, state.parHTol);
-
+  
+  if(id === "thermal") return true;
   return true;
 }
 /* =====================================================
