@@ -2556,28 +2556,51 @@ if(id === "thermal"){
         <label>Hauteur d’axe (po)</label>
         <input id="in_axisHeight" type="number" step="0.1" value="${state.axisHeight}">
       </div>
-      <div>
-        <label>Matériau</label>
-        <select id="in_material">
-          <option value="aluminium">Aluminium</option>
-          <option value="acier">Acier carbone</option>
-          <option value="inox">Acier inoxydable</option>
-          <option value="fonte">Fonte</option>
-          <option value="bronze">Bronze</option>
-        </select>
-      </div>
+   <div>
+  <label>Matériau</label>
+  <div style="display:flex; align-items:center; gap:8px;">
+    <select id="in_material">
+      <option value="aluminium">Aluminium</option>
+      <option value="acier">Acier carbone</option>
+      <option value="inox">Acier inoxydable</option>
+      <option value="fonte">Fonte</option>
+      <option value="bronze">Bronze</option>
+    </select>
+    <span id="matCoeff"
+          style="font-size:12px; opacity:.75; white-space:nowrap;">
+      —
+    </span>
+  </div>
+</div>
     </div>
   `;
 
   // ✅ IMPORTANT : forcer la valeur sélectionnée après injection HTML
   const sel = document.getElementById("in_material");
   if(sel) sel.value = state.material;
+  const coeffSpan = document.getElementById("matCoeff");
+if(coeffSpan){
+  const c = MATERIAL_COEFF[state.material];
+  coeffSpan.textContent = c
+    ? `α = ${c} /°F`
+    : "";
+}
 
   wireInputs([
     ["in_tempAmb",    v => state.tempAmb = Number(v)],
     ["in_tempOp",     v => state.tempOp = Number(v)],
     ["in_axisHeight", v => state.axisHeight = Number(v)],
-    ["in_material",   v => state.material = v],
+   ["in_material", v => {
+  state.material = v;
+
+  const coeffSpan = document.getElementById("matCoeff");
+  if(coeffSpan){
+    const c = MATERIAL_COEFF[v];
+    coeffSpan.textContent = c
+      ? `α = ${c} /°F`
+      : "";
+  }
+}],
   ]);
 
   return;
