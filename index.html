@@ -1366,11 +1366,7 @@ if(zeroBtn){
     // 2) Zéro cadran (aiguille)
     dialZeroOffset = 0;
 
-    // 3) RESET mécanique (dessins)
-    state.parV = 0;
-    state.parH = 0;
-    state.angV = 0;
-    state.angH = 0;
+
 
     // 4) Redessin complet
     updateTraining();
@@ -1581,26 +1577,14 @@ function computeDialReading(){
 
 function updateTraining(){
 
-  // ===== INJECTION DU TRAINING DANS LA GÉOMÉTRIE =====
-if(trainingMode){
-
-  state.parV = 0;
-  state.parH = 0;
-  state.angV = 0;
-  state.angH = 0;
-
-  if(trainType === "parV") state.parV = trainValue;
-  if(trainType === "parH") state.parH = trainValue;
-  if(trainType === "angV") state.angV = trainValue;
-  if(trainType === "angH") state.angH = trainValue;
-}
-
+  
 const reading = computeDialReading();
 
     // Position réelle du comparateur → aiguille
 
 
 drawDial(reading, reading);
+drawTrainingViews();
   renderAll();
   
   const txt = document.getElementById("dialValue");
@@ -1617,7 +1601,7 @@ drawDial(reading, reading);
     msg += `Lecture cadran : <b>${reading.toFixed(2)} mil</b><br><br>`;
 
     if(trainType.startsWith("par")){
-      msg += "📏 Parallélisme → le comparateur lit la moitié du déplacement réel.";
+      msg += "📏 Parallélisme → le comparateur lit le DOUBLE du déplacement réel (correction = lecture ÷ 2).";
     }else{
       msg += "📐 Angularité → la lecture dépend du bras de levier.";
     }
@@ -3118,6 +3102,7 @@ function drawTopViewGeneric(ctxTarget){
 
   const canvas = ctxTarget.canvas;
 const {w,h} = resizeCanvas(canvas, ctxTarget);
+if(w < 10 || h < 10) return;
 const ctx = ctxTarget;
   clear(ctx,w,h);
 
@@ -3438,6 +3423,7 @@ function drawSideViewGeneric(ctxTarget){
 
   const canvas = ctxTarget.canvas;
 const {w,h} = resizeCanvas(canvas, ctxTarget);
+if(w < 10 || h < 10) return;
 const ctx = ctxTarget;
   clear(ctx,w,h);
 
@@ -3703,6 +3689,12 @@ function drawTopView(){
 
 function drawSideView(){
   drawSideViewGeneric(sideCtx);
+}
+
+function drawTrainingViews(){
+  if(!trainingMode) return;
+  if(window.topCtxTest)  drawTopViewGeneric(window.topCtxTest);
+  if(window.sideCtxTest) drawSideViewGeneric(window.sideCtxTest);
 }
 function renderAll(){
   refreshUI();
