@@ -1592,16 +1592,23 @@ function computeDialReading(){
 
 function updateTraining(){
 
-  
-const reading = computeDialReading();
+  const reading = computeDialReading();
 
-    // Position réelle du comparateur → aiguille
+  // 🔑 CRITIQUE — synchroniser la taille des canvas AVANT dessin
+  if(window.topCanvasTest && window.topCtxTest){
+    resizeCanvas(window.topCanvasTest, window.topCtxTest);
+  }
+  if(window.sideCanvasTest && window.sideCtxTest){
+    resizeCanvas(window.sideCanvasTest, window.sideCtxTest);
+  }
 
+  // Dessins
+  drawDial(reading, reading);
+  drawTrainingViews();
 
-drawDial(reading, reading);
-drawTrainingViews();
+  // ⚠️ renderAll APRÈS (UI, pas canvas training)
   renderAll();
-  
+
   const txt = document.getElementById("dialValue");
   if(txt){
     txt.textContent = `${reading.toFixed(2)} mil`;
@@ -1628,7 +1635,6 @@ drawTrainingViews();
     explain.innerHTML = msg;
   }
 }
-
 /* =====================================================
    MAPPING PATTES (lettres ↔ coins)
    Coins = TL (haut-gauche), TR (haut-droite),
