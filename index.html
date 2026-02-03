@@ -2613,7 +2613,9 @@ else if(id === "thermal"){
     </div>
 
     <label>Matériau</label>
-    <select onchange="state.motor.material = this.value">
+    <select onchange="state.motor.material = this.value;
+       refreshUI();
+      ">
       ${materialOptions(state.motor.material)}
     </select>
   </div>
@@ -2639,7 +2641,10 @@ else if(id === "thermal"){
     </div>
 
     <label>Matériau</label>
-    <select onchange="state.pump.material = this.value">
+  <select onchange="
+  state.pump.material = this.value;
+  refreshUI();
+">
       ${materialOptions(state.pump.material)}
     </select>
   </div>
