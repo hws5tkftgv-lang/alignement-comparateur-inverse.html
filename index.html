@@ -1031,8 +1031,8 @@ function buildHelpHTML(){
 
 <div class="box">
   <b>2) Parallélisme (12–6 et 3–9) : règle CRITIQUE</b><br>
+  En parallélisme, le comparateur lit le double du déplacement réel, car une seule machine est corrigée.<br>
   Correction moteur = Lecture ÷ 2<br>
-  Parce que l’on corrige uniquement une des deux machines (le moteur).
 </div>
 
 <div class="box">
@@ -1655,17 +1655,23 @@ const state = {
   
   footScheme: "standard",
 
-  angV: 0,
-  angVTol: 1,
+  angV: 3,
+  angVTol: 3,
 
-  parV: 0,
-  parVTol: 1,
+  parV: 3,
+  parVTol: 3,
 
-  angH: 0,
-  angHTol: 1,
+  angH: 3,
+  angHTol: 3,
 
-  parH: 0,
-  parHTol: 1
+  parH: 3,
+  parHTol: 3
+  
+  // Dilatation thermique
+tempAmb: 68,
+tempOp: 90,
+material: "aluminium",
+axisHeight: 6
 };
 /* =====================================================
    PARAMÈTRES GÉOMÉTRIQUES (pouces)
@@ -1674,6 +1680,14 @@ const geometry = {
   couplingDiameter: 3,      // Ø accouplement
   centerToFrontFeet: 6,    // Centre → pattes AVANT
   frontToRearFeet: 10      // Pattes AVANT → ARRIÈRE
+
+};
+const thermalCoeff = {
+  aluminium: 0.0000124,
+  acier: 0.0000063,
+  inox: 0.0000095,
+  fonte: 0.0000065,
+  bronze: 0.00001
 };
 // Sécurité : distances géométriques toujours définies
 if(!Number.isFinite(geometry.distDialToFront)) {
@@ -1741,7 +1755,7 @@ function updateNote(stepId){
 
     case "parV":
       note.textContent =
-        "⚠️ Parallélisme vertical : la correction réelle à appliquer est la lecture ÷ 2, répartie uniformément sur les 4 pattes (A + B + C + D).";
+        "⚠️ Parallélisme vertical : En parallélisme, le comparateur lit le double du déplacement réel, car une seule machine est corrigée. La correction réelle à appliquer est la lecture ÷ 2, répartie uniformément sur les 4 pattes (A + B + C + D).";
       note.classList.add("note-blink");
       break;
 
@@ -1903,6 +1917,38 @@ function computeParallelHorizontal(){
     };
   }
   return null;
+}
+
+function buildThermalStep(){
+  const deltaMil = calcThermalGrowth(
+    state.axisHeight,
+    state.material,
+    state.tempOp,
+    state.tempAmb
+  );
+
+  let msg = "🌡️ Compensation de dilatation thermique\n\n";
+
+  msg += "Données :\n";
+  msg += `• Matériau : ${state.material}\n`;
+  msg += `• Hauteur d’axe : ${state.axisHeight} po\n`;
+  msg += `• Température ambiante : ${state.tempAmb} °F\n`;
+  msg += `• Température d’opération : ${state.tempOp} °F\n\n`;
+
+  msg += "Formule :\n";
+  msg += "ΔH = hauteur × coefficient × (T_op − T_amb)\n\n";
+
+  msg += `Résultat :\n`;
+  msg += `ΔH = ${deltaMil.toFixed(2)} mil (vers le haut)\n\n`;
+
+  msg += "🔧 Correction à l’alignement :\n";
+  msg += `👉 Retirer ${deltaMil.toFixed(2)} mil de cales sous le moteur\n\n`;
+
+  msg += "⚠️ NOTE IMPORTANTE :\n";
+  msg += "Cette correction ne modifie PAS les lectures au cadran.\n";
+  msg += "Elle s’applique APRÈS l’alignement à froid.\n";
+
+  return msg;
 }
 /* =====================================================
    CALCUL CORRECTION ANGULAIRE (mils réels)
@@ -2232,6 +2278,11 @@ const realMove = Math.abs(state.parH) / 2;
   return msg;
 }
 
+if(stepId === "thermal"){
+  return buildThermalStep();
+}
+
+
 return "";
 }
 /* =====================================================
@@ -2261,6 +2312,9 @@ function renderInputsForCurrentStep(){
     ]);
     return;
   }
+
+
+
 
   if(id === "softfoot"){
     ui.inputsArea.innerHTML = `
@@ -2376,6 +2430,9 @@ if(id === "measures"){
   return;
 }
 
+
+
+
   // =====================================================
   // ANGULARITÉ VERTICALE
   // =====================================================
@@ -2470,6 +2527,44 @@ if(id === "parV"){
     ]);
     return;
   }
+  if(id === "thermal"){
+  ui.inputsArea.innerHTML = `
+    <div class="row">
+      <label>Température ambiante (°F)</label>
+      <input id="in_tempAmb" type="number" value="68">
+    </div>
+
+    <div class="row">
+      <label>Température d’opération (°F)</label>
+      <input id="in_tempOp" type="number" value="90">
+    </div>
+
+    <div class="row">
+      <label>Hauteur d’axe (po)</label>
+      <input id="in_axisHeight" type="number" value="6">
+    </div>
+
+    <div class="row">
+      <label>Matériau</label>
+      <select id="in_material">
+        <option value="aluminium">Aluminium</option>
+        <option value="acier">Acier carbone</option>
+        <option value="inox">Acier inoxydable</option>
+        <option value="fonte">Fonte</option>
+        <option value="bronze">Bronze</option>
+      </select>
+    </div>
+  `;
+
+  wireInputs([
+    ["in_tempAmb", v => state.tempAmb = +v],
+    ["in_tempOp", v => state.tempOp = +v],
+    ["in_axisHeight", v => state.axisHeight = +v],
+    ["in_material", v => state.material = v]
+  ]);
+
+  return;
+}
 }
 function buildFormulaSoftFoot(){
   const sf = computeSoftFoot();
@@ -3134,7 +3229,12 @@ ctx.fillText(labelFoot("C"), PM.C.x, PM.C.y + labelOffset + 6);
 }
 
 
-
+function calcThermalGrowth(height, material, tempOp, tempAmb){
+  const k = thermalCoeff[material];
+  const deltaT = tempOp - tempAmb;
+  const growthInch = height * k * deltaT;
+  return growthInch * 1000; // mils
+}
 
 function drawSideViewGeneric(ctxTarget){
 
