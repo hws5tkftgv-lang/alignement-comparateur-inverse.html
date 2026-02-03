@@ -1687,7 +1687,7 @@ const thermalCoeff = {
   acier: 0.0000063,
   inox: 0.0000095,
   fonte: 0.0000065,
-  bronze: 0.00001
+  bronze: 0.0000100
 };
 // Sécurité : distances géométriques toujours définies
 if(!Number.isFinite(geometry.distDialToFront)) {
@@ -1945,7 +1945,15 @@ function buildThermalStep(){
   msg += "Formule :\n";
   msg += "ΔH = hauteur × coefficient × (T_op − T_amb)\n\n";
 
-  msg += `Résultat :\n`;
+  // 🔒 Sécurité si le coefficient est invalide
+  if (isNaN(deltaMil)) {
+    msg += "❌ ERREUR DE CALCUL\n";
+    msg += "Coefficient de dilatation invalide pour le matériau sélectionné.\n";
+    msg += "Vérifiez le matériau.\n";
+    return msg;
+  }
+
+  msg += "Résultat :\n";
   msg += `ΔH = ${deltaMil.toFixed(2)} mil (vers le haut)\n\n`;
 
   msg += "🔧 Correction à l’alignement :\n";
@@ -3237,11 +3245,13 @@ ctx.fillText(labelFoot("C"), PM.C.x, PM.C.y + labelOffset + 6);
 }
 
 
-function calcThermalGrowth(height, material, tempOp, tempAmb){
-  const k = thermalCoeff[material];
-  const deltaT = tempOp - tempAmb;
-  const growthInch = height * k * deltaT;
-  return growthInch * 1000; // mils
+function calcThermalGrowth(heightInch, materialKey, tempOp, tempAmb){
+  const coeff = THERMAL_COEFF[materialKey];
+
+  if(!coeff) return NaN;
+
+  const deltaInch = heightInch * coeff * (tempOp - tempAmb);
+  return deltaInch * 1000; // pouces → mils
 }
 
 function drawSideViewGeneric(ctxTarget){
