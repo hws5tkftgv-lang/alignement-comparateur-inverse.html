@@ -1342,6 +1342,11 @@ modal.style.display = "block";
 document.body.classList.add("modal-open");
 document.body.classList.add("training-on");
 document.body.classList.add("training-on", "mobile-compact");
+// ⚠️ iOS FIX — attendre que le modal soit réellement visible
+setTimeout(() => {
+  forceResizeTrainingCanvases();
+  updateTraining();
+}, 80);
 // ✅ iPhone/Safari: forcer le layout du modal avant de dessiner le cadran
 requestAnimationFrame(() => {
   requestAnimationFrame(() => {
@@ -2911,6 +2916,21 @@ function resizeCanvas(canvas, ctx){
 /* =====================================================
    UTILITAIRES DESSIN
 ===================================================== */
+
+function forceResizeTrainingCanvases(){
+  if(window.topCanvasTest && window.topCtxTest){
+    const r = topCanvasTest.getBoundingClientRect();
+    topCanvasTest.width  = Math.max(1, Math.floor(r.width));
+    topCanvasTest.height = Math.max(1, Math.floor(r.height));
+  }
+
+  if(window.sideCanvasTest && window.sideCtxTest){
+    const r = sideCanvasTest.getBoundingClientRect();
+    sideCanvasTest.width  = Math.max(1, Math.floor(r.width));
+    sideCanvasTest.height = Math.max(1, Math.floor(r.height));
+  }
+}
+
 function clear(ctx,w,h){
   ctx.clearRect(0,0,w,h);
   ctx.fillStyle="#000";
@@ -3762,7 +3782,17 @@ window.addEventListener("load", () => {
 
   renderAll();
 });
-
+// ============================================
+// 📱 iOS / Safari — FIX ORIENTATION TRAINING
+// ============================================
+window.addEventListener("orientationchange", () => {
+  if(trainingMode){
+    setTimeout(() => {
+      forceResizeTrainingCanvases();
+      updateTraining();
+    }, 150);
+  }
+});
 
 </script>
 </body>
