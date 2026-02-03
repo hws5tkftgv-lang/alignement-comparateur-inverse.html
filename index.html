@@ -3732,6 +3732,11 @@ function drawSideView(){
 }
 
 function drawTrainingViews(){
+  console.log("TRAINING DRAW", {
+  canvas: window.sideCanvasTest,
+  w: window.sideCanvasTest?.width,
+  h: window.sideCanvasTest?.height
+});
   if(!trainingMode) return;
   if(window.topCtxTest)  drawTopViewGeneric(window.topCtxTest);
   if(window.sideCtxTest) drawSideViewGeneric(window.sideCtxTest);
