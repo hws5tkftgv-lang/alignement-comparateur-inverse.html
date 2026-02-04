@@ -3740,6 +3740,8 @@ function drawTrainingViews(){
   if(!trainingMode) return;
   if(window.topCtxTest)  drawTopViewGeneric(window.topCtxTest);
   if(window.sideCtxTest) drawSideViewGeneric(window.sideCtxTest);
+  ctx.fillStyle = "red";
+ctx.fillRect(0, 0, 20, 20);
 }
 function renderAll(){
   refreshUI();
