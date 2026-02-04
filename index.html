@@ -839,12 +839,7 @@ body.modal-open{
    RÉDUCTION PROPORTIONNELLE BLOCS
    ================================ */
 
-/* BOÎTE CADRAN */
-#dialBlock{
-  transform: scale(0.65);          /* ← ajuste ici (0.80 à 0.90) */
-  transform-origin: top center;
-  margin-bottom: -40px;            /* compense l'espace vide */
-}
+
 
 
 /* ===== NOTE CLIGNOTANTE (parallélisme) ===== */
@@ -1315,89 +1310,152 @@ Comprendre le lien entre :
 `;
 }
 
+// ===============================
+// TRAINING — SCROLL LOCK (iOS safe)
+// ===============================
+let __trainingScrollY = 0;
+
+function trainingLockScroll(){
+  __trainingScrollY = window.scrollY || 0;
+  document.body.style.position = "fixed";
+  document.body.style.top = `-${__trainingScrollY}px`;
+  document.body.style.left = "0";
+  document.body.style.right = "0";
+  document.body.style.width = "100%";
+}
+
+function trainingUnlockScroll(){
+  document.body.style.position = "";
+  document.body.style.top = "";
+  document.body.style.left = "";
+  document.body.style.right = "";
+  document.body.style.width = "";
+  window.scrollTo(0, __trainingScrollY);
+}
+
+// ===============================
+// TRAINING — MODAL HEIGHT (visualViewport)
+// ===============================
+let __trainingResizeRAF = 0;
+
+function trainingResizeModalHeight(){
+  const modal = document.getElementById("trainingModal");
+  if(!modal) return;
+
+  const vh = (window.visualViewport && window.visualViewport.height)
+    ? window.visualViewport.height
+    : window.innerHeight;
+
+  modal.style.height = `${Math.round(vh)}px`;
+}
+
+function trainingRequestResize(){
+  if(__trainingResizeRAF) return;
+  __trainingResizeRAF = requestAnimationFrame(() => {
+    __trainingResizeRAF = 0;
+    trainingResizeModalHeight();
+    forceResizeTrainingCanvases();
+    drawTrainingViews();
+    drawDial(computeDialReading(), computeDialReading());
+  });
+}
+
+function trainingAttachResizeListeners(){
+  window.addEventListener("resize", trainingRequestResize, { passive:true });
+  window.addEventListener("orientationchange", trainingRequestResize, { passive:true });
+
+  if(window.visualViewport){
+    window.visualViewport.addEventListener("resize", trainingRequestResize, { passive:true });
+    window.visualViewport.addEventListener("scroll", trainingRequestResize, { passive:true });
+  }
+}
+
+function trainingDetachResizeListeners(){
+  window.removeEventListener("resize", trainingRequestResize);
+  window.removeEventListener("orientationchange", trainingRequestResize);
+
+  if(window.visualViewport){
+    window.visualViewport.removeEventListener("resize", trainingRequestResize);
+    window.visualViewport.removeEventListener("scroll", trainingRequestResize);
+  }
+}
+
+
+
+
+
 function openTraining(){
   trainingMode = true;
+
   const modal = document.getElementById("trainingModal");
   const content = document.getElementById("trainingContent");
   if(!modal || !content) return;
 
   content.innerHTML = buildTrainingHTML();
-  console.log("TRAINING HTML injecté");
 
-const tc = document.getElementById("topViewTest");
-const sc = document.getElementById("sideViewTest");
+  // refs canvases TRAINING
+  const tc = document.getElementById("topViewTest");
+  const sc = document.getElementById("sideViewTest");
 
-console.log("topViewTest:", tc);
-console.log("sideViewTest:", sc);
+  if(tc && sc){
+    window.topCanvasTest  = tc;
+    window.sideCanvasTest = sc;
+    window.topCtxTest  = tc.getContext("2d");
+    window.sideCtxTest = sc.getContext("2d");
+  }
 
-if(tc && sc){
-  window.topCanvasTest  = tc;
-  window.sideCanvasTest = sc;
+  modal.style.display = "block";
 
-  window.topCtxTest  = tc.getContext("2d");
-  window.sideCtxTest = sc.getContext("2d");
-}
+  // classes UI
+  document.body.classList.add("modal-open");
+  document.body.classList.add("training-on");
 
-modal.style.display = "block";
-document.body.classList.add("modal-open");
-document.body.classList.add("training-on");
-document.body.classList.add("training-on", "mobile-compact");
-// ⚠️ iOS FIX — attendre que le modal soit réellement visible
-setTimeout(() => {
-  forceResizeTrainingCanvases();
-  updateTraining();
-}, 80);
-// ✅ iPhone/Safari: forcer le layout du modal avant de dessiner le cadran
-requestAnimationFrame(() => {
-  requestAnimationFrame(() => {
-    drawDial(0, 0);      // reset visuel immédiat
-    updateTraining();    // redraw avec la vraie taille
-  });
-});
+  // ✅ iOS: empêcher scroll du fond
+  trainingLockScroll();
 
+  // ✅ iOS: hauteur stable du modal
+  trainingResizeModalHeight();
+  trainingAttachResizeListeners();
 
-  // ===============================
-  // INIT TRAINING (ÉTAPE 3)
-  // ===============================
-
+  // INIT variables
   const slider = document.getElementById("trainSlider");
   const mount  = document.getElementById("trainMount");
   const type   = document.getElementById("trainType");
-  
-  
   const zeroBtn = document.getElementById("zeroDialBtn");
 
-if(zeroBtn){
-  zeroBtn.addEventListener("click", () => {
+  trainValue = 0;
+  trainType  = type?.value || "angV";
+  trainMount = mount?.value || "motor";
+  dialZeroOffset = 0;
 
-    // ===== RESET TOTAL =====
+  if(slider) slider.value = 0;
 
-    // 1) Slider
-    trainValue = 0;
-    if(slider){
-      slider.value = 0;
-    }
+  // handlers
+  if(zeroBtn){
+    zeroBtn.addEventListener("click", () => {
+      trainValue = 0;
+      if(slider) slider.value = 0;
+      dialZeroOffset = 0;
 
-    // 2) Zéro cadran (aiguille)
-    dialZeroOffset = 0;
+      // petit feedback visuel (si tu ajoutes le CSS plus bas)
+      const dial = document.getElementById("trainDial");
+      if(dial){
+        dial.classList.remove("dial-flash");
+        void dial.offsetWidth;
+        dial.classList.add("dial-flash");
+      }
 
+      updateTraining();
+    });
+  }
 
-
-    // 4) Redessin complet
-    updateTraining();
-  });
-}
   if(slider){
-  slider.addEventListener("input", () => {
+    slider.addEventListener("input", () => {
+      trainValue = Number(slider.value) || 0;
+      updateTraining();
+    });
+  }
 
-    trainValue = parseFloat(slider.value);
-
-    
-
-    updateTraining();
-    
-  });
-}
   if(type){
     type.addEventListener("change", () => {
       trainType = type.value;
@@ -1412,42 +1470,29 @@ if(zeroBtn){
     });
   }
 
-  trainValue = 0;
-trainType  = type?.value || "angV";
-trainMount = mount?.value || "motor";
-
-dialZeroOffset = 0;   // 🔑 RESET ZÉRO AU DÉPART
-
-if(slider) slider.value = 0;
-
-updateTraining();
+  // ✅ draw initial propre (après layout)
+  requestAnimationFrame(() => {
+    trainingRequestResize();
+    updateTraining();
+  });
 }
+
+
 function closeTraining(){
   trainingMode = false;
+
   const modal = document.getElementById("trainingModal");
   if(!modal) return;
 
   modal.style.display = "none";
+
   document.body.classList.remove("modal-open");
   document.body.classList.remove("training-on");
-  document.body.classList.remove("training-on", "mobile-compact");
+
+  trainingDetachResizeListeners();
+  trainingUnlockScroll();
 }
-/* =====================================================
-   TRAINING — MOTEUR DU CADRAN
-===================================================== */
 
-let trainValue = 0;
-let trainType  = "angV";
-let trainMount = "motor";
-let trainingOffset = 0;
-let trainingMode = false;
-let dialZeroOffset = 0;
-
-const DIAL = {
-  center: 130,
-  radius: 110,
-  needle: 90
-};
 
 function drawDial(needleVal, displayVal){
 
