@@ -1019,6 +1019,20 @@ Les pattes A / B / C / D seront affichées ici.
 </div>
 <script>
 "use strict";
+// ===============================
+// GLOBALS TRAINING (OBLIGATOIRE)
+// ===============================
+let trainingMode = false;
+let trainValue = 0;
+let trainType = "angV";
+let trainMount = "motor";
+let dialZeroOffset = 0;
+
+// refs canvases training (sécuritaire)
+window.topCanvasTest = null;
+window.sideCanvasTest = null;
+window.topCtxTest = null;
+window.sideCtxTest = null;
 /* =====================================================
    AIDE / FORMULES (BULLE ℹ️) + IMPRESSION
 ===================================================== */
@@ -1664,7 +1678,7 @@ ctx.arc(0, 0, 7, 0, Math.PI * 2);
 ctx.fill();
 
 ctx.restore();
-} 
+
 
 function computeDialReading(){
 
@@ -3047,15 +3061,15 @@ function resizeCanvas(canvas, ctx){
 
 function forceResizeTrainingCanvases(){
   if(window.topCanvasTest && window.topCtxTest){
-    const r = topCanvasTest.getBoundingClientRect();
-    topCanvasTest.width  = Math.max(1, Math.floor(r.width));
-    topCanvasTest.height = Math.max(1, Math.floor(r.height));
+    const r = window.topCanvasTest.getBoundingClientRect();
+    window.topCanvasTest.width  = Math.max(1, Math.floor(r.width));
+    window.topCanvasTest.height = Math.max(1, Math.floor(r.height));
   }
 
   if(window.sideCanvasTest && window.sideCtxTest){
-    const r = sideCanvasTest.getBoundingClientRect();
-    sideCanvasTest.width  = Math.max(1, Math.floor(r.width));
-    sideCanvasTest.height = Math.max(1, Math.floor(r.height));
+    const r = window.sideCanvasTest.getBoundingClientRect();
+    window.sideCanvasTest.width  = Math.max(1, Math.floor(r.width));
+    window.sideCanvasTest.height = Math.max(1, Math.floor(r.height));
   }
 }
 
