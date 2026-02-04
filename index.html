@@ -1570,8 +1570,13 @@ function drawDial(needleVal, displayVal){
   const ctx = canvas.getContext("2d");
 
   const dpr = window.devicePixelRatio || 1;
-  const rect = canvas.getBoundingClientRect();
-  const size = Math.max(220, Math.min(300, rect.width || 260));
+const rect = canvas.getBoundingClientRect();
+
+// 🔧 taille basée sur le conteneur, plus généreuse
+const size = Math.max(
+  260,
+  Math.min(420, rect.width || 320)
+);
 
   canvas.width  = Math.round(size * dpr);
   canvas.height = Math.round(size * dpr);
@@ -1591,7 +1596,8 @@ function drawDial(needleVal, displayVal){
   // snap parfait au zéro (évite les résidus flottants Safari)
   if (Math.abs(nv) < 0.001) nv = 0;
 
-  nv = Math.max(-100, Math.min(100, nv));
+  // limite logique alignée sur le slider (-200 à +200)
+nv = Math.max(-200, Math.min(200, nv));
 
   ctx.clearRect(0,0,w,h);
 
@@ -1659,7 +1665,11 @@ function drawDial(needleVal, displayVal){
   ctx.save();
 
   // 1 tour complet à ±100
-  const ang = (nv / 100) * (Math.PI * 2);
+  // ================= AIGUILLE =================
+
+// 1 tour complet = 100 mil
+// → 200 mil = 2 tours
+const ang = (nv / 100) * (Math.PI * 2);
   ctx.rotate(ang);
 
   // dessin aiguille
