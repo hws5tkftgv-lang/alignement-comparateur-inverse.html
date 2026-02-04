@@ -458,12 +458,6 @@ body.modal-open{
   width: 100%;
 }
 
-#dialWrap{
-  width:100%;
-  max-width:260px;
-  aspect-ratio:1/1;
-  margin:auto;
-}
 
 #trainDial{
   width:100%;
@@ -473,9 +467,6 @@ body.modal-open{
   border:3px solid #666;
 }
 
-@media (max-width: 600px){
-  #dialWrap{ max-width:200px; }
-}
 
 @media (min-width: 1200px){
   #dialWrap{ max-width:220px; }
@@ -534,10 +525,7 @@ body.modal-open{
     padding:10px;
   }
 
-  body.training-on #dialWrap{
-    max-width:165px;   /* ~ -25 % réel */
-    margin:4px auto;
-  }
+  
 
   body.training-on #dialValue{
     font-size:12px;
@@ -595,14 +583,8 @@ body.modal-open{
 
   /* Bloc "But pédagogique" (le cadre blanc) */
   #trainingModal .helpContent > .box:first-of-type{
-    display: none !important;
-  }
-}
-@media (max-width: 768px){
+    display: none !@media (max-width: 768px){
 
-  #trainingModal #dialWrap{
-    max-width: 165px;   /* ≈ -25 % */
-  }
 
   #trainingModal #dialValue{
     font-size: 12px;
@@ -863,6 +845,27 @@ body.modal-open{
   min-height: 280px;   /* ← valeur testée, SAFE */
   display: block;
 }
+
+/* ===============================
+   TRAINING — CADRAN (RÈGLE MAÎTRE)
+=============================== */
+
+#dialWrap{
+  width: 100%;
+  max-width: 420px;   /* ← AJUSTE ICI (420–480 recommandé) */
+  aspect-ratio: 1 / 1;
+  margin: 10px auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#trainDial{
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
 
 </style>
 </head>
