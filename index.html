@@ -3732,16 +3732,19 @@ function drawSideView(){
 }
 
 function drawTrainingViews(){
-  console.log("TRAINING DRAW", {
-  canvas: window.sideCanvasTest,
-  w: window.sideCanvasTest?.width,
-  h: window.sideCanvasTest?.height
-});
   if(!trainingMode) return;
-  if(window.topCtxTest)  drawTopViewGeneric(window.topCtxTest);
-  if(window.sideCtxTest) drawSideViewGeneric(window.sideCtxTest);
-  ctx.fillStyle = "red";
-ctx.fillRect(0, 0, 20, 20);
+
+  if(window.topCtxTest){
+    drawTopViewGeneric(window.topCtxTest);
+  }
+
+  if(window.sideCtxTest){
+    drawSideViewGeneric(window.sideCtxTest);
+
+    // 🔴 TEST VISUEL — preuve qu’on dessine sur le BON canvas
+    window.sideCtxTest.fillStyle = "red";
+    window.sideCtxTest.fillRect(0, 0, 20, 20);
+  }
 }
 function renderAll(){
   refreshUI();
