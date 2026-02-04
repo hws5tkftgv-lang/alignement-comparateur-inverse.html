@@ -1586,13 +1586,12 @@ function drawDial(needleVal, displayVal){
   const R_needle= w * 0.40;
 
   let nv = Number(needleVal);
+  if (isNaN(nv)) nv = 0;
 
-if (isNaN(nv)) nv = 0;
+  // snap parfait au zéro (évite les résidus flottants Safari)
+  if (Math.abs(nv) < 0.001) nv = 0;
 
-// snap parfait au zéro (évite les résidus flottants Safari)
-if (Math.abs(nv) < 0.001) nv = 0;
-
-nv = Math.max(-100, Math.min(100, nv));
+  nv = Math.max(-100, Math.min(100, nv));
 
   ctx.clearRect(0,0,w,h);
 
@@ -1657,36 +1656,35 @@ nv = Math.max(-100, Math.min(100, nv));
   }
 
   // ================= AIGUILLE =================
-ctx.save();
+  ctx.save();
 
-// 1 tour complet à ±100
-const ang = (nv / 100) * (Math.PI * 2);
-ctx.rotate(ang);
+  // 1 tour complet à ±100
+  const ang = (nv / 100) * (Math.PI * 2);
+  ctx.rotate(ang);
 
-// dessin aiguille (0 = 12h car on dessine vers le haut)
-ctx.strokeStyle = "#ff3b30";
-ctx.lineWidth = 4;
-ctx.beginPath();
-ctx.moveTo(0, 12);
-ctx.lineTo(0, -R_needle);
-ctx.stroke();
+  // dessin aiguille
+  ctx.strokeStyle = "#ff3b30";
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(0, 12);
+  ctx.lineTo(0, -R_needle);
+  ctx.stroke();
 
-// hub
-ctx.fillStyle = "#fff";
-ctx.beginPath();
-ctx.arc(0, 0, 7, 0, Math.PI * 2);
-ctx.fill();
+  // hub
+  ctx.fillStyle = "#fff";
+  ctx.beginPath();
+  ctx.arc(0, 0, 7, 0, Math.PI * 2);
+  ctx.fill();
 
-ctx.restore();
+  ctx.restore();
+  ctx.restore(); // ← ferme le ctx.save() du translate(cx,cy)
+} // ✅ IMPORTANT : drawDial se termine ICI
 
 
+// ✅ DOIT ÊTRE GLOBAL (pas dans drawDial)
 function computeDialReading(){
 
   let reading;
-
-  // ===============================
-  // RÈGLES MÉCANIQUES
-  // ===============================
 
   // Parallélisme → lecture = 2 × déplacement réel
   if(trainType === "parV" || trainType === "parH"){
