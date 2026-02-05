@@ -1009,6 +1009,8 @@ let trainValue = 0;
 let trainType = "angV";
 let trainMount = "motor";
 let dialZeroOffset = 0;
+let offsetTop  = 0;   // biais visuel horizontal (mils)
+let offsetSide = 0;  // biais visuel vertical (mils)
 
 // refs canvases training (sécuritaire)
 window.topCanvasTest = null;
@@ -1238,13 +1240,29 @@ function buildTrainingHTML(){
 
 
 <div class="box">
-<b>But pédagogique :</b><br>
-Comprendre le lien entre :
-<ul>
-<li>Déplacement réel du moteur</li>
-<li>Position du comparateur</li>
-<li>Lecture au cadran (directe ou inversée)</li>
-</ul>
+
+  <b>Réglages visuels (pédagogiques)</b><br>
+
+  <label style="display:block; margin-top:8px;">
+    Offset horizontal – Vue de dessus (Top)
+  </label>
+  <input id="offsetTopSlider"
+         type="range"
+         min="-50"
+         max="50"
+         step="1"
+         value="0">
+
+  <label style="display:block; margin-top:10px;">
+    Offset vertical – Vue de côté (Side)
+  </label>
+  <input id="offsetSideSlider"
+         type="range"
+         min="-50"
+         max="50"
+         step="1"
+         value="0">
+
 </div>
 
 
@@ -1448,6 +1466,29 @@ function openTraining(){
   const mount  = document.getElementById("trainMount");
   const type   = document.getElementById("trainType");
   const zeroBtn = document.getElementById("zeroDialBtn");
+  // --- sliders offsets visuels (pédagogiques uniquement) ---
+const offsetTopSlider  = document.getElementById("offsetTopSlider");
+const offsetSideSlider = document.getElementById("offsetSideSlider");
+
+// reset valeurs
+offsetTop  = 0;
+offsetSide = 0;
+
+if(offsetTopSlider){
+  offsetTopSlider.value = 0;
+  offsetTopSlider.addEventListener("input", () => {
+    offsetTop = Number(offsetTopSlider.value) || 0;
+    updateTraining();
+  });
+}
+
+if(offsetSideSlider){
+  offsetSideSlider.value = 0;
+  offsetSideSlider.addEventListener("input", () => {
+    offsetSide = Number(offsetSideSlider.value) || 0;
+    updateTraining();
+  });
+}
 
   trainValue = 0;
   trainType  = type?.value || "angV";
