@@ -1213,7 +1213,7 @@ function buildTrainingHTML(){
 </div>
 <div style="margin-top:18px;">
   <label>Déplacement réel du moteur (mils)</label>
-  <input id="trainSlider" type="range" min="-100" max="100" step="1" value="0">
+<input id="trainSlider" type="range" min="-200" max="200" step="1" value="0">´
 
   <div id="dialBlock" style="display:flex; flex-direction:column; align-items:center; margin-top:10px;">
 
@@ -3264,11 +3264,12 @@ let angV = trainingMode ? trainState.angV : state.angV;
 // ====================================================
 //   MOTEUR MOBILE — TOUJOURS DESSINÉ
 // ====================================================
+// PARALLÉLISME HORIZONTAL (TopView) = déplacement en X
 const maxShift = 60;
 const shift = Math.max(-maxShift, Math.min(maxShift, parH * scale));
 
-const motorCx = baseCx;
-const motorCy = baseCy + (parH * scale);
+const motorCx = baseCx + shift;
+const motorCy = baseCy;
 
 
   const { motorW, motorH, pumpW, pumpH, gap, shaftH, coupW, coupH } = GEOM;
