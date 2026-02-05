@@ -1671,17 +1671,21 @@ const ang = (nv / 100) * (Math.PI * 2);
 
 
 function computeDialReading(){
-  // valeur mécanique active (celle qu’on manipule)
-  const tv = Number(trainState?.[activeDefect] ?? 0);
 
-  // type actif
-  const t = activeDefect;
+  let reading = 0;
 
-  // parallélisme: lecture = 2x déplacement réel
-  let reading = (t === "parV" || t === "parH") ? (tv * 2) : tv;
+  // contributions verticales
+  reading += trainState.parV * 2;
+  reading += trainState.angV;
 
-  // inversion si cadran sur pompe
-  if(trainMount === "pump") reading = -reading;
+  // contributions horizontales
+  reading += trainState.parH * 2;
+  reading += trainState.angH;
+
+  // inversion si cadran monté sur la pompe
+  if(trainMount === "pump"){
+    reading = -reading;
+  }
 
   // zéro utilisateur
   reading -= dialZeroOffset;
