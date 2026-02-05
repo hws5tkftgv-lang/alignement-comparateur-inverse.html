@@ -571,61 +571,6 @@ body.modal-open{
 }
 
 
-/* =====================================================
-   TRAINING — NETTOYAGE CONTENU INUTILE (MOBILE SEULEMENT)
-===================================================== */
-@media (max-width: 768px){
-
-  /* Titre "Mode entraînement — Compréhension du cadran" */
-  #trainingModal h2{
-    display: none !important;
-  }
-
-  /* Bloc "But pédagogique" (le cadre blanc) */
-  #trainingModal .helpContent > .box:first-of-type{
-    display: none !@media (max-width: 768px){
-
-
-  #trainingModal #dialValue{
-    font-size: 12px;
-  }
-
-  #trainingModal #trainingExplain{
-    font-size: 11px;
-    line-height: 1.2;
-    max-height: 48px;
-  }
-}
-@media (max-width: 768px){
-
-  /* Slider */
-  #trainingModal input[type="range"]{
-    margin-top: 6px;
-    margin-bottom: 4px;
-    height: 24px;
-  }
-
-  /* Labels -100 / 0 / +100 */
-  #trainingModal .rangeLabels{
-    font-size: 11px;
-    margin-top: 2px;
-  }
-}
-@media (max-width: 768px){
-
-  #trainingModal .canvasCard{
-    padding: 6px;
-  }
-
-  #trainingModal .canvasHeader{
-    font-size: 11px;
-    padding: 4px 6px;
-  }
-
-  #trainingModal .canvasCard canvas{
-    height: 180px;   /* ≈ -25 % */
-  }
-}
 
 /* =====================================================
    TRAINING — SUPPRESSION DU BLOC INTRO PÉDAGOGIQUE
@@ -1030,8 +975,7 @@ let trainMount = "motor";
 let dialZeroOffset = 0;
 
 
-let activeDefect = "parH"; // défaut actif par défaut
-let lastDialValue = 0;    // pour calculer la variation
+
 
 // refs canvases training (sécuritaire)
 window.topCanvasTest = null;
@@ -1519,43 +1463,49 @@ function openTraining(){
     slider.addEventListener("input", () => {
 
       const current = Number(slider.value) || 0;
-      const delta   = current - lastDialValue;
-      lastDialValue = current;
+const delta   = current - lastDialValue;
+lastDialValue = current;
 
-      // appliquer UNIQUEMENT sur le défaut actif
-      trainState[activeDefect] += delta;
+// déplacement réel du défaut actif
+trainState[activeDefect] = (Number(trainState[activeDefect]) || 0) + delta;
 
-      updateTraining();
-    });
-  }
+// trainValue = valeur active (utile pour affichage)
+trainValue = Number(trainState[activeDefect]) || 0;
 
+// trainType = défaut actif (cohérent partout)
+trainType = activeDefect;
+
+updateTraining();
   // ===============================
   // RESET GLOBAL (OPTIONNEL MAIS PROPRE)
   // ===============================
   if(zeroBtn){
-    zeroBtn.addEventListener("click", () => {
+  zeroBtn.addEventListener("click", () => {
+    // on met le cadran à zéro SANS toucher aux défauts
+    dialZeroOffset += computeDialReading(); // cumulatif et robuste
 
-      trainState.parH = 0;
-      trainState.angH = 0;
-      trainState.parV = 0;
-      trainState.angV = 0;
+    updateTraining();
+  });
+}
 
-      lastDialValue = 0;
-      if(slider) slider.value = 0;
 
-      dialZeroOffset = 0;
+const resetBtn = document.getElementById("btnResetTraining");
+if(resetBtn){
+  resetBtn.addEventListener("click", () => {
+    trainState.parH = 0;
+    trainState.angH = 0;
+    trainState.parV = 0;
+    trainState.angV = 0;
 
-      const dial = document.getElementById("trainDial");
-      if(dial){
-        dial.classList.remove("dial-flash");
-        void dial.offsetWidth;
-        dial.classList.add("dial-flash");
-      }
+    dialZeroOffset = 0;
+    lastDialValue = 0;
+    trainValue = 0;
 
-      updateTraining();
-    });
-  }
+    if(slider) slider.value = 0;
 
+    updateTraining();
+  });
+}
   // ===============================
   // MONTAGE (MOTEUR / POMPE)
   // ===============================
@@ -1719,26 +1669,20 @@ const ang = (nv / 100) * (Math.PI * 2);
 } // ✅ IMPORTANT : drawDial se termine ICI
 
 
-// ✅ DOIT ÊTRE GLOBAL (pas dans drawDial)
 function computeDialReading(){
+  // valeur mécanique active (celle qu’on manipule)
+  const tv = Number(trainState?.[activeDefect] ?? 0);
 
-  let reading;
+  // type actif
+  const t = activeDefect;
 
-  // Parallélisme → lecture = 2 × déplacement réel
-  if(trainType === "parV" || trainType === "parH"){
-    reading = trainValue * 2;
-  }
-  // Angularité → lecture directe (simplification pédagogique)
-  else{
-    reading = trainValue;
-  }
+  // parallélisme: lecture = 2x déplacement réel
+  let reading = (t === "parV" || t === "parH") ? (tv * 2) : tv;
 
-  // Inversion si cadran monté sur la pompe
-  if(trainMount === "pump"){
-    reading = -reading;
-  }
+  // inversion si cadran sur pompe
+  if(trainMount === "pump") reading = -reading;
 
-  // Zéro utilisateur
+  // zéro utilisateur
   reading -= dialZeroOffset;
 
   return reading;
