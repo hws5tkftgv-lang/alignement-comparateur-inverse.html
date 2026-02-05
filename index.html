@@ -865,7 +865,27 @@ body.modal-open{
   height: 100%;
   display: block;
 }
+.toggleGroup{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 8px;
+}
 
+.defectToggle{
+  padding: 8px;
+  background: #1c2b6a;
+  border: 1px solid #2f3f9e;
+  color: #eaf1ff;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.defectToggle.active{
+  background: #00a2ff;
+  color: #000;
+  font-weight: 600;
+}
 
 </style>
 </head>
@@ -1011,6 +1031,15 @@ let trainMount = "motor";
 let dialZeroOffset = 0;
 let offsetTop  = 0;   // biais visuel horizontal (mils)
 let offsetSide = 0;  // biais visuel vertical (mils)
+const trainState = {
+  parH: 0,
+  angH: 0,
+  parV: 0,
+  angV: 0
+};
+
+let activeDefect = "parH"; // défaut actif par défaut
+let lastDialValue = 0;    // pour calculer la variation
 
 // refs canvases training (sécuritaire)
 window.topCanvasTest = null;
@@ -1240,33 +1269,19 @@ function buildTrainingHTML(){
 
 
 <div class="box">
+  <b>Sélection du défaut à observer</b>
 
-  <b>Réglages visuels (pédagogiques)</b><br>
+  <div class="toggleGroup">
+    <button class="defectToggle active" data-defect="parH">Parallélisme H</button>
+    <button class="defectToggle" data-defect="angH">Angularité H</button>
+    <button class="defectToggle" data-defect="parV">Parallélisme V</button>
+    <button class="defectToggle" data-defect="angV">Angularité V</button>
+  </div>
 
-  <label style="display:block; margin-top:8px;">
-    Offset horizontal – Vue de dessus (Top)
-  </label>
-  <input id="offsetTopSlider"
-         type="range"
-         min="-50"
-         max="50"
-         step="1"
-         value="0">
-
-  <label style="display:block; margin-top:10px;">
-    Offset vertical – Vue de côté (Side)
-  </label>
-  <input id="offsetSideSlider"
-         type="range"
-         min="-50"
-         max="50"
-         step="1"
-         value="0">
-
+  <button id="btnResetTraining" style="margin-top:10px;">
+    Reset alignement
+  </button>
 </div>
-
-
-
 <div style="margin-top:18px;">
   <label>Déplacement réel du moteur (mils)</label>
   <input id="trainSlider" type="range" min="-100" max="100" step="1" value="0">
@@ -1466,29 +1481,26 @@ function openTraining(){
   const mount  = document.getElementById("trainMount");
   const type   = document.getElementById("trainType");
   const zeroBtn = document.getElementById("zeroDialBtn");
-  // --- sliders offsets visuels (pédagogiques uniquement) ---
-const offsetTopSlider  = document.getElementById("offsetTopSlider");
-const offsetSideSlider = document.getElementById("offsetSideSlider");
+  // ===============================
+// TRAINING — TOGGLES DE DÉFAUT
+// ===============================
+const defectButtons = document.querySelectorAll(".defectToggle");
 
-// reset valeurs
-offsetTop  = 0;
-offsetSide = 0;
+defectButtons.forEach(btn => {
+  btn.addEventListener("click", () => {
 
-if(offsetTopSlider){
-  offsetTopSlider.value = 0;
-  offsetTopSlider.addEventListener("input", () => {
-    offsetTop = Number(offsetTopSlider.value) || 0;
-    updateTraining();
+    // visuel actif
+    defectButtons.forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+
+    // défaut actif
+    activeDefect = btn.dataset.defect;
+
+    // reset lecture instantanée du cadran
+    lastDialValue = 0;
+    if(slider) slider.value = 0;
   });
-}
-
-if(offsetSideSlider){
-  offsetSideSlider.value = 0;
-  offsetSideSlider.addEventListener("input", () => {
-    offsetSide = Number(offsetSideSlider.value) || 0;
-    updateTraining();
-  });
-}
+});
 
   trainValue = 0;
   trainType  = type?.value || "angV";
@@ -1517,11 +1529,16 @@ if(offsetSideSlider){
   }
 
   if(slider){
-    slider.addEventListener("input", () => {
-      trainValue = Number(slider.value) || 0;
-      updateTraining();
-    });
-  }
+  slider.addEventListener("input", () => {
+    const current = Number(slider.value) || 0;
+    const delta = current - lastDialValue;
+
+    trainState[activeDefect] += delta;
+
+    lastDialValue = current;
+    updateTraining();
+  });
+}
 
   if(type){
     type.addEventListener("change", () => {
