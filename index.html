@@ -1025,17 +1025,10 @@ Les pattes A / B / C / D seront affichées ici.
 // GLOBALS TRAINING (OBLIGATOIRE)
 // ===============================
 let trainingMode = false;
-let trainValue = 0;
-let trainType = "angV";
+
 let trainMount = "motor";
 let dialZeroOffset = 0;
 
-const trainState = {
-  parH: 0,
-  angH: 0,
-  parV: 0,
-  angV: 0
-};
 
 let activeDefect = "parH"; // défaut actif par défaut
 let lastDialValue = 0;    // pour calculer la variation
@@ -1451,15 +1444,21 @@ let activeDefect = "angV";
 let lastDialValue = 0;
 
 function openTraining(){
+
+  // ===============================
+  // ACTIVER MODE TRAINING
+  // ===============================
   trainingMode = true;
 
-  const modal = document.getElementById("trainingModal");
+  const modal   = document.getElementById("trainingModal");
   const content = document.getElementById("trainingContent");
   if(!modal || !content) return;
 
   content.innerHTML = buildTrainingHTML();
 
-  // refs canvases TRAINING
+  // ===============================
+  // CANVAS TRAINING
+  // ===============================
   const tc = document.getElementById("topViewTest");
   const sc = document.getElementById("sideViewTest");
 
@@ -1472,58 +1471,80 @@ function openTraining(){
 
   modal.style.display = "block";
 
-  // classes UI
-  document.body.classList.add("modal-open");
-  document.body.classList.add("training-on");
+  document.body.classList.add("modal-open","training-on");
 
-  // ✅ iOS: empêcher scroll du fond
   trainingLockScroll();
-
-  // ✅ iOS: hauteur stable du modal
   trainingResizeModalHeight();
   trainingAttachResizeListeners();
 
-  // INIT variables
-  const slider = document.getElementById("trainSlider");
-  const mount  = document.getElementById("trainMount");
-  const type   = document.getElementById("trainType");
-  const zeroBtn = document.getElementById("zeroDialBtn");
   // ===============================
-// TRAINING — TOGGLES DE DÉFAUT
-// ===============================
-const defectButtons = document.querySelectorAll(".defectToggle");
+  // UI REFS
+  // ===============================
+  const slider  = document.getElementById("trainSlider");
+  const mount   = document.getElementById("trainMount");
+  const zeroBtn = document.getElementById("zeroDialBtn");
 
-defectButtons.forEach(btn => {
-  btn.addEventListener("click", () => {
-
-    // visuel actif
-    defectButtons.forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-
-    // défaut actif
-    activeDefect = btn.dataset.defect;
-
-    // reset lecture instantanée du cadran
-    lastDialValue = 0;
-    if(slider) slider.value = 0;
-  });
-});
-
-  trainValue = 0;
-  trainType  = type?.value || "angV";
-  trainMount = mount?.value || "motor";
+  // ===============================
+  // ÉTAT INITIAL TRAINING
+  // ===============================
+  trainMount     = mount?.value || "motor";
+  activeDefect   = "parH";     // défaut par défaut
+  lastDialValue  = 0;
   dialZeroOffset = 0;
 
   if(slider) slider.value = 0;
 
-  // handlers
+  // ===============================
+  // SÉLECTEURS DE DÉFAUT
+  // ===============================
+  const defectButtons = document.querySelectorAll(".defectToggle");
+
+  defectButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+
+      defectButtons.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      activeDefect  = btn.dataset.defect;
+      lastDialValue = 0;
+
+      if(slider) slider.value = 0;
+    });
+  });
+
+  // ===============================
+  // SLIDER PRINCIPAL (LOGIQUE CLÉ)
+  // ===============================
+  if(slider){
+    slider.addEventListener("input", () => {
+
+      const current = Number(slider.value) || 0;
+      const delta   = current - lastDialValue;
+      lastDialValue = current;
+
+      // appliquer UNIQUEMENT sur le défaut actif
+      trainState[activeDefect] += delta;
+
+      updateTraining();
+    });
+  }
+
+  // ===============================
+  // RESET GLOBAL (OPTIONNEL MAIS PROPRE)
+  // ===============================
   if(zeroBtn){
     zeroBtn.addEventListener("click", () => {
-      trainValue = 0;
+
+      trainState.parH = 0;
+      trainState.angH = 0;
+      trainState.parV = 0;
+      trainState.angV = 0;
+
+      lastDialValue = 0;
       if(slider) slider.value = 0;
+
       dialZeroOffset = 0;
 
-      // petit feedback visuel (si tu ajoutes le CSS plus bas)
       const dial = document.getElementById("trainDial");
       if(dial){
         dial.classList.remove("dial-flash");
@@ -1535,20 +1556,9 @@ defectButtons.forEach(btn => {
     });
   }
 
-  if(slider){
-  slider.addEventListener("input", () => {
-    const current = Number(slider.value) || 0;
-    const delta = current - lastDialValue;
-
-    trainState[activeDefect] += delta;
-
-    lastDialValue = current;
-    updateTraining();
-  });
-}
-
-  
-
+  // ===============================
+  // MONTAGE (MOTEUR / POMPE)
+  // ===============================
   if(mount){
     mount.addEventListener("change", () => {
       trainMount = mount.value;
@@ -1557,34 +1567,13 @@ defectButtons.forEach(btn => {
   }
 
   // ===============================
-  // TRAINING — NAVIGATION ÉTAPES
+  // RENDU INITIAL
   // ===============================
-  const btnPrevStep = document.getElementById("btnTrainPrev");
-  const btnNextStep = document.getElementById("btnTrainNext");
-
-  if(btnPrevStep){
-    btnPrevStep.addEventListener("click", () => {
-      trainingStep = Math.max(0, trainingStep - 1);
-      updateTraining();
-    });
-  }
-
-  if(btnNextStep){
-    btnNextStep.addEventListener("click", () => {
-      trainingStep = Math.min(TRAINING_STEPS.length - 1, trainingStep + 1);
-      updateTraining();
-    });
-  }
-
-
-  // ✅ draw initial propre (après layout)
   requestAnimationFrame(() => {
     trainingRequestResize();
     updateTraining();
   });
 }
-
-
 function closeTraining(){
   trainingMode = false;
 
@@ -3330,18 +3319,16 @@ const ctx = ctxTarget;
   // ====================================================
 //   MODE TRAINING — SURCHARGE DES VALEURS MÉCANIQUES
 // ====================================================
+
+let parH = trainingMode ? trainState.parH : state.parH;
+let angH = trainingMode ? trainState.angH : state.angH;
+let parV = trainingMode ? trainState.parV : state.parV;
+let angV = trainingMode ? trainState.angV : state.angV;
+
 let parH = state.parH;
 let angH = state.angH;
 let parV = state.parV;
 let angV = state.angV;
-
-if(trainingMode){
-  if(trainType === "parH") parH = trainValue;
-  if(trainType === "angH") angH = trainValue;
-  if(trainType === "parV") parV = trainValue;
-  if(trainType === "angV") angV = trainValue;
-}
-
   // ====================================================
   //   RÉFÉRENCES FIXES (POMPE + SOCLE)
   // ====================================================
@@ -3651,13 +3638,8 @@ const ctx = ctxTarget;
   // ====================================================
 //   MODE TRAINING — SURCHARGE DES VALEURS MÉCANIQUES
 // ====================================================
-let parV = state.parV;
-let angV = state.angV;
-
-if(trainingMode){
-  if(trainType === "parV") parV = trainValue;
-  if(trainType === "angV") angV = trainValue;
-}
+let parV = trainingMode ? trainState.parV : state.parV;
+let angV = trainingMode ? trainState.angV : state.angV;
 
   const bottomSafeMargin = 40;   // ← marge visuelle pour lettres & pattes
 let baseCy = (h - bottomSafeMargin) * 0.55;
