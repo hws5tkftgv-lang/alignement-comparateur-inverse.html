@@ -1029,8 +1029,7 @@ let trainValue = 0;
 let trainType = "angV";
 let trainMount = "motor";
 let dialZeroOffset = 0;
-let offsetTop  = 0;   // biais visuel horizontal (mils)
-let offsetSide = 0;  // biais visuel vertical (mils)
+
 const trainState = {
   parH: 0,
   angH: 0,
@@ -1441,7 +1440,15 @@ function trainingDetachResizeListeners(){
 
 
 
+let trainState = {
+  angV: 0,
+  parV: 0,
+  angH: 0,
+  parH: 0
+};
 
+let activeDefect = "angV";
+let lastDialValue = 0;
 
 function openTraining(){
   trainingMode = true;
@@ -1540,12 +1547,7 @@ defectButtons.forEach(btn => {
   });
 }
 
-  if(type){
-    type.addEventListener("change", () => {
-      trainType = type.value;
-      updateTraining();
-    });
-  }
+  
 
   if(mount){
     mount.addEventListener("change", () => {
