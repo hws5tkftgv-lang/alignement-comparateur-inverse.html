@@ -3276,24 +3276,15 @@ const maxShift = 60;
 const shift = Math.max(-maxShift, Math.min(maxShift, parH * scale));
 
 const motorCx = baseCx;
+const motorCy = baseCy + (parH * scale);
 
-// 🔑 PATCH : on applique le shift UNIQUEMENT en parH,
-// mais le moteur est TOUJOURS dessiné
-const motorCy =
-  (trainingMode && trainType === "parH") ||
-  (!trainingMode && STEPS[state.step].id === "parH")
-    ? baseCy + shift
-    : baseCy;
+
   const { motorW, motorH, pumpW, pumpH, gap, shaftH, coupW, coupH } = GEOM;
   // ====================================================
 //   PATTES À POUSSER — PARALLÉLISME HORIZONTAL
 // ====================================================
 let flashFeet = [];
 
-if(STEPS[state.step].id === "parH"){
-  if(state.parH > 0) flashFeet = ["C","D"];
-  if(state.parH < 0) flashFeet = ["A","B"];
-}
 
   const footW = 24;
   const footH = 12;
@@ -3311,14 +3302,7 @@ if(STEPS[state.step].id === "parH"){
     motorH + baseMargin*2
   );
 
-  // ====================================================
-  //   PARAMÈTRE ANGULAIRE (ANGULARITÉ HORIZONTALE)
-  // ====================================================
-  const ang =
-  (trainingMode && trainType === "angH") ||
-  (!trainingMode && STEPS[state.step].id === "angH")
-    ? angH * dialSign * rotGain
-    : 0;
+  
     // ====================================================
 //   FALLBACK : vue neutre si aucune étape active
 // ====================================================
@@ -3354,6 +3338,9 @@ if(!PM.A || !PM.B || !PM.C || !PM.D){
   console.warn("PM invalide — fallback standard");
   PM.A = P.A; PM.B = P.B; PM.C = P.C; PM.D = P.D;
 }
+const ang =
+  (angH * dialSign * rotGain) +
+  (angV * dialSign * rotGain);
   // ====================================================
   //   PIVOT MÉCANIQUE (OPTIONNEL)
   //   - ang > 0  => pivot coin extérieur C
@@ -3422,41 +3409,18 @@ if(ang < 0) pivot = PM.D;
 // ====================================================
 //   ANGULARITÉ HORIZONTALE — FLÈCHES = POUSSER (SENS RÉEL)
 // ====================================================
-if(STEPS[state.step].id === "angH"){
-
-  const v = state.angH * dialSign;
+if(Math.abs(angH) > 0){
+  const v = angH * dialSign;
   const len = 60;
 
-  // POSITIF → moteur incliné DROITE → pousser A + C
   if(v > 0){
-
-    // A → pousser vers le BAS
-    drawArrow(ctx,
-      PM.A.x, PM.A.y - len,
-      PM.A.x, PM.A.y
-    );
-
-    // C → pousser vers le HAUT
-    drawArrow(ctx,
-      PM.C.x,PM.C.y + len,
-      PM.C.x, PM.C.y
-    );
+    drawArrow(ctx, PM.A.x, PM.A.y - len, PM.A.x, PM.A.y);
+    drawArrow(ctx, PM.C.x, PM.C.y + len, PM.C.x, PM.C.y);
   }
 
-  // NÉGATIF → moteur incliné GAUCHE → pousser B + D
   if(v < 0){
-
-    // B → pousser vers le BAS
-    drawArrow(ctx,
-      PM.B.x, PM.B.y - len,
-      PM.B.x, PM.B.y
-    );
-
-    // D → pousser vers le HAUT
-    drawArrow(ctx,
-      PM.D.x, PM.D.y + len,
-      PM.D.x, PM.D.y
-    );
+    drawArrow(ctx, PM.B.x, PM.B.y - len, PM.B.x, PM.B.y);
+    drawArrow(ctx, PM.D.x, PM.D.y + len, PM.D.x, PM.D.y);
   }
 }
   // ====================================================
@@ -3576,12 +3540,7 @@ let angV = trainingMode ? trainState.angV : state.angV;
 let baseCy = (h - bottomSafeMargin) * 0.55;
   let baseCx = w * 0.30;
 
-  let cy = baseCy + (
-  (trainingMode && trainType === "parV") ||
-  (!trainingMode && STEPS[state.step].id === "parV")
-    ? parV * scale
-    : 0
-);
+  let cy = baseCy + (parV * scale);
   let cx = baseCx;
 
   const axisPumpY  = baseCy;   // axe pompe = FIXE
@@ -3612,11 +3571,7 @@ let baseCy = (h - bottomSafeMargin) * 0.55;
   // ====================================================
   //   PARAMÈTRE ANGULAIRE
   // ====================================================
-  const ang =
-  (trainingMode && trainType === "angV") ||
-  (!trainingMode && STEPS[state.step].id === "angV")
-    ? -angV * dialSign * rotGain
-    : 0;
+  const ang = -(angV * dialSign * rotGain);
   // ====================================================
   //   POMPE FIXE + ARBRE + ½ ACCOUPLEMENT
   // ====================================================
