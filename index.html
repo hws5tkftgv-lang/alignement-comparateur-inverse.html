@@ -974,7 +974,8 @@ let trainingMode = false;
 let trainMount = "motor";
 let dialZeroOffset = 0;
 
-
+let trainType = "parH";
+let trainValue = 0;
 
 
 // refs canvases training (sécuritaire)
@@ -1457,38 +1458,38 @@ function openTraining(){
   });
 
   // ===============================
-  // SLIDER PRINCIPAL (LOGIQUE CLÉ)
-  // ===============================
-  if(slider){
-    slider.addEventListener("input", () => {
+// SLIDER PRINCIPAL (LOGIQUE CLÉ)
+// ===============================
+if(slider){
+  slider.addEventListener("input", () => {
+    const current = Number(slider.value) || 0;
+    const delta   = current - lastDialValue;
+    lastDialValue = current;
 
-      const current = Number(slider.value) || 0;
-const delta   = current - lastDialValue;
-lastDialValue = current;
+    // déplacement réel cumulé du défaut actif
+    trainState[activeDefect] = (Number(trainState[activeDefect]) || 0) + delta;
 
-// déplacement réel du défaut actif
-trainState[activeDefect] = (Number(trainState[activeDefect]) || 0) + delta;
-
-// trainValue = valeur active (utile pour affichage)
-trainValue = Number(trainState[activeDefect]) || 0;
-
-// trainType = défaut actif (cohérent partout)
-trainType = activeDefect;
-
-updateTraining();
-  // ===============================
-  // RESET GLOBAL (OPTIONNEL MAIS PROPRE)
-  // ===============================
-  if(zeroBtn){
-  zeroBtn.addEventListener("click", () => {
-    // on met le cadran à zéro SANS toucher aux défauts
-    dialZeroOffset += computeDialReading(); // cumulatif et robuste
+    // variables d'affichage (sécurisées en strict mode)
+    trainValue = Number(trainState[activeDefect]) || 0;
+    trainType  = activeDefect;
 
     updateTraining();
   });
 }
 
+// ===============================
+// ZÉRO CADRAN
+// ===============================
+if(zeroBtn){
+  zeroBtn.addEventListener("click", () => {
+    dialZeroOffset += computeDialReading();
+    updateTraining();
+  });
+}
 
+// ===============================
+// RESET TRAINING
+// ===============================
 const resetBtn = document.getElementById("btnResetTraining");
 if(resetBtn){
   resetBtn.addEventListener("click", () => {
@@ -1506,16 +1507,16 @@ if(resetBtn){
     updateTraining();
   });
 }
-  // ===============================
-  // MONTAGE (MOTEUR / POMPE)
-  // ===============================
-  if(mount){
-    mount.addEventListener("change", () => {
-      trainMount = mount.value;
-      updateTraining();
-    });
-  }
 
+// ===============================
+// MONTAGE (MOTEUR / POMPE)
+// ===============================
+if(mount){
+  mount.addEventListener("change", () => {
+    trainMount = mount.value;
+    updateTraining();
+  });
+}
   // ===============================
   // RENDU INITIAL
   // ===============================
@@ -1688,23 +1689,16 @@ function computeDialReading(){
   return reading;
 }
 function updateTraining(){
-if(!trainingMode) return;
-  // ===============================
-  // TRAINING — LOGIQUE PÉDAGOGIQUE
-  // ===============================
+  if(!trainingMode) return;
+
   const step = TRAINING_STEPS[trainingStep];
 
-  // verrouillage pédagogique du type
-  if(step.id === "par"){
-    trainType = trainType.includes("H") ? "parH" : "parV";
-  }
+  // 🔑 SOURCE UNIQUE DE VÉRITÉ
+  trainType  = activeDefect;
+  trainValue = Number(trainState?.[activeDefect] ?? 0);
 
-  if(step.id === "ang"){
-    trainType = trainType.includes("H") ? "angH" : "angV";
-  }
   const reading = computeDialReading();
 
-  // 🔑 CRITIQUE — synchroniser la taille des canvas AVANT dessin
   if(window.topCanvasTest && window.topCtxTest){
     resizeCanvas(window.topCanvasTest, window.topCtxTest);
   }
@@ -1714,9 +1708,9 @@ if(!trainingMode) return;
 
   drawDial(reading, reading);
 
-// 🔑 TRAINING = CANVAS ISOLÉS
-forceResizeTrainingCanvases();
-drawTrainingViews();
+  forceResizeTrainingCanvases();
+  drawTrainingViews();
+
   const txt = document.getElementById("dialValue");
   if(txt){
     txt.textContent = `${reading.toFixed(2)} mil`;
@@ -1724,17 +1718,13 @@ drawTrainingViews();
 
   const explain = document.getElementById("trainingExplain");
   if(explain){
-
     let msg = "<b>Interprétation mécanique :</b><br>";
-
     msg += `Déplacement moteur : <b>${trainValue.toFixed(2)} mil</b><br>`;
     msg += `Lecture cadran : <b>${reading.toFixed(2)} mil</b><br><br>`;
 
-    if(trainType.startsWith("par")){
-      msg += "📏 Parallélisme → le comparateur lit le DOUBLE du déplacement réel (correction = lecture ÷ 2).";
-    }else{
-      msg += "📐 Angularité → la lecture dépend du bras de levier.";
-    }
+    msg += trainType.startsWith("par")
+      ? "📏 Parallélisme → lecture = 2 × déplacement réel."
+      : "📐 Angularité → lecture liée au bras de levier.";
 
     if(trainMount === "pump"){
       msg += "<br>🔁 Cadran monté sur la pompe → lecture inversée.";
@@ -1742,15 +1732,12 @@ drawTrainingViews();
 
     explain.innerHTML = msg;
   }
-    // ===============================
-  // TRAINING — ÉTAPE PÉDAGOGIQUE
-  // ===============================
+
   const info = document.getElementById("trainInfo");
-  if(info && typeof TRAINING_STEPS !== "undefined"){
+  if(info){
     const s = TRAINING_STEPS[trainingStep];
     info.textContent =
-      `Étape ${trainingStep + 1} / ${TRAINING_STEPS.length}\n\n` +
-      s.text;
+      `Étape ${trainingStep + 1} / ${TRAINING_STEPS.length}\n\n${s.text}`;
   }
 }
 /* =====================================================
