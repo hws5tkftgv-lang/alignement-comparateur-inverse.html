@@ -1444,18 +1444,19 @@ function openTraining(){
   // ===============================
   const defectButtons = document.querySelectorAll(".defectToggle");
 
-  defectButtons.forEach(btn => {
-    btn.addEventListener("click", () => {
+defectButtons.forEach(btn => {
+  btn.addEventListener("click", () => {
 
-      defectButtons.forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
+    defectButtons.forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
 
-      activeDefect  = btn.dataset.defect;
-      lastDialValue = 0;
+    activeDefect = btn.dataset.defect;
 
-      if(slider) slider.value = 0;
-    });
+    lastDialValue = 0;
+    const slider = document.getElementById("trainSlider");
+    if(slider) slider.value = 0;
   });
+});
 
   // ===============================
 // SLIDER PRINCIPAL (LOGIQUE CLÉ)
