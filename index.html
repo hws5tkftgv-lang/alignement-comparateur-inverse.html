@@ -1752,6 +1752,34 @@ function updateTraining(){
       `Étape ${trainingStep + 1} / ${TRAINING_STEPS.length}\n\n${s.text}`;
   }
 }
+// ===============================
+// MISE À JOUR DES CADRANS
+// ===============================
+
+// valeur brute des défauts
+const parValue =
+  trainState.parH + trainState.parV;
+
+const angValue =
+  trainState.angH + trainState.angV;
+
+// appliquer zéro cadran indépendant
+const parDisplay =
+  parValue - (dialState.parallel.zero || 0);
+
+const angDisplay =
+  angValue - (dialState.angular.zero || 0);
+
+// redraw cadrans
+drawDial("dialParallel", parDisplay);
+drawDial("dialAngular", angDisplay);
+
+// affichage texte
+const pv = document.getElementById("dialParallelValue");
+const av = document.getElementById("dialAngularValue");
+
+if(pv) pv.textContent = parDisplay.toFixed(2) + " mil";
+if(av) av.textContent = angDisplay.toFixed(2) + " mil";
 /* =====================================================
    MAPPING PATTES (lettres ↔ coins)
    Coins = TL (haut-gauche), TR (haut-droite),
