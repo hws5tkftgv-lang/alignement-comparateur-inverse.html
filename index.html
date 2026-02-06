@@ -1213,7 +1213,7 @@ function buildTrainingHTML(){
 </div>
 <div style="margin-top:18px;">
   <label>Déplacement réel du moteur (mils)</label>
-<input id="trainSlider" type="range" min="-200" max="200" step="1" value="0">´
+<input id="trainSlider" type="range" min="-200" max="200" step="1" value="0">
 
   <div id="dialBlock" style="display:flex; flex-direction:column; align-items:center; margin-top:10px;">
 
@@ -1667,22 +1667,26 @@ function computeDialReading(){
 
   let reading = 0;
 
-  // contributions verticales
-  reading += trainState.parV * 2;
-  reading += trainState.angV;
+  if(trainingMode){
+    const v = trainState[trainType] || 0;
 
-  // contributions horizontales
-  reading += trainState.parH * 2;
-  reading += trainState.angH;
+    if(trainType.startsWith("par")){
+      reading = v * 2;
+    }else{
+      reading = v;
+    }
+  }else{
+    reading += state.parV * 2;
+    reading += state.angV;
+    reading += state.parH * 2;
+    reading += state.angH;
+  }
 
-  // inversion si cadran monté sur la pompe
   if(trainMount === "pump"){
     reading = -reading;
   }
 
-  // zéro utilisateur
   reading -= dialZeroOffset;
-
   return reading;
 }
 function updateTraining(){
@@ -3252,6 +3256,12 @@ let parH = trainingMode ? trainState.parH : state.parH;
 let angH = trainingMode ? trainState.angH : state.angH;
 let parV = trainingMode ? trainState.parV : state.parV;
 let angV = trainingMode ? trainState.angV : state.angV;
+if(trainingMode){
+  if(trainType !== "parH") parH = 0;
+  if(trainType !== "angH") angH = 0;
+  if(trainType !== "parV") parV = 0;
+  if(trainType !== "angV") angV = 0;
+}
   // ====================================================
   //   RÉFÉRENCES FIXES (POMPE + SOCLE)
   // ====================================================
@@ -3331,9 +3341,7 @@ if(!PM.A || !PM.B || !PM.C || !PM.D){
   console.warn("PM invalide — fallback standard");
   PM.A = P.A; PM.B = P.B; PM.C = P.C; PM.D = P.D;
 }
-const ang =
-  (angH * dialSign * rotGain) +
-  (angV * dialSign * rotGain);
+const ang = angH * dialSign * rotGain;
   // ====================================================
   //   PIVOT MÉCANIQUE (OPTIONNEL)
   //   - ang > 0  => pivot coin extérieur C
