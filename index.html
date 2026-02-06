@@ -1211,55 +1211,54 @@ function buildTrainingHTML(){
     Reset alignement
   </button>
 </div>
+
+<!-- =========================
+     SLIDER UNIQUE
+========================= -->
 <div style="margin-top:18px;">
   <label>Déplacement réel du moteur (mils)</label>
-<input id="trainSlider" type="range" min="-200" max="200" step="1" value="0">
+  <input id="trainSlider" type="range" min="-200" max="200" step="1" value="0">
 
-<div id="dialBlock" style="display:flex; gap:14px; justify-content:center; margin-top:10px;">
+  <!-- =========================
+       DOUBLE CADRAN
+  ========================== -->
+  <div id="dialBlock" style="display:flex; gap:14px; justify-content:center; margin-top:14px;">
 
-  <!-- ===== CADRAN PARALLÉLISME ===== -->
-  <div class="dialCard active" data-dial="parallel">
-    <div class="dialTitle">Parallélisme</div>
+    <!-- PARALLÉLISME -->
+    <div class="dialCard active" data-dial="parallel">
+      <div class="dialTitle">Parallélisme</div>
 
-    <div class="dialWrap">
-      <canvas id="dialParallel"></canvas>
+      <canvas id="dialParallel" width="220" height="220"></canvas>
+
+      <div class="dialValue" id="dialParallelValue">0.00 mil</div>
+
+      <button class="zeroDialBtn" data-dial="parallel">
+        Zéro cadran
+      </button>
     </div>
 
-    <div class="dialValue" id="dialParallelValue">0.00 mil</div>
+    <!-- ANGULARITÉ -->
+    <div class="dialCard" data-dial="angular">
+      <div class="dialTitle">Angularité</div>
 
-    <button class="zeroDialBtn" data-dial="parallel">
-      Zéro cadran
-    </button>
-  </div>
+      <canvas id="dialAngular" width="220" height="220"></canvas>
 
-  <!-- ===== CADRAN ANGULARITÉ ===== -->
-  <div class="dialCard" data-dial="angular">
-    <div class="dialTitle">Angularité</div>
+      <div class="dialValue" id="dialAngularValue">0.00 mil</div>
 
-    <div class="dialWrap">
-      <canvas id="dialAngular"></canvas>
+      <button class="zeroDialBtn" data-dial="angular">
+        Zéro cadran
+      </button>
     </div>
 
-    <div class="dialValue" id="dialAngularValue">0.00 mil</div>
-
-    <button class="zeroDialBtn" data-dial="angular">
-      Zéro cadran
-    </button>
   </div>
-
-</div>
 
   <div style="display:flex; justify-content:space-between; font-size:12px;">
-    <span>-200</span>
-  <span>0</span>
-  <span>+200</span>
+    <span>-200</span><span>0</span><span>+200</span>
   </div>
-</div>
-
 </div>
 
 <!-- ============================
-     SANDBOX VISUEL — TRAINING SEULEMENT
+     VISUALISATION
 ============================= -->
 <div class="card" style="margin-top:16px; border:2px dashed rgba(255,255,255,.25);">
   <h3 style="margin-top:0;">Visualisation pédagogique</h3>
@@ -1280,7 +1279,6 @@ function buildTrainingHTML(){
 <div id="trainInfo" class="noteBox" style="margin-top:14px;text-align:center;">
 —
 </div>
-
 `;
 }
 
