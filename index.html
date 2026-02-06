@@ -1215,24 +1215,39 @@ function buildTrainingHTML(){
   <label>Déplacement réel du moteur (mils)</label>
 <input id="trainSlider" type="range" min="-200" max="200" step="1" value="0">
 
-  <div id="dialBlock" style="display:flex; flex-direction:column; align-items:center; margin-top:10px;">
+<div id="dialBlock" style="display:flex; gap:14px; justify-content:center; margin-top:10px;">
 
-<div id="dialWrap">
-  <canvas id="trainDial"></canvas>
-</div>
+  <!-- ===== CADRAN PARALLÉLISME ===== -->
+  <div class="dialCard active" data-dial="parallel">
+    <div class="dialTitle">Parallélisme</div>
 
-<div id="dialValue">0.00 mil</div>
+    <div class="dialWrap">
+      <canvas id="dialParallel"></canvas>
+    </div>
 
-<!-- 🔘 BOUTON ZÉRO CADRAN -->
-  <button id="zeroDialBtn"
-    style="padding:6px 14px; font-size:13px; border-radius:10px;
-           border:none; background:#ff9800; color:#000; font-weight:900;">
-    Zéro cadran
-  </button>
+    <div class="dialValue" id="dialParallelValue">0.00 mil</div>
 
-
-<div id="trainingExplain"></div>
+    <button class="zeroDialBtn" data-dial="parallel">
+      Zéro cadran
+    </button>
   </div>
+
+  <!-- ===== CADRAN ANGULARITÉ ===== -->
+  <div class="dialCard" data-dial="angular">
+    <div class="dialTitle">Angularité</div>
+
+    <div class="dialWrap">
+      <canvas id="dialAngular"></canvas>
+    </div>
+
+    <div class="dialValue" id="dialAngularValue">0.00 mil</div>
+
+    <button class="zeroDialBtn" data-dial="angular">
+      Zéro cadran
+    </button>
+  </div>
+
+</div>
 
   <div style="display:flex; justify-content:space-between; font-size:12px;">
     <span>-200</span>
@@ -1376,6 +1391,28 @@ let trainState = {
   angH: 0,
   parH: 0
 };
+// ===============================
+// ZÉROS INDÉPENDANTS DES CADRANS
+// ===============================
+
+let dialState = {
+  angular: {
+    zero: 0
+  },
+  parallel: {
+    zero: 0
+  }
+};
+// ===============================
+// HELPERS — TYPE DE DÉFAUT
+// ===============================
+function isAngular(defect){
+  return defect === "angH" || defect === "angV";
+}
+
+function isParallel(defect){
+  return defect === "parH" || defect === "parV";
+}
 
 let activeDefect = "angV";
 let lastDialValue = 0;
