@@ -3251,12 +3251,10 @@ function drawTopViewGeneric(ctxTarget){
   const rotGain = visualGain * 0.00035;
 
   // ====================================================
-  // SOURCE UNIQUE DE VÉRITÉ (aucune logique pédagogique ici)
+  // SOURCE UNIQUE DE VÉRITÉ
   // ====================================================
-  const parH = trainingMode ? trainState.parH : state.parH;
-  const angH = trainingMode ? trainState.angH : state.angH;
-  const parV = trainingMode ? trainState.parV : state.parV; // ignoré en top
-  const angV = trainingMode ? trainState.angV : state.angV; // ignoré en top
+  const parH = trainingMode ? (trainState.parH || 0) : (state.parH || 0);
+  const angH = trainingMode ? (trainState.angH || 0) : (state.angH || 0);
 
   // ====================================================
   // RÉFÉRENCES FIXES (POMPE + SOCLE)
@@ -3267,13 +3265,13 @@ function drawTopViewGeneric(ctxTarget){
   const { motorW, motorH, pumpW, pumpH, gap, shaftH, coupW, coupH } = GEOM;
 
   // ====================================================
-  // PARALLÉLISME H (TOP VIEW) = DÉPLACEMENT EN Y ✅
+  // TOP VIEW : PARALLÉLISME H = DÉPLACEMENT EN Y ✅
   // ====================================================
   const maxShift = 60;
   const shiftY = Math.max(-maxShift, Math.min(maxShift, parH * scale));
 
-  const motorCx = baseCx;          // X TOUJOURS FIXE
-  const motorCy = baseCy + shiftY; // ✅ déplacement latéral
+  const motorCx = baseCx;          // X fixe (axe arbre)
+  const motorCy = baseCy + shiftY; // Y bouge (latéral)
 
   // ====================================================
   // SEMELLE COMMUNE (FIXE)
@@ -3288,17 +3286,17 @@ function drawTopViewGeneric(ctxTarget){
   );
 
   // ====================================================
-  // COORDONNÉES DES PATTES (position moteur)
+  // PATTES (position moteur)
   // ====================================================
   const P = {
-    A:{ x: motorCx - motorW/2 + 24, y: motorCy - motorH/2 + 18 },
-    B:{ x: motorCx + motorW/2 - 24, y: motorCy - motorH/2 + 18 },
-    D:{ x: motorCx - motorW/2 + 24, y: motorCy + motorH/2 - 18 },
-    C:{ x: motorCx + motorW/2 - 24, y: motorCy + motorH/2 - 18 },
+    A:{ x: motorCx - motorW/2 + 24, y: motorCy - motorH/2 + 18 }, // TL
+    B:{ x: motorCx + motorW/2 - 24, y: motorCy - motorH/2 + 18 }, // TR
+    C:{ x: motorCx + motorW/2 - 24, y: motorCy + motorH/2 - 18 }, // BR
+    D:{ x: motorCx - motorW/2 + 24, y: motorCy + motorH/2 - 18 }, // BL
   };
 
-  // Mapping soft-foot
-  const scheme = FOOT_SCHEMES[footSchemeKey];
+  // mapping soft-foot (ordre TL/TR/BR/BL)
+  const scheme = FOOT_SCHEMES[footSchemeKey] || FOOT_SCHEMES.standard;
   const PM = {
     A: P[scheme.TL],
     B: P[scheme.TR],
@@ -3309,47 +3307,38 @@ function drawTopViewGeneric(ctxTarget){
   // ====================================================
   // ANGULARITÉ H (TOP VIEW) = ROTATION
   // ====================================================
-  const ang = angH * dialSign * rotGain;
+  const ang = (angH * dialSign * rotGain);
 
+  // pivot réaliste : coin extérieur
   let pivot = { x: motorCx, y: motorCy };
   if(ang > 0) pivot = PM.C;
   if(ang < 0) pivot = PM.D;
 
   // ====================================================
-  // BLOC MOTEUR (MOBILE)
+  // DESSIN DU MOTEUR (BLOC ROTATIF)
   // ====================================================
+  const footW = 24;
+  const footH = 12;
+
   ctx.save();
   ctx.translate(pivot.x, pivot.y);
   ctx.rotate(ang);
   ctx.translate(-pivot.x, -pivot.y);
 
+  // moteur
   ctx.fillStyle = "#00a2ff";
-  ctx.fillRect(
-    motorCx - motorW/2,
-    motorCy - motorH/2,
-    motorW,
-    motorH
-  );
+  ctx.fillRect(motorCx - motorW/2, motorCy - motorH/2, motorW, motorH);
 
-  ctx.restore();
-
-  // (le reste de ton dessin peut suivre ici sans changement)
-}
-
+  // pattes (dans le bloc rotatif)
   function drawPad(letter){
-  const {x,y} = PM[letter];
-  let col = footColor(letter);
-  if(flashFeet.includes(letter)){
-    if(typeof blinkColor === "function"){
-      col = blinkColor(col);
-    }
+    const pt = PM[letter];
+    if(!pt) return;
+    ctx.fillStyle = footColor(letter);
+    ctx.fillRect(pt.x - footW/2, pt.y - footH/2, footW, footH);
   }
-  ctx.fillStyle = col;
-  ctx.fillRect(x - footW/2, y - footH/2, footW, footH);
-}
   drawPad("A"); drawPad("B"); drawPad("C"); drawPad("D");
 
-  // ---- arbre moteur ----
+  // arbre moteur
   ctx.fillStyle = "#bbbbbb";
   ctx.fillRect(
     motorCx + motorW/2,
@@ -3358,55 +3347,50 @@ function drawTopViewGeneric(ctxTarget){
     shaftH
   );
 
-  // ---- demi-accouplement moteur ----
+  // demi-accouplement moteur
   const coupX = motorCx + motorW/2 + gap/2;
   ctx.fillStyle = "#cfcfcf";
   ctx.fillRect(coupX - 14, motorCy - coupH/2, coupW, coupH);
 
-  // ---- AXE MOTEUR (AU PREMIER PLAN, DANS LE BLOC ROTATIF) ----
+  // axe moteur (dans le bloc rotatif)
   ctx.save();
   ctx.strokeStyle = "rgba(255,255,255,0.95)";
   ctx.setLineDash([5,4]);
   ctx.lineWidth = 2.5;
-
   ctx.beginPath();
   ctx.moveTo(motorCx - motorW/2 - 90, motorCy);
   ctx.lineTo(motorCx + motorW/2 + gap/2, motorCy);
   ctx.stroke();
   ctx.restore();
 
-  ctx.restore(); // FIN BLOC ROTATIF MOTEUR
-// ====================================================
-//   ANGULARITÉ HORIZONTALE — FLÈCHES + CALCUL EXPLICITE
-//   (AU PREMIER PLAN)
-// ====================================================
-// ====================================================
-//   ANGULARITÉ HORIZONTALE — FLÈCHES = POUSSER (SENS RÉEL)
-// ====================================================
-if(Math.abs(angH) > 0){
-  const v = angH * dialSign;
-  const len = 60;
+  ctx.restore(); // ✅ FIN DU BLOC ROTATIF (UN SEUL restore)
 
-  if(v > 0){
-    drawArrow(ctx, PM.A.x, PM.A.y - len, PM.A.x, PM.A.y);
-    drawArrow(ctx, PM.C.x, PM.C.y + len, PM.C.x, PM.C.y);
-  }
-
-  if(v < 0){
-    drawArrow(ctx, PM.B.x, PM.B.y - len, PM.B.x, PM.B.y);
-    drawArrow(ctx, PM.D.x, PM.D.y + len, PM.D.x, PM.D.y);
-  }
-}
   // ====================================================
-  //   BLOC POMPE (FIXE) : POMPE + ARBRE + ½ ACCOUPLEMENT + AXE
+  // ANGULARITÉ H — FLÈCHES (HORS ROTATION, PREMIER PLAN)
+  // ====================================================
+  if(Math.abs(angH) > 0){
+    const v = angH * dialSign;
+    const len = 60;
+
+    if(v > 0){
+      drawArrow(ctx, PM.A.x, PM.A.y - len, PM.A.x, PM.A.y);
+      drawArrow(ctx, PM.C.x, PM.C.y + len, PM.C.x, PM.C.y);
+    }else{
+      drawArrow(ctx, PM.B.x, PM.B.y - len, PM.B.x, PM.B.y);
+      drawArrow(ctx, PM.D.x, PM.D.y + len, PM.D.x, PM.D.y);
+    }
+  }
+
+  // ====================================================
+  // POMPE (FIXE)
   // ====================================================
   const pumpX = baseCx + motorW/2 + gap;
 
-  // ---- pompe ----
+  // pompe
   ctx.fillStyle="#ff9800";
   ctx.fillRect(pumpX, baseCy - pumpH/2, pumpW, pumpH);
 
-  // ---- arbre pompe ----
+  // arbre pompe
   ctx.fillStyle = "#bbbbbb";
   ctx.fillRect(
     baseCx + motorW/2 + gap/2 + 14,
@@ -3415,7 +3399,7 @@ if(Math.abs(angH) > 0){
     shaftH
   );
 
-  // ---- demi-accouplement pompe ----
+  // demi-accouplement pompe
   ctx.fillStyle = "#cfcfcf";
   ctx.fillRect(
     baseCx + motorW/2 + gap/2 + 4,
@@ -3424,12 +3408,11 @@ if(Math.abs(angH) > 0){
     coupH
   );
 
-  // ---- AXE POMPE (FIXE) ----
+  // axe pompe
   ctx.save();
   ctx.strokeStyle = "rgba(255,255,255,0.95)";
   ctx.setLineDash([5,4]);
   ctx.lineWidth = 2.5;
-
   ctx.beginPath();
   ctx.moveTo(baseCx + motorW/2 + gap/2, baseCy);
   ctx.lineTo(baseCx + motorW/2 + gap + pumpW + 90, baseCy);
@@ -3437,7 +3420,7 @@ if(Math.abs(angH) > 0){
   ctx.restore();
 
   // ====================================================
-  //   LETTRES (UTILISER LES COORDONNÉES MOTEUR P)
+  // LETTRES + TITRES (hors rotation)
   // ====================================================
   ctx.fillStyle = "#fff";
   ctx.font = "14px Arial";
@@ -3445,17 +3428,13 @@ if(Math.abs(angH) > 0){
 
   const labelOffset = 26;
   ctx.fillText(labelFoot("A"), PM.A.x, PM.A.y - labelOffset);
-ctx.fillText(labelFoot("B"), PM.B.x, PM.B.y - labelOffset);
-ctx.fillText(labelFoot("D"), PM.D.x, PM.D.y + labelOffset + 6);
-ctx.fillText(labelFoot("C"), PM.C.x, PM.C.y + labelOffset + 6);
-  // ====================================================
-  //   TITRES
-  // ====================================================
+  ctx.fillText(labelFoot("B"), PM.B.x, PM.B.y - labelOffset);
+  ctx.fillText(labelFoot("D"), PM.D.x, PM.D.y + labelOffset + 6);
+  ctx.fillText(labelFoot("C"), PM.C.x, PM.C.y + labelOffset + 6);
+
   ctx.fillText("MOTEUR (mobile)", motorCx, motorCy - motorH/2 - 18);
   ctx.fillText("POMPE (fixe)", pumpX + pumpW/2, baseCy - pumpH/2 - 18);
 }
-
-
 function calcThermalGrowth(heightIn, material, tOp, tAmb){
   const coeff = MATERIAL_COEFF[material];
 
