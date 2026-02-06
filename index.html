@@ -1382,7 +1382,7 @@ function trainingRequestResize(){
     trainingResizeModalHeight();
     forceResizeTrainingCanvases();
     drawTrainingViews();
-    drawDial(computeDialReading(), computeDialReading());
+    updateTraining();
   });
 }
 
@@ -1543,13 +1543,15 @@ function openTraining(){
   // ZÉRO CADRAN (INDÉPENDANT)
   // ===============================
   document.querySelectorAll(".zeroDialBtn").forEach(btn=>{
-    btn.addEventListener("click",()=>{
-      const dial = btn.dataset.dial; // parallel / angular
-      dialState[dial].zero += computeDialReading(dial);
-      updateTraining();
-    });
-  });
+  btn.addEventListener("click",()=>{
+    const dial = btn.dataset.dial; // "parallel" | "angular"
 
+    // on "set" le zéro à la lecture brute actuelle
+    dialState[dial].zero = getTrainingRawReading(dial);
+
+    updateTraining();
+  });
+});
   // ===============================
   // RESET ALIGNEMENT
   // ===============================
@@ -1706,6 +1708,20 @@ function computeDialReading(){
   reading -= dialZeroOffset;
   return reading;
 }
+
+function getTrainingRawReading(dial){
+  // valeurs mécaniques réelles
+  const parValue = (trainState.parH || 0) + (trainState.parV || 0);
+  const angValue = (trainState.angH || 0) + (trainState.angV || 0);
+
+  // lecture brute cadran (avant inversion pompe)
+  if(dial === "parallel") return parValue * 2;
+  if(dial === "angular")  return angValue;
+
+  return 0;
+}
+
+
 function updateTraining(){
   if(!trainingMode) return;
 
