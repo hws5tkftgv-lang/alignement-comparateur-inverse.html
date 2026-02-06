@@ -1593,9 +1593,9 @@ function closeTraining(){
 }
 
 
-function drawDial(needleVal, displayVal){
+function drawDial(canvasId, needleVal){
 
-  const canvas = document.getElementById("trainDial");
+  const canvas = document.getElementById(canvasId);
   if(!canvas) return;
 
   const ctx = canvas.getContext("2d");
