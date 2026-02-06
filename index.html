@@ -1312,7 +1312,30 @@ const TRAINING_STEPS = [
   }
 ];
 
+// ===============================
+// INIT DES CADRANS TRAINING
+// ===============================
+let dialParallelCanvas, dialParallelCtx;
+let dialAngularCanvas, dialAngularCtx;
 
+function initTrainingDials(){
+
+  // ---- PARALLÉLISME ----
+  dialParallelCanvas = document.getElementById("dialParallel");
+  if(dialParallelCanvas){
+    dialParallelCtx = dialParallelCanvas.getContext("2d");
+    resizeCanvas(dialParallelCanvas, dialParallelCtx);
+    drawDial(0, 0, dialParallelCtx);
+  }
+
+  // ---- ANGULARITÉ ----
+  dialAngularCanvas = document.getElementById("dialAngular");
+  if(dialAngularCanvas){
+    dialAngularCtx = dialAngularCanvas.getContext("2d");
+    resizeCanvas(dialAngularCanvas, dialAngularCtx);
+    drawDial(0, 0, dialAngularCtx);
+  }
+}
 // ===============================
 // TRAINING — SCROLL LOCK (iOS safe)
 // ===============================
@@ -1554,6 +1577,7 @@ if(mount){
     trainingRequestResize();
     updateTraining();
   });
+  initTrainingDials();
 }
 function closeTraining(){
   trainingMode = false;
