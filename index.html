@@ -1553,10 +1553,13 @@ updateTraining();
     slider.addEventListener("input", () => {
       const v = Number(slider.value) || 0;
 
-      // valeur ABSOLUE pour le défaut actif
-      trainState[activeDefect] = v;
+// 🔒 LIMITE MÉCANIQUE ABSOLUE ±200 mil
+trainState[activeDefect] = Math.max(
+  -200,
+  Math.min(200, v)
+);
 
-      updateTraining();
+updateTraining();
     });
   }
 
