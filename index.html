@@ -1583,19 +1583,30 @@ if(slider){
   // ZÉRO CADRAN (INDÉPENDANT)
   // ===============================
   document.querySelectorAll(".zeroDialBtn").forEach(btn=>{
-  btn.addEventListener("click",()=>{
-    const dial = btn.dataset.dial; // "parallel" | "angular"
+  btn.addEventListener("click", () => {
 
-    // on "set" le zéro à la lecture brute actuelle
-    const defect =
-  dial === "parallel"
-    ? (activeDefect.startsWith("par") ? activeDefect : "parH")
-    : (activeDefect.startsWith("ang") ? activeDefect : "angH");
+  const dial = btn.dataset.dial;        // "parallel" ou "angular"
 
-dialState[dial].zero = getMechanicalReading(defect);
+  // 🔎 associer le bon défaut mécanique au cadran
+  const defect =
+    dial === "parallel"
+      ? (activeDefect.startsWith("par") ? activeDefect : null)
+      : (activeDefect.startsWith("ang") ? activeDefect : null);
 
-    updateTraining();
-  });
+  if (!defect) return;
+
+  // 1️⃣ fixer le zéro du cadran à la position ACTUELLE du dessin
+  dialState[dial].zero = getMechanicalReading(defect);
+
+  // 2️⃣ recentrer le slider visuellement
+  const slider = document.getElementById("trainSlider");
+  if (slider) {
+    slider.value = 0;
+    lastSliderValue = 0; // 🔑 OBLIGATOIRE pour éviter les sauts
+  }
+
+  updateTraining();
+});
 });
   // ===============================
   // RESET ALIGNEMENT
