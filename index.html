@@ -978,7 +978,11 @@ let dialZeroOffset = 0;
 let trainType = "parH";
 let trainValue = 0;
 let lastSliderValue = 0;
-
+// ===============================
+// RÉGLAGES SLIDER (iPhone SAFE)
+// ===============================
+const SLIDER_GAIN = 0.25;      // sensibilité (0.2 à 0.4)
+const SLIDER_DEADBAND = 0.5;   // zone morte anti micro-bruit iOS
 // refs canvases training (sécuritaire)
 window.topCanvasTest = null;
 window.sideCanvasTest = null;
@@ -1545,19 +1549,28 @@ updateTraining();
     // ===============================
   // SLIDER PRINCIPAL
   // ===============================
-  if(slider){
+  // ===============================
+// SLIDER PRINCIPAL (AMORTI iPHONE)
+// ===============================
+let lastSliderValue = 0;
+
+if(slider){
   slider.addEventListener("input", () => {
 
-    const current = Number(slider.value) || 0;
-    const delta   = current - lastSliderValue;
-    lastSliderValue = current;
+    const raw = Number(slider.value) || 0;
+    const diff = raw - lastSliderValue;
+    lastSliderValue = raw;
 
-    if (delta === 0) return;
+    // 🛑 zone morte iOS (évite micro-sauts)
+    if (Math.abs(diff) < SLIDER_DEADBAND) return;
+
+    // 🎚️ effort amorti
+    const delta = diff * SLIDER_GAIN;
 
     const next =
       (Number(trainState[activeDefect]) || 0) + delta;
 
-    // 🔒 limite mécanique ABSOLUE
+    // 🔒 limite mécanique réelle
     trainState[activeDefect] = Math.max(
       -200,
       Math.min(200, next)
