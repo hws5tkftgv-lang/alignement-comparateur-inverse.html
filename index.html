@@ -832,6 +832,15 @@ body.modal-open{
   font-weight: 600;
 }
 
+#topViewTest,
+#sideViewTest{
+  width: 100%;
+  height: 220px;
+  display: block;
+}
+
+
+
 </style>
 </head>
 
@@ -1412,24 +1421,24 @@ let dialState = {
 // LECTURE MÉCANIQUE RÉELLE (SOURCE UNIQUE)
 // ==========================================
 function getMechanicalReading(dialType){
-  let value = 0;
+
+  let v = 0;
 
   if(dialType === "parallel"){
-    // parallélisme = déplacement réel × 2
-    value = (trainState.parH + trainState.parV) * 2;
+    if(activeDefect === "parH") v = trainState.parH * 2;
+    if(activeDefect === "parV") v = trainState.parV * 2;
   }
 
   if(dialType === "angular"){
-    // angularité = inclinaison réelle
-    value = (trainState.angH + trainState.angV);
+    if(activeDefect === "angH") v = trainState.angH;
+    if(activeDefect === "angV") v = trainState.angV;
   }
 
-  // inversion si cadran monté sur la pompe
   if(trainMount === "pump"){
-    value = -value;
+    v = -v;
   }
 
-  return value;
+  return v;
 }
 // ===============================
 // HELPERS — TYPE DE DÉFAUT
@@ -1491,7 +1500,7 @@ function openTraining(){
   trainMount    = mount?.value || "motor";
   activeDefect  = "parH";
   activeDial    = "parallel";     // ⬅️ TRÈS IMPORTANT
-  lastDialValue = 0;
+  
 
   if(slider) slider.value = 0;
 
@@ -1579,7 +1588,7 @@ updateTraining();
       dialState.parallel.zero = 0;
       dialState.angular.zero  = 0;
 
-      lastDialValue = 0;
+      
       if(slider) slider.value = 0;
 
       updateTraining();
@@ -1600,7 +1609,7 @@ updateTraining();
   // INIT + iPHONE FIX
   // ===============================
   initTrainingDials();
-
+drawTrainingViews();
   requestAnimationFrame(()=>{
     trainingRequestResize();
     updateTraining();
