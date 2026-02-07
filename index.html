@@ -1420,6 +1420,30 @@ let dialState = {
     zero: 0
   }
 };
+
+// ==========================================
+// LECTURE MÉCANIQUE RÉELLE (SOURCE UNIQUE)
+// ==========================================
+function getMechanicalReading(dialType){
+  let value = 0;
+
+  if(dialType === "parallel"){
+    // parallélisme = déplacement réel × 2
+    value = (trainState.parH + trainState.parV) * 2;
+  }
+
+  if(dialType === "angular"){
+    // angularité = inclinaison réelle
+    value = (trainState.angH + trainState.angV);
+  }
+
+  // inversion si cadran monté sur la pompe
+  if(trainMount === "pump"){
+    value = -value;
+  }
+
+  return value;
+}
 // ===============================
 // HELPERS — TYPE DE DÉFAUT
 // ===============================
@@ -1541,7 +1565,7 @@ function openTraining(){
     const dial = btn.dataset.dial; // "parallel" | "angular"
 
     // on "set" le zéro à la lecture brute actuelle
-    dialState[dial].zero = getTrainingRawReading(dial);
+    dialState[dial].zero = getMechanicalReading(dial);
 
     updateTraining();
   });
@@ -1676,32 +1700,7 @@ function drawDial(canvasId, needleVal){
   ctx.arc(cx,cy,6,0,Math.PI*2);
   ctx.fill();
 }
-function computeDialReading(){
 
-  let reading = 0;
-
-  if(trainingMode){
-    const v = trainState[trainType] || 0;
-
-    if(trainType.startsWith("par")){
-      reading = v * 2;
-    }else{
-      reading = v;
-    }
-  }else{
-    reading += state.parV * 2;
-    reading += state.angV;
-    reading += state.parH * 2;
-    reading += state.angH;
-  }
-
-  if(trainMount === "pump"){
-    reading = -reading;
-  }
-
-  reading -= dialZeroOffset;
-  return reading;
-}
 
 function getTrainingRawReading(dial){
   // valeurs mécaniques réelles
@@ -1722,11 +1721,11 @@ function updateTraining(){
   // ===============================
   // VALEURS MÉCANIQUES RÉELLES
   // ===============================
-  const parValue =
-    (trainState.parH || 0) + (trainState.parV || 0);
+  const parRaw = getMechanicalReading("parallel");
+const angRaw = getMechanicalReading("angular");
 
-  const angValue =
-    (trainState.angH || 0) + (trainState.angV || 0);
+const parDisplay = parRaw - (dialState.parallel.zero || 0);
+const angDisplay = angRaw - (dialState.angular.zero || 0);
 
   // ===============================
   // APPLICATION DES ZÉROS CADRANS
