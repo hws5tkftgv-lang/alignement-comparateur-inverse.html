@@ -1313,22 +1313,9 @@ let dialParallelCanvas, dialParallelCtx;
 let dialAngularCanvas, dialAngularCtx;
 
 function initTrainingDials(){
-
-  // ---- PARALLÉLISME ----
-  dialParallelCanvas = document.getElementById("dialParallel");
-  if(dialParallelCanvas){
-    dialParallelCtx = dialParallelCanvas.getContext("2d");
-    resizeCanvas(dialParallelCanvas, dialParallelCtx);
-    drawDial(0, 0, dialParallelCtx);
-  }
-
-  // ---- ANGULARITÉ ----
-  dialAngularCanvas = document.getElementById("dialAngular");
-  if(dialAngularCanvas){
-    dialAngularCtx = dialAngularCanvas.getContext("2d");
-    resizeCanvas(dialAngularCanvas, dialAngularCtx);
-    drawDial(0, 0, dialAngularCtx);
-  }
+  // Dessine juste un cadran "0" au bon endroit
+  drawDial("dialParallel", 0);
+  drawDial("dialAngular", 0);
 }
 // ===============================
 // TRAINING — SCROLL LOCK (iOS safe)
@@ -1702,45 +1689,28 @@ function drawDial(canvasId, needleVal){
 }
 
 
-function getTrainingRawReading(dial){
-  // valeurs mécaniques réelles
-  const parValue = (trainState.parH || 0) + (trainState.parV || 0);
-  const angValue = (trainState.angH || 0) + (trainState.angV || 0);
-
-  // lecture brute cadran (avant inversion pompe)
-  if(dial === "parallel") return parValue * 2;
-  if(dial === "angular")  return angValue;
-
-  return 0;
-}
 
 
 function updateTraining(){
   if(!trainingMode) return;
 
   // ===============================
-  // VALEURS MÉCANIQUES RÉELLES
+  // LECTURES MÉCANIQUES BRUTES
   // ===============================
   const parRaw = getMechanicalReading("parallel");
-const angRaw = getMechanicalReading("angular");
-
-const parDisplay = parRaw - (dialState.parallel.zero || 0);
-const angDisplay = angRaw - (dialState.angular.zero || 0);
+  const angRaw = getMechanicalReading("angular");
 
   // ===============================
-  // APPLICATION DES ZÉROS CADRANS
+  // AFFICHAGE (ZÉRO INDÉPENDANT PAR CADRAN)
   // ===============================
-  const parDisplay =
-    parValue * 2 - (dialState.parallel.zero || 0);
+  const parDisplay = parRaw - (dialState.parallel.zero || 0);
+  const angDisplay = angRaw - (dialState.angular.zero || 0);
 
-  const angDisplay =
-    angValue - (dialState.angular.zero || 0);
-
-  // inversion si cadran monté sur pompe
+  // inversion si cadran monté sur pompe (affichage seulement)
   const sign = (trainMount === "pump") ? -1 : 1;
 
   // ===============================
-  // DESSIN DES CADRANS
+  // DESSIN CADRANS
   // ===============================
   drawDial("dialParallel", parDisplay * sign);
   drawDial("dialAngular",  angDisplay * sign);
@@ -1750,7 +1720,6 @@ const angDisplay = angRaw - (dialState.angular.zero || 0);
   // ===============================
   const pv = document.getElementById("dialParallelValue");
   const av = document.getElementById("dialAngularValue");
-
   if(pv) pv.textContent = (parDisplay * sign).toFixed(2) + " mil";
   if(av) av.textContent = (angDisplay * sign).toFixed(2) + " mil";
 
@@ -1767,8 +1736,8 @@ const angDisplay = angRaw - (dialState.angular.zero || 0);
   if(explain){
     explain.innerHTML =
       `<b>État actuel :</b><br>
-       Parallélisme réel : ${parValue.toFixed(2)} mil<br>
-       Angularité réelle : ${angValue.toFixed(2)} mil`;
+       Parallélisme brut : ${parRaw.toFixed(2)} mil<br>
+       Angularité brute : ${angRaw.toFixed(2)} mil`;
   }
 
   const info = document.getElementById("trainInfo");
@@ -1778,7 +1747,6 @@ const angDisplay = angRaw - (dialState.angular.zero || 0);
       `Étape ${trainingStep + 1} / ${TRAINING_STEPS.length}\n\n${s.text}`;
   }
 }
-
 /* =====================================================
    MAPPING PATTES (lettres ↔ coins)
    Coins = TL (haut-gauche), TR (haut-droite),
