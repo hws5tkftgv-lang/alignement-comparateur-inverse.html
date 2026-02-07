@@ -1546,18 +1546,17 @@ updateTraining();
     });
   });
 
-  // ===============================
+    // ===============================
   // SLIDER PRINCIPAL
   // ===============================
   if(slider){
-    slider.addEventListener("input",()=>{
-  const v = Number(slider.value) || 0;
+    slider.addEventListener("input", () => {
+      const v = Number(slider.value) || 0;
 
-  // valeur ABSOLUE par défaut
-  trainState[activeDefect] = v;
+      // valeur ABSOLUE pour le défaut actif
+      trainState[activeDefect] = v;
 
-  updateTraining();
-});
+      updateTraining();
     });
   }
 
