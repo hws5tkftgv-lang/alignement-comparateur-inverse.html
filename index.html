@@ -1710,36 +1710,39 @@ function drawDial(canvasId, needleVal){
 
 
 
-
 function updateTraining(){
   if(!trainingMode) return;
 
   // ===============================
-  // LECTURES MÉCANIQUES BRUTES
+  // LECTURE MÉCANIQUE RÉELLE
   // ===============================
-  const parRaw = getMechanicalReading("parallel");
-  const angRaw = getMechanicalReading("angular");
+  const parDefect = activeDefect.startsWith("par") ? activeDefect : null;
+  const angDefect = activeDefect.startsWith("ang") ? activeDefect : null;
+
+  const parRaw = parDefect ? getMechanicalReading(parDefect) : 0;
+  const angRaw = angDefect ? getMechanicalReading(angDefect) : 0;
 
   // ===============================
-  // AFFICHAGE (ZÉRO INDÉPENDANT PAR CADRAN)
+  // APPLICATION DES ZÉROS
   // ===============================
   const parDisplay = parRaw - (dialState.parallel.zero || 0);
   const angDisplay = angRaw - (dialState.angular.zero || 0);
 
-  
   // ===============================
-  // DESSIN CADRANS
+  // DESSIN DES CADRANS
   // ===============================
   drawDial("dialParallel", parDisplay);
-drawDial("dialAngular",  angDisplay);
+  drawDial("dialAngular",  angDisplay);
 
   // ===============================
   // TEXTE SOUS CADRANS
   // ===============================
   const pv = document.getElementById("dialParallelValue");
   const av = document.getElementById("dialAngularValue");
+
   if(pv) pv.textContent = parDisplay.toFixed(2) + " mil";
-if(av) av.textContent = angDisplay.toFixed(2) + " mil";
+  if(av) av.textContent = angDisplay.toFixed(2) + " mil";
+
   // ===============================
   // DESSINS MÉCANIQUES
   // ===============================
@@ -1752,63 +1755,11 @@ if(av) av.textContent = angDisplay.toFixed(2) + " mil";
   const explain = document.getElementById("trainingExplain");
   if(explain){
     explain.innerHTML =
-      `<b>État actuel :</b><br>
-       Parallélisme brut : ${parRaw.toFixed(2)} mil<br>
-       Angularité brute : ${angRaw.toFixed(2)} mil`;
+      `<b>Défaut actif :</b> ${activeDefect}<br>
+       Lecture brute : ${parDefect ? parRaw.toFixed(2) : angRaw.toFixed(2)} mil`;
   }
-
-  const info = document.getElementById("trainInfo");
-  if(info){
-    const s = TRAINING_STEPS[trainingStep];
-    info.textContent =
-      `Étape ${trainingStep + 1} / ${TRAINING_STEPS.length}\n\n${s.text}`;
-  }
-  
-  // =======================================
-// LECTURE MÉCANIQUE → CADRANS
-// =======================================
-
-// lecture mécanique brute selon le défaut
-function getMechanicalReading(defect){
-  const v = Number(trainState[defect]) || 0;
-
-  // Parallélisme = lecture DOUBLE
-  if(defect === "parH" || defect === "parV"){
-    return v * 2;
-  }
-
-  // Angularité = lecture directe
-  if(defect === "angH" || defect === "angV"){
-    return v;
-  }
-
-  return 0;
 }
 
-// --- CADRAN PARALLÉLISME ---
-const parDefect = activeDefect.startsWith("par") ? activeDefect : null;
-if(parDefect){
-  const raw = getMechanicalReading(parDefect);
-  const value = raw - (dialState.parallel.zero || 0);
-
-  drawDial("dialParallel", value);
-
-  const el = document.getElementById("dialParallelValue");
-  if(el) el.textContent = value.toFixed(2) + " mil";
-}
-
-// --- CADRAN ANGULARITÉ ---
-const angDefect = activeDefect.startsWith("ang") ? activeDefect : null;
-if(angDefect){
-  const raw = getMechanicalReading(angDefect);
-  const value = raw - (dialState.angular.zero || 0);
-
-  drawDial("dialAngular", value);
-
-  const el = document.getElementById("dialAngularValue");
-  if(el) el.textContent = value.toFixed(2) + " mil";
-}
-}
 /* =====================================================
    MAPPING PATTES (lettres ↔ coins)
    Coins = TL (haut-gauche), TR (haut-droite),
