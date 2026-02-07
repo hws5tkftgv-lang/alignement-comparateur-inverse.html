@@ -1558,7 +1558,13 @@ updateTraining();
   }
 
   // appliquer AU DESSIN seulement
-  trainState[activeDefect] = limited;
+  const prev = Number(trainState[activeDefect]) || 0;
+const delta = limited - prev;
+
+trainState[activeDefect] = Math.max(
+  -200,
+  Math.min(200, prev + delta)
+);
 
   updateTraining();
 });
@@ -1572,7 +1578,12 @@ updateTraining();
     const dial = btn.dataset.dial; // "parallel" | "angular"
 
     // on "set" le zéro à la lecture brute actuelle
-    dialState[dial].zero = getMechanicalReading(dial);
+    const defect =
+  dial === "parallel"
+    ? (activeDefect.startsWith("par") ? activeDefect : "parH")
+    : (activeDefect.startsWith("ang") ? activeDefect : "angH");
+
+dialState[dial].zero = getMechanicalReading(defect);
 
     updateTraining();
   });
