@@ -1521,10 +1521,11 @@ trainType    = activeDefect;
 activeDial = (activeDefect.startsWith("par")) ? "parallel" : "angular";
 
 // le slider revient EXACTEMENT à la valeur déjà stockée pour ce défaut
+// ✅ CORRECT — slider neutre
 if(slider){
-  slider.value = Number(trainState[activeDefect] || 0);
+  slider.value = 0;
+  lastSliderValue = 0;
 }
-
 // met à jour l'état visuel des cartes cadrans
 document.querySelectorAll(".dialCard").forEach(c=>c.classList.remove("active"));
 const card = document.querySelector(`.dialCard[data-dial="${activeDial}"]`);
@@ -1552,29 +1553,27 @@ updateTraining();
   // ===============================
 // SLIDER PRINCIPAL (AMORTI iPHONE)
 // ===============================
-let lastSliderValue = 0;
 
-if(slider){
+
+if (slider) {
   slider.addEventListener("input", () => {
 
     const raw = Number(slider.value) || 0;
     const diff = raw - lastSliderValue;
     lastSliderValue = raw;
 
-    // 🛑 zone morte iOS (évite micro-sauts)
+    // 🛑 zone morte iOS
     if (Math.abs(diff) < SLIDER_DEADBAND) return;
 
-    // 🎚️ effort amorti
+    // 🎚️ amortissement
     const delta = diff * SLIDER_GAIN;
 
-    const next =
-      (Number(trainState[activeDefect]) || 0) + delta;
+    // 📌 valeur actuelle mécanique
+    const current = Number(trainState[activeDefect]) || 0;
+    const next = current + delta;
 
-    // 🔒 limite mécanique réelle
-    trainState[activeDefect] = Math.max(
-      -200,
-      Math.min(200, next)
-    );
+    // 🔒 limite MÉCANIQUE RÉELLE
+    trainState[activeDefect] = Math.max(-200, Math.min(200, next));
 
     updateTraining();
   });
