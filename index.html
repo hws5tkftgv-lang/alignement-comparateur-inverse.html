@@ -1546,30 +1546,27 @@ updateTraining();
   // SLIDER PRINCIPAL
   // ===============================
   if(slider){
-    slider.addEventListener("input", () => {
-  const raw = Number(slider.value) || 0;
+  slider.addEventListener("input", () => {
 
-  // 🔒 LIMITE MÉCANIQUE
-  const limited = Math.max(-200, Math.min(200, raw));
+    // le slider est une MOLETTE, pas une position
+    const delta = Number(slider.value) || 0;
+    if (delta === 0) return;
 
-  // 🔁 resynchroniser le slider visuellement
-  if (raw !== limited) {
-    slider.value = limited;
-  }
+    const next =
+      (Number(trainState[activeDefect]) || 0) + delta;
 
-  // appliquer AU DESSIN seulement
-  const prev = Number(trainState[activeDefect]) || 0;
-const delta = limited - prev;
+    // 🔒 limite mécanique ABSOLUE du dessin
+    trainState[activeDefect] = Math.max(
+      -200,
+      Math.min(200, next)
+    );
 
-trainState[activeDefect] = Math.max(
-  -200,
-  Math.min(200, prev + delta)
-);
+    // 🔁 le slider revient TOUJOURS au centre
+    slider.value = 0;
 
-  updateTraining();
-});
-  }
-
+    updateTraining();
+  });
+}
   // ===============================
   // ZÉRO CADRAN (INDÉPENDANT)
   // ===============================
