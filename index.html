@@ -1420,25 +1420,21 @@ let dialState = {
 // ==========================================
 // LECTURE MÉCANIQUE RÉELLE (SOURCE UNIQUE)
 // ==========================================
-function getMechanicalReading(dialType){
+function getMechanicalReading(defect){
 
-  let v = 0;
+  const v = Number(trainState[defect]) || 0;
 
-  if(dialType === "parallel"){
-    if(activeDefect === "parH") v = trainState.parH * 2;
-    if(activeDefect === "parV") v = trainState.parV * 2;
+  // 🔹 PARALLÉLISME → lecture DOUBLE
+  if(defect === "parH" || defect === "parV"){
+    return v * 2;
   }
 
-  if(dialType === "angular"){
-    if(activeDefect === "angH") v = trainState.angH;
-    if(activeDefect === "angV") v = trainState.angV;
+  // 🔹 ANGULARITÉ → lecture directe
+  if(defect === "angH" || defect === "angV"){
+    return v;
   }
 
-  if(trainMount === "pump"){
-    v = -v;
-  }
-
-  return v;
+  return 0;
 }
 // ===============================
 // HELPERS — TYPE DE DÉFAUT
@@ -1767,6 +1763,51 @@ if(av) av.textContent = angDisplay.toFixed(2) + " mil";
     info.textContent =
       `Étape ${trainingStep + 1} / ${TRAINING_STEPS.length}\n\n${s.text}`;
   }
+  
+  // =======================================
+// LECTURE MÉCANIQUE → CADRANS
+// =======================================
+
+// lecture mécanique brute selon le défaut
+function getMechanicalReading(defect){
+  const v = Number(trainState[defect]) || 0;
+
+  // Parallélisme = lecture DOUBLE
+  if(defect === "parH" || defect === "parV"){
+    return v * 2;
+  }
+
+  // Angularité = lecture directe
+  if(defect === "angH" || defect === "angV"){
+    return v;
+  }
+
+  return 0;
+}
+
+// --- CADRAN PARALLÉLISME ---
+const parDefect = activeDefect.startsWith("par") ? activeDefect : null;
+if(parDefect){
+  const raw = getMechanicalReading(parDefect);
+  const value = raw - (dialState.parallel.zero || 0);
+
+  drawDial("dialParallel", value);
+
+  const el = document.getElementById("dialParallelValue");
+  if(el) el.textContent = value.toFixed(2) + " mil";
+}
+
+// --- CADRAN ANGULARITÉ ---
+const angDefect = activeDefect.startsWith("ang") ? activeDefect : null;
+if(angDefect){
+  const raw = getMechanicalReading(angDefect);
+  const value = raw - (dialState.angular.zero || 0);
+
+  drawDial("dialAngular", value);
+
+  const el = document.getElementById("dialAngularValue");
+  if(el) el.textContent = value.toFixed(2) + " mil";
+}
 }
 /* =====================================================
    MAPPING PATTES (lettres ↔ coins)
