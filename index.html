@@ -1443,7 +1443,7 @@ function isParallel(defect){
 }
 
 let activeDefect = "angV";
-let lastDialValue = 0;
+
 let activeDial = "parallel"; // "parallel" ou "angular"
 
 function openTraining(){
@@ -1505,13 +1505,23 @@ function openTraining(){
 
     btn.classList.add("active");
 
-    activeDefect  = btn.dataset.defect;
-    trainType     = activeDefect;   // ✅ MANQUE #1 : on synchronise le défaut actif
-    lastDialValue = 0;
+    activeDefect = btn.dataset.defect;
+trainType    = activeDefect;
 
-    if(slider) slider.value = 0;
+// optionnel mais logique : sélectionner automatiquement le bon cadran
+activeDial = (activeDefect.startsWith("par")) ? "parallel" : "angular";
 
-    updateTraining();               // ✅ redraw immédiat
+// le slider revient EXACTEMENT à la valeur déjà stockée pour ce défaut
+if(slider){
+  slider.value = Number(trainState[activeDefect] || 0);
+}
+
+// met à jour l'état visuel des cartes cadrans
+document.querySelectorAll(".dialCard").forEach(c=>c.classList.remove("active"));
+const card = document.querySelector(`.dialCard[data-dial="${activeDial}"]`);
+if(card) card.classList.add("active");
+
+updateTraining();
   });
 });
   // ===============================
@@ -1532,15 +1542,13 @@ function openTraining(){
   // ===============================
   if(slider){
     slider.addEventListener("input",()=>{
-      const current = Number(slider.value) || 0;
-      const delta   = current - lastDialValue;
-      lastDialValue = current;
+  const v = Number(slider.value) || 0;
 
-      // accumulation du défaut actif
-      trainState[activeDefect] =
-        (Number(trainState[activeDefect]) || 0) + delta;
+  // valeur ABSOLUE par défaut
+  trainState[activeDefect] = v;
 
-      updateTraining();
+  updateTraining();
+});
     });
   }
 
@@ -1706,23 +1714,20 @@ function updateTraining(){
   const parDisplay = parRaw - (dialState.parallel.zero || 0);
   const angDisplay = angRaw - (dialState.angular.zero || 0);
 
-  // inversion si cadran monté sur pompe (affichage seulement)
-  const sign = (trainMount === "pump") ? -1 : 1;
-
+  
   // ===============================
   // DESSIN CADRANS
   // ===============================
-  drawDial("dialParallel", parDisplay * sign);
-  drawDial("dialAngular",  angDisplay * sign);
+  drawDial("dialParallel", parDisplay);
+drawDial("dialAngular",  angDisplay);
 
   // ===============================
   // TEXTE SOUS CADRANS
   // ===============================
   const pv = document.getElementById("dialParallelValue");
   const av = document.getElementById("dialAngularValue");
-  if(pv) pv.textContent = (parDisplay * sign).toFixed(2) + " mil";
-  if(av) av.textContent = (angDisplay * sign).toFixed(2) + " mil";
-
+  if(pv) pv.textContent = parDisplay.toFixed(2) + " mil";
+if(av) av.textContent = angDisplay.toFixed(2) + " mil";
   // ===============================
   // DESSINS MÉCANIQUES
   // ===============================
