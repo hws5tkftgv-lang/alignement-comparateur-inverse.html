@@ -977,7 +977,7 @@ let dialZeroOffset = 0;
 
 let trainType = "parH";
 let trainValue = 0;
-
+let lastSliderValue = 0;
 
 // refs canvases training (sécuritaire)
 window.topCanvasTest = null;
@@ -1548,21 +1548,20 @@ updateTraining();
   if(slider){
   slider.addEventListener("input", () => {
 
-    // le slider est une MOLETTE, pas une position
-    const delta = Number(slider.value) || 0;
+    const current = Number(slider.value) || 0;
+    const delta   = current - lastSliderValue;
+    lastSliderValue = current;
+
     if (delta === 0) return;
 
     const next =
       (Number(trainState[activeDefect]) || 0) + delta;
 
-    // 🔒 limite mécanique ABSOLUE du dessin
+    // 🔒 limite mécanique ABSOLUE
     trainState[activeDefect] = Math.max(
       -200,
       Math.min(200, next)
     );
-
-    // 🔁 le slider revient TOUJOURS au centre
-    slider.value = 0;
 
     updateTraining();
   });
