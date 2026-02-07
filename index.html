@@ -1551,16 +1551,21 @@ updateTraining();
   // ===============================
   if(slider){
     slider.addEventListener("input", () => {
-      const v = Number(slider.value) || 0;
+  const raw = Number(slider.value) || 0;
 
-// 🔒 LIMITE MÉCANIQUE ABSOLUE ±200 mil
-trainState[activeDefect] = Math.max(
-  -200,
-  Math.min(200, v)
-);
+  // 🔒 LIMITE MÉCANIQUE
+  const limited = Math.max(-200, Math.min(200, raw));
 
-updateTraining();
-    });
+  // 🔁 resynchroniser le slider visuellement
+  if (raw !== limited) {
+    slider.value = limited;
+  }
+
+  // appliquer AU DESSIN seulement
+  trainState[activeDefect] = limited;
+
+  updateTraining();
+});
   }
 
   // ===============================
