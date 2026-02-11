@@ -1248,10 +1248,11 @@ function printHelp(){
 
   // Attendre que le DOM soit rendu (CRUCIAL)
   printWindow.onload = () => {
+  setTimeout(() => {
     printWindow.focus();
     printWindow.print();
-    printWindow.close();
-  };
+  }, 300);
+};
 }
 
 function buildTrainingHTML(){
