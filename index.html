@@ -1201,12 +1201,57 @@ function closeHelp(){
 }
 
 function printHelp(){
-  // Ouvre si jamais fermé, pour être sûr d’imprimer la fiche
-  const modal = document.getElementById("helpModal");
-  if(modal && modal.style.display !== "block"){
-    openHelp();
-  }
-  window.print();
+
+  const help = document.getElementById("helpContent");
+  if(!help) return;
+
+  // Clone le contenu pour éviter les styles du site
+  const content = help.cloneNode(true);
+
+  // Nouvelle page propre
+  const printWindow = window.open('', '', 'width=900,height=700');
+
+  printWindow.document.write(`
+    <html>
+    <head>
+      <title>Guide Alignement</title>
+
+      <style>
+        body{
+          font-family: Arial, Helvetica, sans-serif;
+          padding: 30px;
+          background:white;
+          color:black;
+        }
+
+        h1,h2,h3{
+          color:black;
+        }
+
+        .box{
+          border:1px solid #000;
+          border-radius:10px;
+          padding:12px;
+          margin-bottom:14px;
+          page-break-inside: avoid;
+        }
+
+        button{ display:none; }
+      </style>
+    </head>
+    <body></body>
+    </html>
+  `);
+
+  printWindow.document.body.appendChild(content);
+  printWindow.document.close();
+
+  // Attendre que le DOM soit rendu (CRUCIAL)
+  printWindow.onload = () => {
+    printWindow.focus();
+    printWindow.print();
+    printWindow.close();
+  };
 }
 
 function buildTrainingHTML(){
