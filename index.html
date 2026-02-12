@@ -1990,6 +1990,13 @@ const geometry = {
 
 };
 
+function projectDialToFeet(readingMil, diameter, distance){
+  if(diameter <= 0) return 0;
+  const slope = readingMil / diameter; // mil/po
+  return slope * distance;              // mil
+}
+
+
 // Sécurité : distances géométriques toujours définies
 if(!Number.isFinite(geometry.distDialToFront)) {
   geometry.distDialToFront = 6;
@@ -2293,16 +2300,16 @@ function computeAngularShimH(){
 
 
 function computeAngularShimsVertical(){
-  const A = geometry.couplingDiameter;
-  const B = geometry.centerToFrontFeet;
-  const D = geometry.frontToRearFeet;
-  const C = Math.abs(state.angV * dialSign);
 
-  if(A <= 0) return { front:0, rear:0 };
+  const D = geometry.couplingDiameter;
+  const a = geometry.centerToFrontFeet;
+  const b = geometry.frontToRearFeet;
+
+  const reading = Math.abs(state.angV); // lecture cadran réelle
 
   return {
-    front: (B * C) / A,
-    rear: ((B + D) * C) / A
+    front: projectDialToFeet(reading, D, a),
+    rear:  projectDialToFeet(reading, D, a + b)
   };
 }
 
