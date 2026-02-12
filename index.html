@@ -1995,17 +1995,19 @@ const geometry = {
    DÉFINITION DES ÉTAPES
 ===================================================== */
 const STEPS = [
-  { id:"runout",  label:"1 — Voilage" },
-  { id:"softfoot",label:"2 — Pied boiteux" },
-  { id:"measures",label:"3 — Mesures géométriques" },
+  { id:"softfoot", label:"Pied boiteux" },
 
-  { id:"angV",    label:"4 — Angularité verticale" },
-  { id:"parV",    label:"5 — Parallélisme vertical" },
+  { id:"measures", label:"Mesures géométriques" },
 
-  { id:"angH",    label:"6 — Angularité horizontale" },
-  { id:"parH",    label:"7 — Parallélisme horizontal" },
+  { id:"angV", label:"Angularité verticale" },
+  { id:"parV", label:"Parallélisme vertical" },
 
-  { id:"thermal", label:"8 — Dilatation thermique" }
+  { id:"angH", label:"Angularité horizontale" },
+  { id:"parH", label:"Parallélisme horizontal" },
+
+  { id:"thermal", label:"Compensation thermique" },
+
+  { id:"verify", label:"Validation finale" }
 ];
 /* =====================================================
    UTILITAIRES
