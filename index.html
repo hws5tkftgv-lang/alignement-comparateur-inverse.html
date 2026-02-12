@@ -2144,6 +2144,41 @@ function computeParallelVertical(){
 /* =====================================================
    PARALLÉLISME HORIZONTAL — PAIRES
 ===================================================== */
+/* =====================================================
+   ANGULARITÉ VERTICALE — PATTES AFFECTÉES
+===================================================== */
+function computeAngularVertical(){
+
+  const v = state.angV * dialSign;
+  if(v === 0) return null;
+
+  // même logique que les corrections pédagogiques
+  if(v > 0){
+    // avant trop haut → corriger BC
+    return { pair:["B","C"] };
+  }else{
+    // arrière trop haut → corriger AD
+    return { pair:["A","D"] };
+  }
+}
+
+
+/* =====================================================
+   ANGULARITÉ HORIZONTALE — PATTES AFFECTÉES
+===================================================== */
+function computeAngularHorizontal(){
+
+  const v = state.angH * dialSign;
+  if(v === 0) return null;
+
+  if(v > 0){
+    // incliné droite
+    return { pair:["B","D"] };
+  }else{
+    // incliné gauche
+    return { pair:["A","C"] };
+  }
+}
 function computeParallelHorizontal(){
   if(state.parH > 0){
     return {
