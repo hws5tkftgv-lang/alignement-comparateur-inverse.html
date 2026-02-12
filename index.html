@@ -2314,16 +2314,16 @@ function computeAngularShimsVertical(){
 }
 
 function computeAngularShimsHorizontal(){
-  const A = geometry.couplingDiameter;
-  const B = geometry.centerToFrontFeet;
-  const D = geometry.frontToRearFeet;
-  const C = Math.abs(state.angH * dialSign);
 
-  if(A <= 0) return { front:0, rear:0 };
+  const D = geometry.couplingDiameter;
+  const a = geometry.centerToFrontFeet;
+  const b = geometry.frontToRearFeet;
+
+  const reading = Math.abs(state.angH);
 
   return {
-    front: (B * C) / A,
-    rear: ((B + D) * C) / A
+    front: projectDialToFeet(reading, D, a),
+    rear:  projectDialToFeet(reading, D, a + b)
   };
 }
 /* =====================================================
