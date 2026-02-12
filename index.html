@@ -2324,11 +2324,15 @@ function computeAngularShimsHorizontal(){
   const a = geometry.centerToFrontFeet;
   const b = geometry.frontToRearFeet;
 
-  const reading = Math.abs(state.angH);
+  const C = state.angH;
+  const E = state.parH / 2;
+
+  const front = (C / D) * a + E;
+  const rear  = (C / D) * (a + b) + E;
 
   return {
-    front: projectDialToFeet(reading, D, a),
-    rear:  projectDialToFeet(reading, D, a + b)
+    front,
+    rear
   };
 }
 /* =====================================================
