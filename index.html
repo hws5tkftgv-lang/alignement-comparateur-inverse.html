@@ -2287,9 +2287,8 @@ function isStepOK(stepIndex){
   if(id === "runout")  return ok(state.runout, state.runoutTol);
   if(id === "softfoot")return computeSoftFoot().delta <= state.softFootTol;
 
-  if(id === "angV")    return ok(state.angV, state.angVTol);
-  if(id === "parV")    return ok(state.parV, state.parVTol);
-
+  if(id === "angV" || id === "parV")
+  return ok(state.angV, state.angVTol) && ok(state.parV, state.parVTol);
   if(id === "angH")    return ok(state.angH, state.angHTol);
   if(id === "parH")    return ok(state.parH, state.parHTol);
   
@@ -2369,55 +2368,26 @@ function buildCorrectionMessage(){
     return msg;
   }
 
-  // ---------- ANGULARITÉ VERTICALE ----------
-  if(stepId === "angV"){
-    if(ok(state.angV, state.angVTol)){
-      return "✔️ Angularité verticale conforme.";
-    }
+  // ---------- CORRECTION VERTICALE FINALE (CEMEQ) ----------
+if(stepId === "angV" || stepId === "parV"){
 
-    const D = geometry.couplingDiameter;
-    const A = geometry.A;
-    const B = geometry.B;
+  const r = computeCemeqVertical();
 
-    const res = computeAngularShimsVertical();
-    const front = res.front;
-    const rear  = res.rear;
-
-    const v = state.angV * dialSign;
-
-    let msg = "📐 Angularité verticale\n\n";
-    msg += "🧮 Calcul de pente\n";
-    msg += `Pente = Lecture / Ø = ${Math.abs(v).toFixed(2)} / ${D}\n\n`;
-    msg += "Corrections :\n";
-    msg += `Avant  = pente × A = ${front} mil\n`;
-    msg += `Arrière = pente × B = ${rear} mil\n\n`;
-
-    if(v > 0){
-  msg += "Lecture positive : l'avant du moteur est trop haut\n\n";
-
-  msg += "Valeurs de correction :\n";
-  msg += `Avant  = ${front.toFixed(2)} mil\n`;
-  msg += `Arrière = ${rear.toFixed(2)} mil\n\n`;
-
-  msg += "Application possible :\n";
-  msg += `• Retirer sous ${labelFeet(["B","C"])}\n`;
-  msg += `• OU ajouter sous ${labelFeet(["A","D"])}\n`;
-}
-
-if(v < 0){
-  msg += "Lecture négative : l'arrière du moteur est trop haut\n\n";
-
-  msg += "Valeurs de correction :\n";
-  msg += `Avant  = ${front.toFixed(2)} mil\n`;
-  msg += `Arrière = ${rear.toFixed(2)} mil\n\n`;
-
-  msg += "Application possible :\n";
-  msg += `• Retirer sous ${labelFeet(["A","D"])}\n`;
-  msg += `• OU ajouter sous ${labelFeet(["B","C"])}\n`;
-}
-    return msg;
+  if(Math.abs(state.angV) <= state.angVTol && Math.abs(state.parV) <= state.parVTol){
+    return "✔️ Alignement vertical conforme.";
   }
 
+  let msg = "🧮 Correction verticale (méthode CEMEQ)\n\n";
+
+  msg += `Patte AVANT  = ${r.front.toFixed(2)} mil\n`;
+  msg += `Patte ARRIÈRE = ${r.rear.toFixed(2)} mil\n\n`;
+
+  msg += "Ces cales corrigent simultanément :\n";
+  msg += "✔ Angularité verticale\n";
+  msg += "✔ Parallélisme vertical\n";
+
+  return msg;
+}
   // ---------- PARALLÉLISME VERTICAL ----------
   if(stepId === "parV"){
     if(ok(state.parV, state.parVTol)){
