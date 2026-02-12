@@ -2306,7 +2306,6 @@ const ui = {
 
 function buildCorrectionMessage(){
   const stepId = STEPS[state.step].id;
-  let msg = "";
 
   // ---------- PIED BOITEUX ----------
   if(stepId === "softfoot"){
@@ -2318,7 +2317,7 @@ function buildCorrectionMessage(){
 
     const each = (sf.correction / 2).toFixed(1);
 
-    msg += "🦶 Pied boiteux\n\n";
+    let msg = "🦶 Pied boiteux\n\n";
     msg += "⚠️ Hors tolérance\n\n";
     msg += `Diag AC = ${sf.diagAC}\n`;
     msg += `Diag BD = ${sf.diagBD}\n`;
@@ -2326,7 +2325,7 @@ function buildCorrectionMessage(){
     msg += `Correction ≈ ${sf.correction}\n\n`;
 
     msg += "👣 Pied boiteux détecté\n\n";
-    msg += `➕ Ajouter **+${each} mil** sous :\n`;
+    msg += `➕ Ajouter +${each} mil sous :\n`;
     msg += `👉 ${labelFeet(sf.faulty)}\n`;
     msg += "\n⚠️ Toujours corriger en DIAGONALE";
 
@@ -2334,139 +2333,133 @@ function buildCorrectionMessage(){
   }
 
   // ---------- ANGULARITÉ VERTICALE ----------
-if(stepId === "angV"){
-  if(ok(state.angV, state.angVTol)){
-    return "✔️ Angularité verticale conforme.";
+  if(stepId === "angV"){
+    if(ok(state.angV, state.angVTol)){
+      return "✔️ Angularité verticale conforme.";
+    }
+
+    const D = geometry.couplingDiameter;
+    const A = geometry.A;
+    const B = geometry.B;
+
+    const res = computeAngularShimsVertical();
+    const front = res.front;
+    const rear  = res.rear;
+
+    const v = state.angV * dialSign;
+
+    let msg = "📐 Angularité verticale\n\n";
+    msg += "🧮 Calcul de pente\n";
+    msg += `Pente = Lecture / Ø = ${Math.abs(v).toFixed(2)} / ${D}\n\n`;
+    msg += "Corrections :\n";
+    msg += `Avant  = pente × A = ${front} mil\n`;
+    msg += `Arrière = pente × B = ${rear} mil\n\n`;
+
+    if(v > 0){
+      msg += "Lecture POSITIVE → Avant trop haut\n";
+      msg += `➖ Enlever ${front} mil sous ${labelFeet(["B","C"])}\n`;
+      msg += "OU\n";
+      msg += `➕ Ajouter ${rear} mil sous ${labelFeet(["A","D"])}`;
+    }else if(v < 0){
+      msg += "Lecture NÉGATIVE → Arrière trop haut\n";
+      msg += `➖ Enlever ${rear} mil sous ${labelFeet(["A","D"])}\n`;
+      msg += "OU\n";
+      msg += `➕ Ajouter ${front} mil sous ${labelFeet(["B","C"])}`;
+    }
+
+    return msg;
   }
 
-  const D = geometry.couplingDiameter;
-  const A = geometry.A;
-  const B = geometry.B;
+  // ---------- PARALLÉLISME VERTICAL ----------
+  if(stepId === "parV"){
+    if(ok(state.parV, state.parVTol)){
+      return "✔️ Parallélisme vertical conforme.";
+    }
 
-  const res = computeAngularShimsVertical();
-  const front = res.front;
-  const rear  = res.rear;
+    const v = state.parV;
+    const realMove = Math.abs(v) / 2;
 
-  const v = state.angV * dialSign;
+    let msg = "⬆️ Parallélisme vertical\n\n";
+    msg += `Lecture = ${v.toFixed(2)} mil\n`;
+    msg += `Correction réelle = Lecture ÷ 2 = ${realMove.toFixed(2)} mil\n\n`;
 
-  let msg = "📐 Angularité verticale\n\n";
+    if(v > 0){
+      msg += "Moteur trop bas\n";
+      msg += `👉 Ajouter ${realMove.toFixed(2)} mil sous A+B+C+D`;
+    }else{
+      msg += "Moteur trop haut\n";
+      msg += `👉 Retirer ${realMove.toFixed(2)} mil sous A+B+C+D`;
+    }
 
-  msg += "🧮 Calcul de pente\n";
-  msg += `Pente = Lecture / Ø = ${Math.abs(v).toFixed(2)} / ${D}\n\n`;
-
-  msg += "Corrections :\n";
-  msg += `Avant  = pente × A = ${front} mil\n`;
-  msg += `Arrière = pente × B = ${rear} mil\n\n`;
-
-  if(v > 0){
-    msg += "Lecture POSITIVE → Avant trop haut\n";
-    msg += `➖ Enlever ${front} mil sous ${labelFeet(["B","C"])}\n`;
-    msg += `OU\n`;
-    msg += `➕ Ajouter ${rear} mil sous ${labelFeet(["A","D"])}`;
+    return msg;
   }
 
-  if(v < 0){
-    msg += "Lecture NÉGATIVE → Arrière trop haut\n";
-    msg += `➖ Enlever ${rear} mil sous ${labelFeet(["A","D"])}\n`;
-    msg += `OU\n`;
-    msg += `➕ Ajouter ${front} mil sous ${labelFeet(["B","C"])}`;
+  // ---------- ANGULARITÉ HORIZONTALE ----------
+  if(stepId === "angH"){
+    if(ok(state.angH, state.angHTol)){
+      return "✔️ Angularité horizontale conforme.";
+    }
+
+    const D = geometry.couplingDiameter;
+
+    const res = computeAngularShimsHorizontal();
+    const front = res.front;
+    const rear  = res.rear;
+
+    const v = state.angH * dialSign;
+
+    let msg = "↔️ Angularité horizontale\n\n";
+    msg += "🧮 Calcul de pente\n";
+    msg += `Pente = Lecture / Ø = ${Math.abs(v).toFixed(2)} / ${D}\n\n`;
+    msg += "Corrections :\n";
+    msg += `Avant  = ${front} mil\n`;
+    msg += `Arrière = ${rear} mil\n\n`;
+
+    if(v > 0){
+      msg += "Incliné vers la droite\n";
+      msg += `👉 Tirer ${labelFeet(["B","D"])}\n`;
+      msg += `OU pousser ${labelFeet(["A","C"])}`;
+    }else{
+      msg += "Incliné vers la gauche\n";
+      msg += `👉 Tirer ${labelFeet(["A","C"])}\n`;
+      msg += `OU pousser ${labelFeet(["B","D"])}`;
+    }
+
+    return msg;
   }
 
-  return msg;
+  // ---------- PARALLÉLISME HORIZONTAL ----------
+  if(stepId === "parH"){
+    if(ok(state.parH, state.parHTol)){
+      return "✔️ Parallélisme horizontal conforme.";
+    }
+
+    const v = state.parH;
+    const realMove = Math.abs(v) / 2;
+
+    let msg = "↔️ Parallélisme horizontal\n\n";
+    msg += `Lecture = ${v.toFixed(2)} mil\n`;
+    msg += `Correction réelle = ${realMove.toFixed(2)} mil\n\n`;
+
+    if(v > 0){
+      msg += `👉 Tirer ${labelFeet(["A","B"])}\n`;
+      msg += `OU pousser ${labelFeet(["C","D"])}`;
+    }else{
+      msg += `👉 Tirer ${labelFeet(["C","D"])}\n`;
+      msg += `OU pousser ${labelFeet(["A","B"])}`;
+    }
+
+    return msg;
+  }
+
+  // ---------- DILATATION ----------
+  if(stepId === "thermal"){
+    return buildThermalStep();
+  }
+
+  // défaut
+  return "";
 }
-
-// ---------- PARALLÉLISME VERTICAL ----------
-if(stepId === "parV"){
-  if(ok(state.parV, state.parVTol)){
-    return "✔️ Parallélisme vertical conforme.";
-  }
-
-  const v = state.parV;
-  const realMove = Math.abs(v)/2;
-
-  let msg = "⬆️ Parallélisme vertical\n\n";
-  msg += `Lecture = ${v.toFixed(2)} mil\n`;
-  msg += `Correction réelle = Lecture ÷ 2 = ${realMove.toFixed(2)} mil\n\n`;
-
-  if(v > 0){
-    msg += "Moteur trop bas\n";
-    msg += `👉 Ajouter ${realMove.toFixed(2)} mil sous A+B+C+D`;
-  }else{
-    msg += "Moteur trop haut\n";
-    msg += `👉 Retirer ${realMove.toFixed(2)} mil sous A+B+C+D`;
-  }
-
-  return msg;
-}
-
-// ---------- ANGULARITÉ HORIZONTALE ----------
-if(stepId === "angH"){
-  if(ok(state.angH, state.angHTol)){
-    return "✔️ Angularité horizontale conforme.";
-  }
-
-  const D = geometry.couplingDiameter;
-  const A = geometry.A;
-  const B = geometry.B;
-
-  const res = computeAngularShimsHorizontal();
-  const front = res.front;
-  const rear  = res.rear;
-
-  const v = state.angH * dialSign;
-
-  let msg = "↔️ Angularité horizontale\n\n";
-
-  msg += "🧮 Calcul de pente\n";
-  msg += `Pente = Lecture / Ø = ${Math.abs(v).toFixed(2)} / ${D}\n\n`;
-
-  msg += "Corrections :\n";
-  msg += `Avant  = ${front} mil\n`;
-  msg += `Arrière = ${rear} mil\n\n`;
-
-  if(v > 0){
-    msg += "Incliné vers la droite\n";
-    msg += `👉 Tirer ${labelFeet(["B","D"])}\n`;
-    msg += `OU pousser ${labelFeet(["A","C"])}`;
-  }else{
-    msg += "Incliné vers la gauche\n";
-    msg += `👉 Tirer ${labelFeet(["A","C"])}\n`;
-    msg += `OU pousser ${labelFeet(["B","D"])}`;
-  }
-
-  return msg;
-}
-
-// ---------- PARALLÉLISME HORIZONTAL ----------
-if(stepId === "parH"){
-  if(ok(state.parH, state.parHTol)){
-    return "✔️ Parallélisme horizontal conforme.";
-  }
-
-  const v = state.parH;
-  const realMove = Math.abs(v)/2;
-
-  let msg = "↔️ Parallélisme horizontal\n\n";
-  msg += `Lecture = ${v.toFixed(2)} mil\n`;
-  msg += `Correction réelle = ${realMove.toFixed(2)} mil\n\n`;
-
-  if(v > 0){
-    msg += `👉 Tirer ${labelFeet(["A","B"])}\n`;
-    msg += `OU pousser ${labelFeet(["C","D"])}`;
-  }else{
-    msg += `👉 Tirer ${labelFeet(["C","D"])}\n`;
-    msg += `OU pousser ${labelFeet(["A","B"])}`;
-  }
-
-  return msg;
-}
-
-// ---------- DILATATION ----------
-if(stepId === "thermal"){
-  return buildThermalStep();
-}
-
-return "";
 /* =====================================================
    UI — Inputs par étape (avec IDs)
 ===================================================== */
