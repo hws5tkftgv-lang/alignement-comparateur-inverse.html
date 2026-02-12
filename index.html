@@ -2276,23 +2276,44 @@ function computeAngularShimsHorizontal(){
    VALIDATION PAR ÉTAPE
 ===================================================== */
 function isStepOK(stepIndex){
+
   const id = STEPS[stepIndex].id;
 
+  // Mesures géométriques obligatoires
   if(id === "measures"){
-  return geometry.couplingDiameter > 0 &&
-         geometry.A > 0 &&
-         geometry.B > 0;
-}
+    return geometry.couplingDiameter > 0 &&
+           geometry.A > 0 &&
+           geometry.B > 0;
+  }
 
-  if(id === "runout")  return ok(state.runout, state.runoutTol);
-  if(id === "softfoot")return computeSoftFoot().delta <= state.softFootTol;
+  // Pied boiteux doit être corrigé avant de continuer
+  if(id === "softfoot"){
+    return computeSoftFoot().delta <= state.softFootTol;
+  }
 
-  if(id === "angV" || id === "parV")
-  return ok(state.angV, state.angVTol) && ok(state.parV, state.parVTol);
-  if(id === "angH")    return ok(state.angH, state.angHTol);
-  if(id === "parH")    return ok(state.parH, state.parHTol);
-  
+  // Lectures verticales → toujours OK (on lit simplement)
+  if(id === "readV") return true;
+
+  // Correction verticale → toujours OK (le calcul corrige)
+  if(id === "shimV") return true;
+
+  // Lectures horizontales → toujours OK
+  if(id === "readH") return true;
+
+  // Correction horizontale → toujours OK
+  if(id === "shimH") return true;
+
+  // Thermique
   if(id === "thermal") return true;
+
+  // Validation finale → ici on vérifie la machine alignée
+  if(id === "verify"){
+    return ok(state.angV, state.angVTol) &&
+           ok(state.parV, state.parVTol) &&
+           ok(state.angH, state.angHTol) &&
+           ok(state.parH, state.parHTol);
+  }
+
   return true;
 }
 /* =====================================================
@@ -2624,55 +2645,45 @@ if(id === "measures"){
 
 
 
-  // =====================================================
-  // ANGULARITÉ VERTICALE
-  // =====================================================
-  if(id === "angV"){
+  // ===== LECTURES VERTICALES =====
+if(id === "readV"){
   ui.inputsArea.innerHTML = `
     <div class="row">
       <div>
-        <label>Lecture cadran 12–6 (mils)</label>
+        <label>Angularité verticale (C) 12-6 (mils)</label>
         <input id="in_angV" type="number" step="0.1" value="${state.angV}">
       </div>
       <div>
-        <label>Tolérance (mils)</label>
-        <input id="in_angVTol" type="number" step="0.1" value="${state.angVTol}">
+        <label>Parallélisme vertical (E) 12-6 (mils)</label>
+        <input id="in_parV" type="number" step="0.1" value="${state.parV}">
       </div>
     </div>
-
- 
   `;
 
   wireInputs([
     ["in_angV", v => state.angV = v],
-    ["in_angVTol", v => state.angVTol = Math.max(0, v)]
+    ["in_parV", v => state.parV = v]
   ]);
   return;
 }
+// ===== CORRECTION VERTICALE =====
+if(id === "shimV"){
+  const r = computeCemeqVertical();
 
-if(id === "parV"){
   ui.inputsArea.innerHTML = `
-    <div class="row">
-      <div>
-        <label>Parallélisme vertical (mils)</label>
-        <input id="in_parV" type="number" step="0.1" value="${state.parV}">
-      </div>
-      <div>
-        <label>Tolérance (mils)</label>
-        <input id="in_parVTol" type="number" step="0.1" value="${state.parVTol}">
-      </div>
+    <div class="noteBox">
+      Ajouter les cales suivantes :
+      <br><br>
+      <b>AVANT :</b> ${r.front.toFixed(2)} mil
+      <br>
+      <b>ARRIÈRE :</b> ${r.rear.toFixed(2)} mil
+      <br><br>
+      Cette correction règle simultanément
+      l’angularité ET le parallélisme vertical.
     </div>
-
-    
   `;
-
-  wireInputs([
-    ["in_parV", v => state.parV = v],
-    ["in_parVTol", v => state.parVTol = Math.max(0, v)]
-  ]);
   return;
 }
-
 
   // =====================================================
   // ANGULARITÉ HORIZONTALE
