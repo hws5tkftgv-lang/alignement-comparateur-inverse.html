@@ -2307,16 +2307,12 @@ function computeAngularShimsVertical(){
   const a = geometry.centerToFrontFeet;
   const b = geometry.frontToRearFeet;
 
-  const C = state.angV;     // angularité
-  const E = state.parV / 2; // parallélisme réel (lecture ÷2)
+  const v = state.angV;   // UNIQUEMENT angularité
 
-  const front = (C / D) * a + E;
-  const rear  = (C / D) * (a + b) + E;
+  const front = (v / D) * a;
+  const rear  = (v / D) * (a + b);
 
-  return {
-    front,
-    rear
-  };
+  return { front, rear };
 }
 function computeAngularShimsHorizontal(){
 
@@ -2324,16 +2320,12 @@ function computeAngularShimsHorizontal(){
   const a = geometry.centerToFrontFeet;
   const b = geometry.frontToRearFeet;
 
-  const C = state.angH;
-  const E = state.parH / 2;
+  const v = state.angH;
 
-  const front = (C / D) * a + E;
-  const rear  = (C / D) * (a + b) + E;
+  const front = (v / D) * a;
+  const rear  = (v / D) * (a + b);
 
-  return {
-    front,
-    rear
-  };
+  return { front, rear };
 }
 /* =====================================================
    VALIDATION PAR ÉTAPE
@@ -2686,10 +2678,10 @@ function renderInputsForCurrentStep(){
       </div>
     `;
     wireInputs([
-      ["in_sfA", v => state.softFoot.A = Math.abs(v)],
-      ["in_sfB", v => state.softFoot.B = Math.abs(v)],
-      ["in_sfC", v => state.softFoot.C = Math.abs(v)],
-      ["in_sfD", v => state.softFoot.D = Math.abs(v)],
+   ["in_sfA", v => state.softFoot.A = Math.max(0,v)],
+["in_sfB", v => state.softFoot.B = Math.max(0,v)],
+["in_sfC", v => state.softFoot.C = Math.max(0,v)],
+["in_sfD", v => state.softFoot.D = Math.max(0,v)],
       ["in_sfTol", v => state.softFootTol = Math.max(0, v)],
       ["in_footScheme", v => {
   footSchemeKey = v;
