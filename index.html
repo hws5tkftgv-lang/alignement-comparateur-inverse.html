@@ -1986,26 +1986,11 @@ pump: {
    PARAMÈTRES GÉOMÉTRIQUES (pouces)
 ===================================================== */
 const geometry = {
-  couplingDiameter: 3,      // Ø accouplement
-  centerToFrontFeet: 6,    // Centre → pattes AVANT
-  frontToRearFeet: 10      // Pattes AVANT → ARRIÈRE
-
+  couplingDiameter: 3, // D (po)
+  A: 6,                // centre → pattes AVANT (po)
+  B: 16                // centre → pattes ARRIÈRE (po)
 };
 
-function projectDialToFeet(readingMil, diameter, distance){
-  if(diameter <= 0) return 0;
-  const slope = readingMil / diameter; // mil/po
-  return slope * distance;              // mil
-}
-
-
-// Sécurité : distances géométriques toujours définies
-if(!Number.isFinite(geometry.distDialToFront)) {
-  geometry.distDialToFront = 6;
-}
-if(!Number.isFinite(geometry.distFrontToRear)) {
-  geometry.distFrontToRear = 10;
-}
 /* =====================================================
    DÉFINITION DES ÉTAPES
 ===================================================== */
@@ -2137,46 +2122,6 @@ function computeSoftFoot(){
    Avant = BC
    Arrière = AD
 ===================================================== */
-function computeAngularVertical(){
-
-  const v = state.angV * dialSign;
-
-  // POSITIF → ARRIÈRE trop bas
-  if(v > 0){
-
-    if(correctionMode === "add"){
-      return {
-        pair:["A","D"],
-        direction:"ARRIÈRE trop bas — AJOUTER sous A + D"
-      };
-    }else{
-      return {
-        pair:["B","C"],
-        direction:"ARRIÈRE trop bas — ENLEVER sous B + C"
-      };
-    }
-
-  }
-
-  // NÉGATIF → AVANT trop bas
-  if(v < 0){
-
-    if(correctionMode === "add"){
-      return {
-        pair:["B","C"],
-        direction:"AVANT trop bas — AJOUTER sous B + C"
-      };
-    }else{
-      return {
-        pair:["A","D"],
-        direction:"AVANT trop bas — ENLEVER sous A + D"
-      };
-    }
-
-  }
-
-  return null;
-}
 
 
 
@@ -2195,28 +2140,7 @@ function computeParallelVertical(){
 /* =====================================================
    ANGULARITÉ HORIZONTALE — TOP VIEW
 ===================================================== */
-function computeAngularHorizontal(){
 
-  const v = state.angH * dialSign;
-
-  // Lecture POSITIVE → moteur incliné vers la DROITE
-  if(v > 0){
-    return {
-      pair:["B","D"],
-      direction:"Moteur incliné vers la DROITE → corriger B + D"
-    };
-  }
-
-  // Lecture NÉGATIVE → moteur incliné vers la GAUCHE
-  if(v < 0){
-    return {
-      pair:["A","C"],
-      direction:"Moteur incliné vers la GAUCHE → corriger A + C"
-    };
-  }
-
-  return null;
-}
 /* =====================================================
    PARALLÉLISME HORIZONTAL — PAIRES
 ===================================================== */
@@ -2280,18 +2204,34 @@ function buildThermalStep(){
    CALCUL CORRECTION ANGULAIRE (mils réels)
    B × C / A
 ===================================================== */
+function computeAngularShimsVertical(){
+  const v = state.angV;                // mils
+  const D = geometry.couplingDiameter; // po
+  const A = geometry.A;                // po (centre→avant)
+  const B = geometry.B;                // po (centre→arrière)
 
+  if(D <= 0) return { front:0, rear:0 };
+
+  const slope = v / D;     // mil/po
+
+  const front = slope * A; // mil
+  const rear  = slope * B; // mil  ✅ (PAS A+B)
+
+  return { front, rear };
+}
 
 function computeAngularShimsHorizontal(){
+  const v = state.angH;                // mils
+  const D = geometry.couplingDiameter; // po
+  const A = geometry.A;                // po
+  const B = geometry.B;                // po
 
-  const D = geometry.couplingDiameter;
-  const a = geometry.centerToFrontFeet;
-  const b = geometry.frontToRearFeet;
+  if(D <= 0) return { front:0, rear:0 };
 
-  const v = state.angH;
+  const slope = v / D;
 
-  const front = (v / D) * a;
-  const rear  = (v / D) * (a + b);
+  const front = slope * A;
+  const rear  = slope * B;
 
   return { front, rear };
 }
@@ -2302,10 +2242,10 @@ function isStepOK(stepIndex){
   const id = STEPS[stepIndex].id;
 
   if(id === "measures"){
-    return geometry.couplingDiameter > 0 &&
-           geometry.centerToFrontFeet > 0 &&
-           geometry.frontToRearFeet > 0;
-  }
+  return geometry.couplingDiameter > 0 &&
+         geometry.A > 0 &&
+         geometry.B > 0;
+}
 
   if(id === "runout")  return ok(state.runout, state.runoutTol);
   if(id === "softfoot")return computeSoftFoot().delta <= state.softFootTol;
@@ -2394,191 +2334,139 @@ function buildCorrectionMessage(){
   }
 
   // ---------- ANGULARITÉ VERTICALE ----------
-  if(stepId === "angV"){
-    if(ok(state.angV, state.angVTol)){
-      return "✔️ Angularité verticale conforme.";
-    }
-
-    const v = state.angV * dialSign;
-    const a = geometry.centerToFrontFeet;  // centre → pattes AVANT
-const b = geometry.frontToRearFeet;    // pattes AVANT → ARRIÈRE
-const D = geometry.couplingDiameter;   // diamètre accouplement
-    const shims = computeAngularShimsVertical();
-    const front = shims.front.toFixed(2);
-    const rear  = shims.rear.toFixed(2);
-    
-    msg += "🧮 CALCUL — Angularité verticale\n\n";
-
-msg += `v = ${Math.abs(v).toFixed(2)} mil\n`;
-msg += `a = ${a} po (centre → pattes AVANT)\n`;
-msg += `b = ${b} po (pattes AVANT → ARRIÈRE)\n`;
-msg += `D = ${D} po (Ø accouplement)\n\n`;
-
-msg += "Formules :\n";
-msg += "Avant  = (v / D) × a\n";
-msg += "Arrière = (v / D) × (a + b)\n\n";
-
-msg += `Avant  = (${Math.abs(v).toFixed(2)} / ${D}) × ${a} = ${front} mil\n`;
-msg += `Arrière = (${Math.abs(v).toFixed(2)} / ${D}) × ${a + b} = ${rear} mil\n\n`;
-
-    msg += "📐 Angularité verticale\n\n";
-
-    if(v > 0){
-      msg += "Lecture POSITIVE → AVANT plus haut que l’arrière\n";
-      msg += "(moteur incliné vers l’arrière)\n\n";
-      msg += "Action mécanique : abaisser l’avant\n\n";
-      msg += "Corrections possibles :\n";
-      msg += `➖ Enlever ${front} mil sous : ${labelFeet(["B","C"])}\n`;
-      msg += `OU\n`;
-      msg += `➕ Ajouter ${rear} mil sous : ${labelFeet(["A","D"])}`;
-    }
-
-    if(v < 0){
-      msg += "Lecture NÉGATIVE → ARRIÈRE plus haut que l’avant\n";
-      msg += "(moteur incliné vers l’avant)\n\n";
-      msg += "Action mécanique : abaisser l’arrière\n\n";
-      msg += "Corrections possibles :\n";
-      msg += `➖ Enlever ${rear} mil sous : ${labelFeet(["A","D"])}\n`;
-      msg += `OU\n`;
-      msg += `➕ Ajouter ${front} mil sous : ${labelFeet(["B","C"])}`;
-    }
-
-    return msg;
+if(stepId === "angV"){
+  if(ok(state.angV, state.angVTol)){
+    return "✔️ Angularité verticale conforme.";
   }
 
-  // ---------- PARALLÉLISME VERTICAL ----------
+  const D = geometry.couplingDiameter;
+  const A = geometry.A;
+  const B = geometry.B;
+
+  const res = computeAngularShimsVertical();
+  const front = res.front;
+  const rear  = res.rear;
+
+  const v = state.angV * dialSign;
+
+  let msg = "📐 Angularité verticale\n\n";
+
+  msg += "🧮 Calcul de pente\n";
+  msg += `Pente = Lecture / Ø = ${Math.abs(v).toFixed(2)} / ${D}\n\n`;
+
+  msg += "Corrections :\n";
+  msg += `Avant  = pente × A = ${front} mil\n`;
+  msg += `Arrière = pente × B = ${rear} mil\n\n`;
+
+  if(v > 0){
+    msg += "Lecture POSITIVE → Avant trop haut\n";
+    msg += `➖ Enlever ${front} mil sous ${labelFeet(["B","C"])}\n`;
+    msg += `OU\n`;
+    msg += `➕ Ajouter ${rear} mil sous ${labelFeet(["A","D"])}`;
+  }
+
+  if(v < 0){
+    msg += "Lecture NÉGATIVE → Arrière trop haut\n";
+    msg += `➖ Enlever ${rear} mil sous ${labelFeet(["A","D"])}\n`;
+    msg += `OU\n`;
+    msg += `➕ Ajouter ${front} mil sous ${labelFeet(["B","C"])}`;
+  }
+
+  return msg;
+}
+
+// ---------- PARALLÉLISME VERTICAL ----------
 if(stepId === "parV"){
   if(ok(state.parV, state.parVTol)){
     return "✔️ Parallélisme vertical conforme.";
   }
 
-  const v = state.parV;                    // lecture comparateur (mil)
-  const realMove = Math.abs(v) / 2;        // correction réelle
+  const v = state.parV;
+  const realMove = Math.abs(v)/2;
 
   let msg = "⬆️ Parallélisme vertical\n\n";
-
   msg += `Lecture = ${v.toFixed(2)} mil\n`;
-  msg += `Tolérance = ${state.parVTol} mil\n\n`;
-  msg += `Correction réelle recommandée = ${realMove.toFixed(2)} mil\n\n`;
+  msg += `Correction réelle = Lecture ÷ 2 = ${realMove.toFixed(2)} mil\n\n`;
 
   if(v > 0){
-    msg += "📈 Lecture POSITIVE → moteur trop BAS\n\n";
-    msg += "Correction mécanique :\n";
-    msg += `👉 Ajouter ${realMove.toFixed(2)} mil sous A + B + C + D\n`;
-    msg += "(montée uniforme du moteur)\n";
-  }
-
-  if(v < 0){
-    msg += "📉 Lecture NÉGATIVE → moteur trop HAUT\n\n";
-    msg += "Correction mécanique :\n";
-    msg += `👉 Retirer ${realMove.toFixed(2)} mil sous A + B + C + D\n`;
-    msg += "(descente uniforme du moteur)\n";
+    msg += "Moteur trop bas\n";
+    msg += `👉 Ajouter ${realMove.toFixed(2)} mil sous A+B+C+D`;
+  }else{
+    msg += "Moteur trop haut\n";
+    msg += `👉 Retirer ${realMove.toFixed(2)} mil sous A+B+C+D`;
   }
 
   return msg;
 }
 
-  
 // ---------- ANGULARITÉ HORIZONTALE ----------
 if(stepId === "angH"){
-
   if(ok(state.angH, state.angHTol)){
     return "✔️ Angularité horizontale conforme.";
   }
 
-  let msg = "";
+  const D = geometry.couplingDiameter;
+  const A = geometry.A;
+  const B = geometry.B;
 
-  const v = Math.abs(state.angH);          // mil
-  const D = geometry.couplingDiameter;     // po
-  const a = geometry.centerToFrontFeet;
-const b = geometry.frontToRearFeet;
+  const res = computeAngularShimsHorizontal();
+  const front = res.front;
+  const rear  = res.rear;
 
-  if(D <= 0 || a <= 0 || b < 0){
-    return "❌ Données géométriques invalides (Ø ou distances manquantes).";
-  }
+  const v = state.angH * dialSign;
 
-  const front = (v * a / D).toFixed(2);
-  const rear  = (v * (a + b) / D).toFixed(2);
+  let msg = "↔️ Angularité horizontale\n\n";
 
-  msg += "↔️ Angularité horizontale\n\n";
+  msg += "🧮 Calcul de pente\n";
+  msg += `Pente = Lecture / Ø = ${Math.abs(v).toFixed(2)} / ${D}\n\n`;
 
-  msg += "🧮 CALCUL :\n\n";
-  msg += `v = ${v.toFixed(2)} mil\n`;
-  msg += `D = ${D} po\n`;
-  msg += `a = ${a} po\n`;
-  msg += `b = ${b} po\n\n`;
+  msg += "Corrections :\n";
+  msg += `Avant  = ${front} mil\n`;
+  msg += `Arrière = ${rear} mil\n\n`;
 
-  msg += "Formules :\n";
-  msg += "Avant   = (v × a) / D\n";
-  msg += "Arrière = (v × (a + b)) / D\n\n";
-
-  msg += `Avant   = (${v.toFixed(2)} × ${a}) / ${D} = ${front} mil\n`;
-  msg += `Arrière = (${v.toFixed(2)} × ${a + b}) / ${D} = ${rear} mil\n\n`;
-
-  msg += "Application des corrections :\n";
-  msg += `• Patte AVANT : ${front} mil\n`;
-  msg += `• Patte ARRIÈRE : ${rear} mil\n\n`;
-
-  if(state.angH > 0){
-    msg += "📈 Lecture POSITIVE → moteur incliné vers la DROITE\n\n";
-    msg += "Correction mécanique :\n";
-    msg += `👉 Tirer sur ${labelFeet(["B","D"])}\n`;
-    msg += "OU\n";
-    msg += `👉 Pousser sur ${labelFeet(["A","C"])}\n`;
-  }
-
-  if(state.angH < 0){
-    msg += "📉 Lecture NÉGATIVE → moteur incliné vers la GAUCHE\n\n";
-    msg += "Correction mécanique :\n";
-    msg += `👉 Tirer sur ${labelFeet(["A","C"])}\n`;
-    msg += "OU\n";
-    msg += `👉 Pousser sur ${labelFeet(["B","D"])}\n`;
+  if(v > 0){
+    msg += "Incliné vers la droite\n";
+    msg += `👉 Tirer ${labelFeet(["B","D"])}\n`;
+    msg += `OU pousser ${labelFeet(["A","C"])}`;
+  }else{
+    msg += "Incliné vers la gauche\n";
+    msg += `👉 Tirer ${labelFeet(["A","C"])}\n`;
+    msg += `OU pousser ${labelFeet(["B","D"])}`;
   }
 
   return msg;
 }
-
 
 // ---------- PARALLÉLISME HORIZONTAL ----------
 if(stepId === "parH"){
   if(ok(state.parH, state.parHTol)){
     return "✔️ Parallélisme horizontal conforme.";
   }
-const realMove = Math.abs(state.parH) / 2;
+
   const v = state.parH;
+  const realMove = Math.abs(v)/2;
 
   let msg = "↔️ Parallélisme horizontal\n\n";
-
   msg += `Lecture = ${v.toFixed(2)} mil\n`;
-  msg += `Tolérance = ${state.parHTol} mil\n\n`;
+  msg += `Correction réelle = ${realMove.toFixed(2)} mil\n\n`;
 
-    if(v > 0){
-  msg += "📈 Lecture POSITIVE → moteur décalé vers la DROITE\n\n";
-  msg += `Correction réelle recommandée = ${realMove.toFixed(2)} mil\n\n`;
-  msg += "Correction mécanique :\n";
-  msg += `👉 Tirer sur ${labelFeet(["A","B"])} de ${realMove.toFixed(2)} mil\n`;
-  msg += "OU\n";
-  msg += `👉 Pousser sur ${labelFeet(["C","D"])} de ${realMove.toFixed(2)} mil\n`;
-}
-  if(v < 0){
-  msg += "📉 Lecture NÉGATIVE → moteur décalé vers la GAUCHE\n\n";
-  msg += `Correction réelle recommandée = ${realMove.toFixed(2)} mil\n\n`;
-  msg += "Correction mécanique :\n";
-  msg += `👉 Tirer sur ${labelFeet(["C","D"])} de ${realMove.toFixed(2)} mil\n`;
-  msg += "OU\n";
-  msg += `👉 Pousser sur ${labelFeet(["A","B"])} de ${realMove.toFixed(2)} mil\n`;
-}
+  if(v > 0){
+    msg += `👉 Tirer ${labelFeet(["A","B"])}\n`;
+    msg += `OU pousser ${labelFeet(["C","D"])}`;
+  }else{
+    msg += `👉 Tirer ${labelFeet(["C","D"])}\n`;
+    msg += `OU pousser ${labelFeet(["A","B"])}`;
+  }
 
   return msg;
 }
 
+// ---------- DILATATION ----------
 if(stepId === "thermal"){
   return buildThermalStep();
 }
 
-
 return "";
-}
 /* =====================================================
    UI — Inputs par étape (avec IDs)
 ===================================================== */
@@ -2684,7 +2572,7 @@ if(id === "measures"){
         <div>
           <label style="color:#4caf50;">Centre → pattes AVANT (po)</label>
           <input id="in_centerFront" class="c-green" type="number" step="0.1"
-                 value="${geometry.centerToFrontFeet}">
+                 value="${geometry.A}">
         </div>
       </div>
 
@@ -2697,9 +2585,9 @@ if(id === "measures"){
     html = `
       <div class="row">
         <div>
-          <label style="color:#ff9800;">Pattes AVANT → ARRIÈRE (po)</label>
-          <input id="in_frontRear" class="c-orange" type="number" step="0.1"
-                 value="${geometry.frontToRearFeet}">
+         <label style="color:#ff9800;">Centre → pattes ARRIÈRE (po)</label>
+<input id="in_centerRear" class="c-orange" type="number" step="0.1"
+       value="${geometry.B}">
         </div>
       </div>
 
@@ -2714,11 +2602,11 @@ if(id === "measures"){
   }
 
   if(state.measureStep === 1){
-    wireInputs([["in_centerFront", v => geometry.centerToFrontFeet = Math.max(0.1, v)]]);
+    wireInputs([["in_centerFront", v => geometry.A = Math.max(0.1, v)]]);
   }
 
   if(state.measureStep === 2){
-    wireInputs([["in_frontRear", v => geometry.frontToRearFeet = Math.max(0.1, v)]]);
+    wireInputs([["in_centerRear", v => geometry.B = Math.max(0.1, v)]]);
   }
 
   return;
