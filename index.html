@@ -2280,40 +2280,8 @@ function buildThermalStep(){
    CALCUL CORRECTION ANGULAIRE (mils réels)
    B × C / A
 ===================================================== */
-function computeAngularShim(){
-  const A = geometry.couplingDiameter;
-  const B = geometry.centerToFrontFeet;
-  const C = Math.abs(state.angV); // lecture cadran (mils)
-
-  if(A <= 0) return 0;
-
-  return (B * C) / A;
-}
-
-function computeAngularShimH(){
-  const A = geometry.couplingDiameter;
-  const B = geometry.centerToFrontFeet;
-  const C = Math.abs(state.angH); // lecture cadran horizontale (mils)
-
-  if(A <= 0) return 0;
-  return (B * C) / A;
-}
 
 
-
-function computeAngularShimsVertical(){
-
-  const D = geometry.couplingDiameter;
-  const a = geometry.centerToFrontFeet;
-  const b = geometry.frontToRearFeet;
-
-  const v = state.angV;   // UNIQUEMENT angularité
-
-  const front = (v / D) * a;
-  const rear  = (v / D) * (a + b);
-
-  return { front, rear };
-}
 function computeAngularShimsHorizontal(){
 
   const D = geometry.couplingDiameter;
@@ -3669,17 +3637,13 @@ function drawSideViewGeneric(ctxTarget){
   // ====================================================
   // MOTEUR — BLOC SOLIDAIRE (PIVOT RÉALISTE)
   // ====================================================
-  const pivotDX = rearFootX;
-  const pivotCX = frontFootX;
-  const pivotY  = cy + motorH / 2;
+  const pivotX = cx + motorW/2 + gap/2; // centre accouplement
+const pivotY = cy;
 
-  const pivotX = (ang >= 0) ? pivotCX : pivotDX;
-
-  ctx.save();
-  ctx.translate(pivotX, pivotY);
-  ctx.rotate(ang);
-  ctx.translate(-pivotX, -pivotY);
-
+ctx.save();
+ctx.translate(pivotX, pivotY);
+ctx.rotate(ang);
+ctx.translate(-pivotX, -pivotY);
   // ---- moteur ----
   ctx.fillStyle = "#00a2ff";
   ctx.fillRect(cx - motorW / 2, cy - motorH / 2, motorW, motorH);
