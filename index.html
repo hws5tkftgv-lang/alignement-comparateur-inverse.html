@@ -2307,14 +2307,17 @@ function computeAngularShimsVertical(){
   const a = geometry.centerToFrontFeet;
   const b = geometry.frontToRearFeet;
 
-  const reading = Math.abs(state.angV); // lecture cadran réelle
+  const C = state.angV;     // angularité
+  const E = state.parV / 2; // parallélisme réel (lecture ÷2)
+
+  const front = (C / D) * a + E;
+  const rear  = (C / D) * (a + b) + E;
 
   return {
-    front: projectDialToFeet(reading, D, a),
-    rear:  projectDialToFeet(reading, D, a + b)
+    front,
+    rear
   };
 }
-
 function computeAngularShimsHorizontal(){
 
   const D = geometry.couplingDiameter;
