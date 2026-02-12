@@ -2391,17 +2391,28 @@ function buildCorrectionMessage(){
     msg += `Arrière = pente × B = ${rear} mil\n\n`;
 
     if(v > 0){
-      msg += "Lecture POSITIVE → Avant trop haut\n";
-      msg += `➖ Enlever ${front} mil sous ${labelFeet(["B","C"])}\n`;
-      msg += "OU\n";
-      msg += `➕ Ajouter ${rear} mil sous ${labelFeet(["A","D"])}`;
-    }else if(v < 0){
-      msg += "Lecture NÉGATIVE → Arrière trop haut\n";
-      msg += `➖ Enlever ${rear} mil sous ${labelFeet(["A","D"])}\n`;
-      msg += "OU\n";
-      msg += `➕ Ajouter ${front} mil sous ${labelFeet(["B","C"])}`;
-    }
+  msg += "Lecture positive : l'avant du moteur est trop haut\n\n";
 
+  msg += "Valeurs de correction :\n";
+  msg += `Avant  = ${front.toFixed(2)} mil\n`;
+  msg += `Arrière = ${rear.toFixed(2)} mil\n\n`;
+
+  msg += "Application possible :\n";
+  msg += `• Retirer sous ${labelFeet(["B","C"])}\n`;
+  msg += `• OU ajouter sous ${labelFeet(["A","D"])}\n`;
+}
+
+if(v < 0){
+  msg += "Lecture négative : l'arrière du moteur est trop haut\n\n";
+
+  msg += "Valeurs de correction :\n";
+  msg += `Avant  = ${front.toFixed(2)} mil\n`;
+  msg += `Arrière = ${rear.toFixed(2)} mil\n\n`;
+
+  msg += "Application possible :\n";
+  msg += `• Retirer sous ${labelFeet(["A","D"])}\n`;
+  msg += `• OU ajouter sous ${labelFeet(["B","C"])}\n`;
+}
     return msg;
   }
 
@@ -2415,16 +2426,16 @@ function buildCorrectionMessage(){
     const realMove = Math.abs(v) / 2;
 
     let msg = "⬆️ Parallélisme vertical\n\n";
-    msg += `Lecture = ${v.toFixed(2)} mil\n`;
-    msg += `Correction réelle = Lecture ÷ 2 = ${realMove.toFixed(2)} mil\n\n`;
+    msg += "Décalage vertical parallèle\n";
+msg += "Correction réelle = lecture ÷ 2\n\n";
 
-    if(v > 0){
-      msg += "Moteur trop bas\n";
-      msg += `👉 Ajouter ${realMove.toFixed(2)} mil sous A+B+C+D`;
-    }else{
-      msg += "Moteur trop haut\n";
-      msg += `👉 Retirer ${realMove.toFixed(2)} mil sous A+B+C+D`;
-    }
+if(v > 0){
+  msg += "Le moteur doit monter\n";
+  msg += `Ajouter ${realMove.toFixed(2)} mil sous toutes les pattes`;
+}else{
+  msg += "Le moteur doit descendre\n";
+  msg += `Retirer ${realMove.toFixed(2)} mil sous toutes les pattes`;
+}
 
     return msg;
   }
@@ -2451,14 +2462,15 @@ function buildCorrectionMessage(){
     msg += `Arrière = ${rear} mil\n\n`;
 
     if(v > 0){
-      msg += "Incliné vers la droite\n";
-      msg += `👉 Tirer ${labelFeet(["B","D"])}\n`;
-      msg += `OU pousser ${labelFeet(["A","C"])}`;
-    }else{
-      msg += "Incliné vers la gauche\n";
-      msg += `👉 Tirer ${labelFeet(["A","C"])}\n`;
-      msg += `OU pousser ${labelFeet(["B","D"])}`;
-    }
+  msg += "Lecture positive : l'arbre moteur pointe vers la droite\n\n";
+  msg += `Correction : déplacer ${labelFeet(["B","D"])} vers l'extérieur\n`;
+  msg += `ou ${labelFeet(["A","C"])} vers l'intérieur`;
+}
+else{
+  msg += "Lecture négative : l'arbre moteur pointe vers la gauche\n\n";
+  msg += `Correction : déplacer ${labelFeet(["A","C"])} vers l'extérieur\n`;
+  msg += `ou ${labelFeet(["B","D"])} vers l'intérieur`;
+}
 
     return msg;
   }
@@ -2473,17 +2485,14 @@ function buildCorrectionMessage(){
     const realMove = Math.abs(v) / 2;
 
     let msg = "↔️ Parallélisme horizontal\n\n";
-    msg += `Lecture = ${v.toFixed(2)} mil\n`;
-    msg += `Correction réelle = ${realMove.toFixed(2)} mil\n\n`;
+    msg += "Décalage horizontal parallèle\n";
+msg += "Correction réelle = lecture ÷ 2\n\n";
 
-    if(v > 0){
-      msg += `👉 Tirer ${labelFeet(["A","B"])}\n`;
-      msg += `OU pousser ${labelFeet(["C","D"])}`;
-    }else{
-      msg += `👉 Tirer ${labelFeet(["C","D"])}\n`;
-      msg += `OU pousser ${labelFeet(["A","B"])}`;
-    }
-
+if(v > 0){
+  msg += `Déplacer le moteur vers la gauche de ${realMove.toFixed(2)} mil`;
+}else{
+  msg += `Déplacer le moteur vers la droite de ${realMove.toFixed(2)} mil`;
+}
     return msg;
   }
 
