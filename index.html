@@ -2257,6 +2257,34 @@ function computeAngularShimsVertical(){
   return { front, rear };
 }
 
+
+/* =====================================================
+   MÉTHODE CEMEQ — CORRECTION VERTICALE COMBINÉE
+   Corrige Angularité + Parallélisme en même temps
+   Formules officielles :
+   Avant  = (A × C / D) + E
+   Arrière = (B × C / D) + E
+===================================================== */
+function computeCemeqVertical(){
+
+  const C = Number(state.angV) || 0; // angularité (mil)
+  const E = Number(state.parV) || 0; // parallélisme (mil)
+
+  const D = Number(geometry.couplingDiameter) || 0;
+  const A = Number(geometry.A) || 0;
+  const B = Number(geometry.B) || 0;
+
+  if(D <= 0 || A <= 0 || B <= 0){
+    return { front:0, rear:0 };
+  }
+
+  // Formules CEMEQ
+  const front = (A * C / D) + E;
+  const rear  = (B * C / D) + E;
+
+  return { front, rear };
+}
+
 function computeAngularShimsHorizontal(){
   const v = state.angH;                // mils
   const D = geometry.couplingDiameter; // po
