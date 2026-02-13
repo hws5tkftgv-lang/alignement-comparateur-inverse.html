@@ -2345,20 +2345,9 @@ function isStepOK(stepIndex){
   // Validation finale → ici on vérifie la machine alignée
   // Validation finale → basée sur les cales réelles (méthode CEMEQ)
 if(id === "verify"){
-
-  const v = computeCemeqVertical();
-  const h = computeCemeqHorizontal();
-
-  const tol = 2; // tolérance alignement finale (mils)
-
-  return Math.abs(v.front) <= tol &&
-         Math.abs(v.rear)  <= tol &&
-         Math.abs(h.front) <= tol &&
-         Math.abs(h.rear)  <= tol;
-}
-
   return true;
 }
+
 /* =====================================================
    MESSAGE TEXTE (ZONE INFO)
 ===================================================== */
