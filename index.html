@@ -1029,160 +1029,140 @@ function formatCoefficient(coef){
 
 
 // 1) contenu HTML de la fiche
+
 function buildHelpHTML(){
-  // ⚠️ Ici on écrit LA référence pédagogique (une seule source de vérité)
   return `
-  <h3><b>Conventions importantes</b></h3>
+
+<h3><b>Conventions importantes</b></h3>
 
 <div class="box">
-  <b>1) Comparateur inversé = mesure RELATIVE entre 2 arbres</b><br>
-  La lecture au cadran représente l’écart entre l’arbre mobile (moteur) et l’arbre fixe (pompe).<br>
+<b>Comparateur inversé</b><br>
+Le cadran ne mesure PAS un défaut précis.<br>
+Il mesure la différence de position entre l’arbre mobile (moteur) et l’arbre fixe (pompe).<br><br>
+On ne corrige donc jamais la lecture directement :<br>
+on calcule des cales.
 </div>
 
-<div class="box">
-  <b>2) Parallélisme (12–6 et 3–9) : règle CRITIQUE</b><br>
-  En parallélisme, le comparateur lit le double du déplacement réel, car une seule machine est corrigée.<br>
-  Correction moteur = Lecture ÷ 2<br>
-</div>
 
 <div class="box">
-  <b>3) Angularité</b><br>
-  Les valeurs <b>Avant</b> et <b>Arrière</b> sont des valeurs absolues de cale.
-  Ensuite, le <b>signe</b> (+ / −) indique quelle extrémité est plus haute ou plus basse, et la règle (ajouter / enlever) indique sur quelles pattes appliquer la correction.
+<b>Méthode CEMEQ — principe</b><br>
+Une seule correction corrige en même temps :
+<ul>
+<li>l’angularité</li>
+<li>le parallélisme</li>
+</ul>
+
+Formules :
+
+P_avant  = (A × C ÷ D) + E<br>
+P_arrière = (B × C ÷ D) + E
 </div>
+
+
+<div class="box">
+<b>Interprétation</b><br>
+Les valeurs Avant et Arrière donnent directement l’épaisseur de cale.<br>
+Le signe indique simplement quelle extrémité est trop haute ou trop basse.
+</div>
+
 
 
 <h3><b>Étape 1 — Voilage (Runout)</b></h3>
 <div class="box">
-  But : vérifier que la rotation est correcte et que la lecture est dans la tolérance.<br>
-  Condition : Il faut que la valeur mesurée soit plus petite que la tolérance admissible.
+Vérifier que l’arbre tourne rond.<br>
+La valeur mesurée doit être plus petite que la tolérance.
 </div>
+
 
 
 <h3><b>Étape 2 — Pied boiteux (Soft Foot)</b></h3>
 <div class="box">
-  Méthode par diagonales :<br>
-  Diag 1 = A (haut gauche) + C (bas droit)<br>
-  Diag 2 = B (haut droit) + D (bas gauche)<br><br>
-<ul>
-Δ = Diag 1 (la plus grande valeur)
-  − Diag 2 (la valeur la plus petite)
-</ul>
- <ul> Si résultat = 3 mils et moins = Aucune correction nécéssaire</ul>
- <ul> Si résultat = 3 mils et plus  = Correction ≈ 0.8 × Δ</ul>
- <ul> On corrige les deux pattes de la diagonale la plus élevée
-  Par patte (2 pattes) = Correction ÷ 2</ul>
+Méthode des diagonales :<br><br>
+
+Diag 1 = A + C<br>
+Diag 2 = B + D<br><br>
+
+Δ = plus grande − plus petite<br><br>
+
+Si Δ ≤ 3 mil → OK<br>
+Si Δ > 3 mil → correction ≈ 0.8 × Δ<br>
+On corrige les deux pattes de la diagonale la plus haute
 </div>
+
 
 
 <h3><b>Étape 3 — Mesures géométriques</b></h3>
 <div class="box">
-  D = diamètre de l’accouplement (support) en pouces (po)<br>
-  a = distance entre le point de mesure et les pattes AVANT (po)<br>
-  b = distance entre les pattes AVANT et les pattes ARRIÈRE (po)
+D = diamètre de l’accouplement (po)<br>
+A = centre accouplement → pattes avant (po)<br>
+B = centre accouplement → pattes arrière (po)
 </div>
 
 
-<h3><b>Étape 4 — Angularité verticale (12–6)</b></h3>
+
+<h3><b>Étape 4 — Correction verticale (12–6)</b></h3>
 <div class="box">
-  Lecture : v = Lecture du cadran 12–6 (mils)<br><br>
+Lecture verticale = C<br>
+Décalage vertical = E<br><br>
 
-  Formules :<br>
-  Avant  = (valeur cadran ÷ D) × a<br>
-  Arrière = (valeur cadran ÷ D) × (a + b)<br><br>
+Calcul :
 
-  Appliquer ensuite selon le signe (+ / −) et la règle d’ajout / retrait.
+P_avant  = (A × C ÷ D) + E<br>
+P_arrière = (B × C ÷ D) + E<br><br>
+
+Cette correction aligne complètement le moteur verticalement.
 </div>
 
 
-<h3><b>Étape 5 — Parallélisme vertical (12–6)</b></h3>
-<div class="box">
-  Lecture : Lecture du cadran 12–6
-  Règle : Correction = Valeur mesurée ÷ 2<br><br>
 
-  Application : même correction sur les quatre pattes (A + B + C + D), en ajout ou en retrait selon le signe.
+<h3><b>Étape 5 — Correction horizontale (3–9)</b></h3>
+<div class="box">
+Même principe que vertical.<br>
+On utilise la lecture horizontale dans la même formule.<br><br>
+
+P_avant  = (A × C ÷ D) + E<br>
+P_arrière = (B × C ÷ D) + E<br><br>
+
+On déplace ensuite le moteur latéralement.
 </div>
 
 
-<h3><b>Étape 6 — Angularité horizontale (3–9)</b></h3>
-<div class="box">
-  Lecture : Lecture du cadran 3–9 <br><br>
 
-  Formules :<br>
-  Avant  = (valeur cadran ÷ D) × a<br>
-  Arrière = (valeur cadran ÷ D) × (a + b)<br><br>
-
-  Appliquer selon le signe (+ / −) sur les bonnes pattes en poussant ou en tirant.
-</div>
-
-
-<h3><b>Étape 7 — Parallélisme horizontal (3–9)</b></h3>
-<div class="box">
-  Lecture : Lecture du cadran 3-9
-  Règle : Correction = Valeur mesurée ÷ 2<br><br>
-
-  Le déplacement réel du moteur correspond à la moitié de la lecture mesurée.
-</div>
-
-<h3><b>Étape 8 — Dilatation thermique</b></h3>
+<h3><b>Étape 6 — Dilatation thermique</b></h3>
 
 <div class="box">
-<b>C’est quoi la dilatation thermique ?</b><br>
-Quand une machine est en opération,elle devient plus chaude et un peu plus haute.
-Le moteur et la pompe ne chauffent pas pareil et ne sont pas faits du même matériau,
-donc ils ne montent pas de la même façon.
+Quand la machine chauffe, elle grandit en hauteur.<br>
+Le moteur et la pompe ne montent pas pareil.<br>
+On doit donc prévoir la position à chaud.
 </div>
 
 <div class="box">
-<b>De quoi ça dépend ?</b><br>
-La dilatation dépend de :
+Formule :<br><br>
+ΔH = Hauteur × Coefficient × (Température opération − Température ambiante)
+</div>
+
+<div class="box">
+Coefficients usuels :<br>
+acier : 0.0000063<br>
+fonte : 0.0000065<br>
+inox : 0.0000095<br>
+bronze : 0.0000100<br>
+aluminium : 0.0000124
+</div>
+
+<div class="box">
+La dilatation thermique :<br>
 <ul>
-  <li>la hauteur de l’axe</li>
-  <li>le matériau</li>
-  <li>la différence de température</li>
+<li>se calcule après l’alignement</li>
+<li>ne change pas la lecture du cadran</li>
+<li>sert seulement à anticiper la position à chaud</li>
 </ul>
 </div>
 
-<div class="box">
-<b>La formule </b><br><br>
-<ul>
-    <li>H: Hauteur de l'axe</li>
-    <li>T1:Température opération</li>
-    <li>T2:Température ambiante</li>
-    <li>C: Coefficient</li>
-</ul>
-<b>H × Coef × (T1-T2)</b><br><br>
-<ul>
-   <li>aluminium: 0.0000124</li>
-   <li>acier:     0.0000063</li>
-   <li>inox:      0.0000095</li>
-   <li>fonte:     0.0000065</li>
-   <li>bronze:    0.0000100</li>
-</ul>
-</span>
-</div>
-
-
-
-<div class="box">
-<b>Comment on corrige en vrai ?</b><br>
-<ul>
-  <li>Si le moteur monte plus que la pompe → on enlève des cales à froid</li>
-  <li>Si le moteur monte moins que la pompe → on ajoute des cales à froid</li>
-</ul>
-</div>
-
-<div class="box">
-<b>Règle importante à retenir</b><br>
-⚠️ La dilatation thermique :
-<ul>
-  <li>se calcule APRÈS l’alignement à froid</li>
-  <li>ne change PAS les lectures au cadran</li>
-  <li>sert seulement à anticiper la position à chaud</li>
-</ul>
-</div>
-  `;
+`;
 }
+
+
 
 // 2) ouvrir/fermer/imprimer
 function openHelp(){
@@ -1262,7 +1242,7 @@ function buildTrainingHTML(){
 
 
 <div class="box">
-  <b>Sélection du défaut à observer</b>
+  <b>   Training = comprendre • Alignement = corriger  </b>
 
   <div class="toggleGroup">
     <button class="defectToggle active" data-defect="parH">Parallélisme H</button>
@@ -2047,27 +2027,13 @@ function updateNote(stepId){
         "Corriger le pied boiteux AVANT tout autre ajustement.";
       break;
 
-    case "angV":
-      note.textContent =
-        "Angularité verticale : correction par ajout ou retrait de cales selon le signe.";
-      break;
+    case "vert":
+  txt = "La lecture au comparateur donne directement les cales à installer selon la méthode CEMEQ.";
+break;
 
-    case "parV":
-      note.textContent =
-        "⚠️ Parallélisme vertical : En parallélisme, le comparateur lit le double du déplacement réel, car une seule machine est corrigée. La correction réelle à appliquer est la lecture ÷ 2, répartie uniformément sur les 4 pattes (A + B + C + D).";
-      note.classList.add("note-blink");
-      break;
-
-    case "angH":
-      note.textContent =
-        "Angularité horizontale : correction par déplacement différentiel des pattes selon le sens.";
-      break;
-
-    case "parH":
-      note.textContent =
-        "⚠️ Parallélisme horizontal : la correction réelle du moteur est la lecture ÷ 2 (on corrige une seule machine).";
-      note.classList.add("note-blink");
-      break;
+case "horz":
+  txt = "Même principe : la lecture sert uniquement à calculer les déplacements latéraux.";
+break;
       
     case "thermal":
       note.textContent =
