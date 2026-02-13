@@ -2285,6 +2285,29 @@ function computeCemeqVertical(){
   return { front, rear };
 }
 
+/* =====================================================
+   MÉTHODE CEMEQ — CORRECTION HORIZONTALE COMBINÉE
+===================================================== */
+function computeCemeqHorizontal(){
+
+  const C = Number(state.angH) || 0; // angularité horizontale
+  const E = Number(state.parH) || 0; // parallélisme horizontal
+
+  const D = Number(geometry.couplingDiameter) || 0;
+  const A = Number(geometry.A) || 0;
+  const B = Number(geometry.B) || 0;
+
+  if(D <= 0 || A <= 0 || B <= 0){
+    return { front:0, rear:0 };
+  }
+
+  const front = (A * C / D) + E;
+  const rear  = (B * C / D) + E;
+
+  return { front, rear };
+}
+
+
 function computeAngularShimsHorizontal(){
   const v = state.angH;                // mils
   const D = geometry.couplingDiameter; // po
@@ -2463,61 +2486,54 @@ if(stepId === "shimV"){
 
   return msg;
 }
-  // ---------- ANGULARITÉ HORIZONTALE ----------
-  if(stepId === "angH"){
-    if(ok(state.angH, state.angHTol)){
-      return "✔️ Angularité horizontale conforme.";
-    }
 
-    const D = geometry.couplingDiameter;
+// ---------- CORRECTION HORIZONTALE (CEMEQ AVEC DÉTAIL) ----------
+if(stepId === "shimH"){
 
-    const res = computeAngularShimsHorizontal();
-    const front = res.front;
-    const rear  = res.rear;
+  const C = Number(state.angH) || 0;
+  const E = Number(state.parH) || 0;
+  const D = Number(geometry.couplingDiameter) || 0;
+  const A = Number(geometry.A) || 0;
+  const B = Number(geometry.B) || 0;
 
-    const v = state.angH * dialSign;
-
-    let msg = "↔️ Angularité horizontale\n\n";
-    msg += "🧮 Calcul de pente\n";
-    msg += `Pente = Lecture / Ø = ${Math.abs(v).toFixed(2)} / ${D}\n\n`;
-    msg += "Corrections :\n";
-    msg += `Avant  = ${front} mil\n`;
-    msg += `Arrière = ${rear} mil\n\n`;
-
-    if(v > 0){
-  msg += "Lecture positive : l'arbre moteur pointe vers la droite\n\n";
-  msg += `Correction : déplacer ${labelFeet(["B","D"])} vers l'extérieur\n`;
-  msg += `ou ${labelFeet(["A","C"])} vers l'intérieur`;
-}
-else{
-  msg += "Lecture négative : l'arbre moteur pointe vers la gauche\n\n";
-  msg += `Correction : déplacer ${labelFeet(["A","C"])} vers l'extérieur\n`;
-  msg += `ou ${labelFeet(["B","D"])} vers l'intérieur`;
-}
-
-    return msg;
+  if(D <= 0 || A <= 0 || B <= 0){
+    return "❌ Données géométriques invalides.";
   }
 
-  // ---------- PARALLÉLISME HORIZONTAL ----------
-  if(stepId === "parH"){
-    if(ok(state.parH, state.parHTol)){
-      return "✔️ Parallélisme horizontal conforme.";
-    }
+  const front = (A * C / D) + E;
+  const rear  = (B * C / D) + E;
 
-    const v = state.parH;
-    const realMove = Math.abs(v) / 2;
+  let msg = "🧮 Calcul déplacement horizontal (méthode CEMEQ)\n\n";
 
-    let msg = "↔️ Parallélisme horizontal\n\n";
-    msg += "Décalage horizontal parallèle\n";
-msg += "Correction réelle = lecture ÷ 2\n\n";
+  msg += "Formules :\n";
+  msg += "Avant  = (A × C ÷ D) + E\n";
+  msg += "Arrière = (B × C ÷ D) + E\n\n";
 
-if(v > 0){
-  msg += `Déplacer le moteur vers la gauche de ${realMove.toFixed(2)} mil`;
-}else{
-  msg += `Déplacer le moteur vers la droite de ${realMove.toFixed(2)} mil`;
+  msg += "Remplacement des valeurs :\n\n";
+
+  msg += `Avant  = (${A} × ${C} ÷ ${D}) + ${E}\n`;
+  msg += `       = ${(A*C/D).toFixed(3)} + ${E}\n`;
+  msg += `       = ${front.toFixed(2)} mil\n\n`;
+
+  msg += `Arrière = (${B} × ${C} ÷ ${D}) + ${E}\n`;
+  msg += `       = ${(B*C/D).toFixed(3)} + ${E}\n`;
+  msg += `       = ${rear.toFixed(2)} mil\n\n`;
+
+  msg += "Déplacement moteur :\n";
+
+  if(front > 0 && rear > 0)
+    msg += "👉 Déplacer le moteur vers la GAUCHE\n";
+
+  if(front < 0 && rear < 0)
+    msg += "👉 Déplacer le moteur vers la DROITE\n";
+
+  msg += `\nPatte AVANT  : ${front.toFixed(2)} mil`;
+  msg += `\nPatte ARRIÈRE: ${rear.toFixed(2)} mil`;
+
+  return msg;
 }
-    return msg;
-  }
+
+ 
 
   // ---------- DILATATION ----------
   if(stepId === "thermal"){
@@ -2715,50 +2731,31 @@ if(id === "shimV"){
   return;
 }
 
-  // =====================================================
-  // ANGULARITÉ HORIZONTALE
-  // =====================================================
-  if(id === "angH"){
+  
+  // ===== LECTURES HORIZONTALES =====
+if(id === "readH"){
   ui.inputsArea.innerHTML = `
     <div class="row">
       <div>
-        <label>Lecture cadran 3–9 (mils)</label>
+        <label>Angularité horizontale (C) 3-9 (mils)</label>
         <input id="in_angH" type="number" step="0.1" value="${state.angH}">
       </div>
       <div>
-        <label>Tolérance (mils)</label>
-        <input id="in_angHTol" type="number" step="0.1" value="${state.angHTol}">
+        <label>Parallélisme horizontal (E) 3-9 (mils)</label>
+        <input id="in_parH" type="number" step="0.1" value="${state.parH}">
       </div>
     </div>
-
-  
   `;
 
   wireInputs([
     ["in_angH", v => state.angH = v],
-    ["in_angHTol", v => state.angHTol = Math.max(0, v)]
+    ["in_parH", v => state.parH = v]
   ]);
   return;
 }
-  if(id === "parH"){
-    ui.inputsArea.innerHTML = `
-      <div class="row">
-        <div>
-          <label>Parallélisme horizontal (mils)</label>
-          <input id="in_parH" type="number" step="0.1" value="${state.parH}">
-        </div>
-        <div>
-          <label>Tolérance (mils)</label>
-          <input id="in_parHTol" type="number" step="0.1" value="${state.parHTol}">
-        </div>
-      </div>
-    `;
-    wireInputs([
-      ["in_parH", v => state.parH = v],
-      ["in_parHTol", v => state.parHTol = Math.max(0, v)],
-    ]);
-    return;
-  }
+  
+  
+  
 else if(id === "thermal"){
   ui.inputsArea.innerHTML = `
 
