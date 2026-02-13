@@ -3211,228 +3211,92 @@ function drawTopViewGeneric(ctxTarget){
   const ctx = ctxTarget;
   clear(ctx, w, h);
 
-  const scale   = trainingMode ? visualGain * 0.08 : visualGain;
-  const rotGain = visualGain * 0.00035;
+  // =========================
+  // DONNÉES CEMEQ
+  // =========================
+  const C = trainingMode ? trainState.angH : state.angH; // angularité
+  const E = trainingMode ? trainState.parH : state.parH; // parallélisme
+  const D = geometry.couplingDiameter || 8;
 
-  // ====================================================
-  // SOURCE UNIQUE DE VÉRITÉ
-  // ====================================================
-  const parH = trainingMode ? (trainState.parH || 0) : (state.parH || 0);
-  const angH = trainingMode ? (trainState.angH || 0) : (state.angH || 0);
+  const scale = 0.7;
+  const slope = (C / D) * 80; // amplification visuelle
 
-  // ====================================================
-  // RÉFÉRENCES FIXES (POMPE + SOCLE)
-  // ====================================================
-  const baseCx = w * 0.30;
-  const baseCy = h * 0.5;
+  // =========================
+  // POSITIONS FIXES
+  // =========================
+  const baseY = h * 0.5;
+  const baseX = w * 0.30;
 
-  const { motorW, motorH, pumpW, pumpH, gap, shaftH, coupW, coupH } = GEOM;
+  const { motorW, motorH, pumpW, pumpH, gap } = GEOM;
 
-  // ====================================================
-  // TOP VIEW : PARALLÉLISME H = DÉPLACEMENT EN Y ✅
-  // ====================================================
-  const maxShift = 60;
-  const shiftY = Math.max(-maxShift, Math.min(maxShift, parH * scale));
+  // pompe fixe
+  const pumpX = baseX + motorW/2 + gap;
 
-  const motorCx = baseCx;          // X fixe (axe arbre)
-  const motorCy = baseCy + shiftY; // Y bouge (latéral)
+  // positions AV / AR moteur
+  const rearX  = baseX - motorW/2;
+  const frontX = baseX + motorW/2;
 
-  // ====================================================
-  // SEMELLE COMMUNE (FIXE)
-  // ====================================================
-  const baseMargin = 40;
-  ctx.fillStyle = "#1a235a";
-  ctx.fillRect(
-    baseCx - motorW/2 - baseMargin,
-    baseCy - motorH/2 - baseMargin,
-    motorW + gap + pumpW + baseMargin*2,
-    motorH + baseMargin*2
-  );
+  // décalages CEMEQ
+  const rearOffset  = (E + (-motorW/2 * slope)) * scale;
+  const frontOffset = (E + ( motorW/2 * slope)) * scale;
 
-  // ====================================================
-  // PATTES (position moteur)
-  // ====================================================
-  const P = {
-    A:{ x: motorCx - motorW/2 + 24, y: motorCy - motorH/2 + 18 }, // TL
-    B:{ x: motorCx + motorW/2 - 24, y: motorCy - motorH/2 + 18 }, // TR
-    C:{ x: motorCx + motorW/2 - 24, y: motorCy + motorH/2 - 18 }, // BR
-    D:{ x: motorCx - motorW/2 + 24, y: motorCy + motorH/2 - 18 }, // BL
-  };
+  // =========================
+  // SEMELLE
+  // =========================
+  ctx.fillStyle="#1a235a";
+  ctx.fillRect(baseX-motorW/2-60, baseY-motorH/2-60,
+               motorW+gap+pumpW+120, motorH+120);
 
-  // mapping soft-foot (ordre TL/TR/BR/BL)
-  const scheme = FOOT_SCHEMES[footSchemeKey] || FOOT_SCHEMES.standard;
-  const PM = {
-    A: P[scheme.TL],
-    B: P[scheme.TR],
-    C: P[scheme.BR],
-    D: P[scheme.BL],
-  };
-
-  // ====================================================
-  // ANGULARITÉ H (TOP VIEW) = ROTATION
-  // ====================================================
-  const ang = (angH * dialSign * rotGain);
-
-  // pivot réaliste : coin extérieur
-  let pivot = { x: motorCx, y: motorCy };
-  if(ang > 0) pivot = PM.C;
-  if(ang < 0) pivot = PM.D;
-
-  // ====================================================
-  // DESSIN DU MOTEUR (BLOC ROTATIF)
-  // ====================================================
-  const footW = 24;
-  const footH = 12;
-
-  ctx.save();
-  ctx.translate(pivot.x, pivot.y);
-  ctx.rotate(ang);
-  ctx.translate(-pivot.x, -pivot.y);
-
-  // moteur
-  ctx.fillStyle = "#00a2ff";
-  ctx.fillRect(motorCx - motorW/2, motorCy - motorH/2, motorW, motorH);
-
-  // pattes (dans le bloc rotatif)
-  function drawPad(letter){
-    const pt = PM[letter];
-    if(!pt) return;
-    ctx.fillStyle = footColor(letter);
-    ctx.fillRect(pt.x - footW/2, pt.y - footH/2, footW, footH);
-  }
-  drawPad("A"); drawPad("B"); drawPad("C"); drawPad("D");
-
-  // arbre moteur
-  ctx.fillStyle = "#bbbbbb";
-  ctx.fillRect(
-    motorCx + motorW/2,
-    motorCy - shaftH/2,
-    (gap/2) - 8,
-    shaftH
-  );
-
-  // demi-accouplement moteur
-  const coupX = motorCx + motorW/2 + gap/2;
-  ctx.fillStyle = "#cfcfcf";
-  ctx.fillRect(coupX - 14, motorCy - coupH/2, coupW, coupH);
-
-  // axe moteur (dans le bloc rotatif)
-  ctx.save();
-  ctx.strokeStyle = "rgba(255,255,255,0.95)";
-  ctx.setLineDash([5,4]);
-  ctx.lineWidth = 2.5;
-  ctx.beginPath();
-  ctx.moveTo(motorCx - motorW/2 - 90, motorCy);
-  ctx.lineTo(motorCx + motorW/2 + gap/2, motorCy);
-  ctx.stroke();
-  ctx.restore();
-
-  ctx.restore(); // ✅ FIN DU BLOC ROTATIF (UN SEUL restore)
-
-  // ====================================================
-  // ANGULARITÉ H — FLÈCHES (HORS ROTATION, PREMIER PLAN)
-  // ====================================================
-  if(Math.abs(angH) > 0){
-    const v = angH * dialSign;
-    const len = 60;
-
-    if(v > 0){
-      drawArrow(ctx, PM.A.x, PM.A.y - len, PM.A.x, PM.A.y);
-      drawArrow(ctx, PM.C.x, PM.C.y + len, PM.C.x, PM.C.y);
-    }else{
-      drawArrow(ctx, PM.B.x, PM.B.y - len, PM.B.x, PM.B.y);
-      drawArrow(ctx, PM.D.x, PM.D.y + len, PM.D.x, PM.D.y);
-    }
-  }
-
-  // ====================================================
-  // POMPE (FIXE)
-  // ====================================================
-  const pumpX = baseCx + motorW/2 + gap;
-
-  // pompe
+  // =========================
+  // POMPE
+  // =========================
   ctx.fillStyle="#ff9800";
-  ctx.fillRect(pumpX, baseCy - pumpH/2, pumpW, pumpH);
+  ctx.fillRect(pumpX, baseY-pumpH/2, pumpW, pumpH);
 
-  // arbre pompe
-  ctx.fillStyle = "#bbbbbb";
-  ctx.fillRect(
-    baseCx + motorW/2 + gap/2 + 14,
-    baseCy - shaftH/2,
-    (gap/2) - 8,
-    shaftH
-  );
-
-  // demi-accouplement pompe
-  ctx.fillStyle = "#cfcfcf";
-  ctx.fillRect(
-    baseCx + motorW/2 + gap/2 + 4,
-    baseCy - coupH/2,
-    coupW,
-    coupH
-  );
-
-  // axe pompe
-  ctx.save();
-  ctx.strokeStyle = "rgba(255,255,255,0.95)";
-  ctx.setLineDash([5,4]);
-  ctx.lineWidth = 2.5;
+  // =========================
+  // MOTEUR (trapèze CEMEQ)
+  // =========================
+  ctx.fillStyle="#00a2ff";
   ctx.beginPath();
-  ctx.moveTo(baseCx + motorW/2 + gap/2, baseCy);
-  ctx.lineTo(baseCx + motorW/2 + gap + pumpW + 90, baseCy);
+  ctx.moveTo(rearX,  baseY-motorH/2 + rearOffset);
+  ctx.lineTo(frontX, baseY-motorH/2 + frontOffset);
+  ctx.lineTo(frontX, baseY+motorH/2 + frontOffset);
+  ctx.lineTo(rearX,  baseY+motorH/2 + rearOffset);
+  ctx.closePath();
+  ctx.fill();
+
+  // =========================
+  // AXES
+  // =========================
+  ctx.strokeStyle="white";
+  ctx.setLineDash([5,5]);
+
+  ctx.beginPath();
+  ctx.moveTo(rearX-100, baseY+rearOffset);
+  ctx.lineTo(frontX,    baseY+frontOffset);
   ctx.stroke();
-  ctx.restore();
 
-  // ====================================================
-  // LETTRES + TITRES (hors rotation)
-  // ====================================================
-  ctx.fillStyle = "#fff";
-  ctx.font = "14px Arial";
-  ctx.textAlign = "center";
+  ctx.beginPath();
+  ctx.moveTo(pumpX, baseY);
+  ctx.lineTo(pumpX+pumpW+100, baseY);
+  ctx.stroke();
+  ctx.setLineDash([]);
 
-  const labelOffset = 26;
-  ctx.fillText(labelFoot("A"), PM.A.x, PM.A.y - labelOffset);
-  ctx.fillText(labelFoot("B"), PM.B.x, PM.B.y - labelOffset);
-  ctx.fillText(labelFoot("D"), PM.D.x, PM.D.y + labelOffset + 6);
-  ctx.fillText(labelFoot("C"), PM.C.x, PM.C.y + labelOffset + 6);
-
-  ctx.fillText("MOTEUR (mobile)", motorCx, motorCy - motorH/2 - 18);
-  ctx.fillText("POMPE (fixe)", pumpX + pumpW/2, baseCy - pumpH/2 - 18);
-}
-function calcThermalGrowth(heightIn, material, tOp, tAmb){
-  const coeff = MATERIAL_COEFF[material];
-
-  if(!coeff || isNaN(heightIn) || isNaN(tOp) || isNaN(tAmb)){
-    return 0;
+  // =========================
+  // FLÈCHES (INTERPRÉTATION)
+  // =========================
+  if(Math.abs(C)>0){
+    drawArrow(ctx, rearX, baseY+rearOffset, rearX, baseY);
+    drawArrow(ctx, frontX, baseY+frontOffset, frontX, baseY);
   }
 
-  const deltaIn = heightIn * coeff * (tOp - tAmb);
-  return deltaIn * 1000; // pouces → mils
-}
-
-function calcRelativeThermalShim(motor, pump, tempAmb){
-  const motorCoeff = MATERIAL_COEFF[motor.material];
-  const pumpCoeff  = MATERIAL_COEFF[pump.material];
-
-  if(!motorCoeff || !pumpCoeff){
-    return null;
-  }
-
-  const dH_motor =
-    motor.axisHeight * motorCoeff * (motor.tempOp - tempAmb) * 1000;
-
-  const dH_pump =
-    pump.axisHeight * pumpCoeff * (pump.tempOp - tempAmb) * 1000;
-
-  const deltaRelative = dH_motor - dH_pump;
-
-  return {
-    motorGrowth: dH_motor,        // mil
-    pumpGrowth:  dH_pump,         // mil
-    relative:    deltaRelative,   // mil
-    action: deltaRelative < 0 ? "ADD" : "REMOVE",
-    shim: Math.abs(deltaRelative)
-  };
+  // =========================
+  // TITRES
+  // =========================
+  ctx.fillStyle="#fff";
+  ctx.textAlign="center";
+  ctx.fillText("MOTEUR (mobile)", baseX, baseY-motorH/2-18);
+  ctx.fillText("POMPE (fixe)", pumpX+pumpW/2, baseY-pumpH/2-18);
 }
 
 function drawSideViewGeneric(ctxTarget){
@@ -3441,170 +3305,79 @@ function drawSideViewGeneric(ctxTarget){
 
   const canvas = ctxTarget.canvas;
   const { w, h } = resizeCanvas(canvas, ctxTarget);
-  if (w < 10 || h < 10) return;
+  if(w < 10 || h < 10) return;
 
   const ctx = ctxTarget;
   clear(ctx, w, h);
 
-  const scale   = trainingMode ? visualGain * 0.08 : visualGain;
-  const rotGain = visualGain * 0.00035;
+  const C = trainingMode ? trainState.angV : state.angV;
+  const E = trainingMode ? trainState.parV : state.parV;
+  const D = geometry.couplingDiameter || 8;
 
-  // ====================================================
-  // MODE TRAINING — SOURCE UNIQUE DE VÉRITÉ
-  // ====================================================
-  let parV = trainingMode ? trainState.parV : state.parV;
-  let angV = trainingMode ? trainState.angV : state.angV;
+  const scale = 0.7;
+  const slope = (C / D) * 80;
 
-  
-  // ====================================================
-  // RÉFÉRENCES FIXES
-  // ====================================================
-  const bottomSafeMargin = 40;
-  const baseCy = (h - bottomSafeMargin) * 0.55;
-  const baseCx = w * 0.30;
+  const baseY = h * 0.55;
+  const baseX = w * 0.30;
 
-  const cy = baseCy + (parV * scale); // ✅ parV = déplacement vertical
-  const cx = baseCx;
+  const { motorW, motorH, pumpW, pumpH, gap } = GEOM;
 
-  const axisPumpY  = baseCy; // FIXE
-  const axisMotorY = cy;     // MOBILE
+  const pumpX = baseX + motorW/2 + gap;
 
-  const { motorW, motorH, pumpW, pumpH, gap, shaftH, coupW, coupH } = GEOM;
+  const rearX  = baseX - motorW/2;
+  const frontX = baseX + motorW/2;
 
-  const footW = 24;
-  const footH = 10;
+  const rearOffset  = -(E + (-motorW/2 * slope)) * scale;
+  const frontOffset = -(E + ( motorW/2 * slope)) * scale;
 
-  const rearFootX  = cx - motorW / 2 + footW / 2;
-  const frontFootX = cx + motorW / 2 - footW / 2;
+  // base
+  ctx.fillStyle="#1a235a";
+  ctx.fillRect(baseX-motorW/2-60, baseY+motorH/2+10,
+               motorW+gap+pumpW+120, 16);
 
-  // ====================================================
-  // SEMELLE COMMUNE
-  // ====================================================
-  const baseMargin = 40;
-  const baseTop = baseCy + pumpH / 2 + footH - 2;
+  // pompe
+  ctx.fillStyle="#ff9800";
+  ctx.fillRect(pumpX, baseY-pumpH/2, pumpW, pumpH);
 
-  ctx.fillStyle = "#1a235a";
-  ctx.fillRect(
-    cx - motorW / 2 - baseMargin,
-    baseTop,
-    motorW + gap + pumpW + baseMargin * 2,
-    16
-  );
+  // moteur trapèze
+  ctx.fillStyle="#00a2ff";
+  ctx.beginPath();
+  ctx.moveTo(rearX,  baseY-motorH/2 + rearOffset);
+  ctx.lineTo(frontX, baseY-motorH/2 + frontOffset);
+  ctx.lineTo(frontX, baseY+motorH/2 + frontOffset);
+  ctx.lineTo(rearX,  baseY+motorH/2 + rearOffset);
+  ctx.closePath();
+  ctx.fill();
 
-  // ====================================================
-  // PARAMÈTRE ANGULAIRE (ANGULARITÉ VERTICALE)
-  // ====================================================
-  const ang = -(angV * dialSign * rotGain);
-
-  // ====================================================
-  // POMPE FIXE
-  // ====================================================
-  const pumpX = cx + motorW / 2 + gap;
-  const coupX = cx + motorW / 2 + gap / 2;
-
-  ctx.fillStyle = "#ff9800";
-  ctx.fillRect(pumpX, baseCy - pumpH / 2, pumpW, pumpH);
-
-  ctx.fillRect(pumpX + 12, baseCy + pumpH / 2 - 2, footW, footH);
-  ctx.fillRect(pumpX + pumpW - 12 - footW, baseCy + pumpH / 2 - 2, footW, footH);
-
-  ctx.fillStyle = "#bbbbbb";
-  ctx.fillRect(
-    coupX + 14,
-    axisPumpY - shaftH / 2,
-    (gap / 2) - 8,
-    shaftH
-  );
-
-  ctx.fillStyle = "#cfcfcf";
-  ctx.fillRect(
-    coupX + 4,
-    axisPumpY - coupH / 2,
-    coupW,
-    coupH
-  );
-
-  // ====================================================
-  // MOTEUR — BLOC SOLIDAIRE (PIVOT RÉALISTE)
-  // ====================================================
-  const pivotX = cx + motorW/2 + gap/2; // centre accouplement
-const pivotY = cy;
-
-ctx.save();
-ctx.translate(pivotX, pivotY);
-ctx.rotate(ang);
-ctx.translate(-pivotX, -pivotY);
-  // ---- moteur ----
-  ctx.fillStyle = "#00a2ff";
-  ctx.fillRect(cx - motorW / 2, cy - motorH / 2, motorW, motorH);
-
-  // pattes moteur
-  ctx.fillRect(rearFootX - footW / 2,  cy + motorH / 2 - 2, footW, footH);
-  ctx.fillRect(frontFootX - footW / 2, cy + motorH / 2 - 2, footW, footH);
-
-  // lettres (mapping respecté)
-  ctx.fillStyle = "#fff";
-  ctx.font = "14px Arial";
-  ctx.textAlign = "center";
-
-  const labelY = Math.min(cy + motorH / 2 + 24, h - 12);
-  ctx.fillText(labelFoot("D"), rearFootX + 12, labelY);
-  ctx.fillText(labelFoot("C"), frontFootX, labelY);
-
-  // arbre moteur
-  ctx.fillStyle = "#bbbbbb";
-  ctx.fillRect(
-    cx + motorW / 2,
-    cy - shaftH / 2,
-    (gap / 2) - 8,
-    shaftH
-  );
-
-  // demi-accouplement moteur
-  ctx.fillStyle = "#cfcfcf";
-  ctx.fillRect(
-    cx + motorW / 2 + gap / 2 - 14,
-    cy - coupH / 2,
-    coupW,
-    coupH
-  );
-
-  // axe moteur
-  ctx.save();
-  ctx.strokeStyle = "rgba(255,255,255,0.95)";
-  ctx.setLineDash([5,4]);
-  ctx.lineWidth = 2.5;
+  // axes
+  ctx.strokeStyle="white";
+  ctx.setLineDash([5,5]);
 
   ctx.beginPath();
-  ctx.moveTo(cx - motorW / 2 - 90, cy);
-  ctx.lineTo(cx + motorW / 2 + gap / 2, cy);
+  ctx.moveTo(rearX-100, baseY+rearOffset);
+  ctx.lineTo(frontX,    baseY+frontOffset);
   ctx.stroke();
-  ctx.restore();
-
-  ctx.restore();
-
-  // axe pompe (fixe)
-  ctx.save();
-  ctx.strokeStyle = "rgba(255,255,255,0.95)";
-  ctx.setLineDash([5,6]);
-  ctx.lineWidth = 2;
 
   ctx.beginPath();
-  ctx.moveTo(cx + motorW / 2 + gap / 2, axisPumpY);
-  ctx.lineTo(cx + motorW / 2 + gap + pumpW + 100, axisPumpY);
+  ctx.moveTo(pumpX, baseY);
+  ctx.lineTo(pumpX+pumpW+100, baseY);
   ctx.stroke();
-  ctx.restore();
+  ctx.setLineDash([]);
 
-  // ====================================================
-  // TITRES
-  // ====================================================
-  ctx.fillStyle = "#fff";
-  ctx.font = "14px Arial";
-  ctx.textAlign = "center";
+  // flèches interprétation
+  if(Math.abs(C)>0){
+    drawArrow(ctx, rearX, baseY+rearOffset, rearX, baseY);
+    drawArrow(ctx, frontX, baseY+frontOffset, frontX, baseY);
+  }
 
-  ctx.fillText("MOTEUR (mobile)", cx, cy - motorH / 2 - 14);
-  ctx.fillText("POMPE (fixe)", pumpX + pumpW / 2, baseCy - pumpH / 2 - 14);
+  ctx.fillStyle="#fff";
+  ctx.textAlign="center";
+  ctx.fillText("MOTEUR (mobile)", baseX, baseY-motorH/2-18);
+  ctx.fillText("POMPE (fixe)", pumpX+pumpW/2, baseY-pumpH/2-18);
 }
+
+
+
 // ===== WRAPPERS PRINCIPAUX =====
 function drawTopView(){
   drawTopViewGeneric(topCtx);
