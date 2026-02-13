@@ -3211,108 +3211,47 @@ function drawTopViewGeneric(ctxTarget){
   const ctx = ctxTarget;
   clear(ctx, w, h);
 
-  // =========================
-  // DONNÉES CEMEQ
-  // =========================
-  const C = trainingMode ? trainState.angH : state.angH; // angularité
-  const E = trainingMode ? trainState.parH : state.parH; // parallélisme
+  const C = trainingMode ? trainState.angH : state.angH;
+  const E = trainingMode ? trainState.parH : state.parH;
   const D = geometry.couplingDiameter || 8;
 
-  const scale = 0.7;
-  const slope = (C / D) * 80; // amplification visuelle
+  const angle = (C / D) * 1.8;
 
-  // =========================
-  // POSITIONS FIXES
-  // =========================
   const baseY = h * 0.5;
   const baseX = w * 0.30;
 
   const { motorW, motorH, pumpW, pumpH, gap } = GEOM;
 
-  // pompe fixe
   const pumpX = baseX + motorW/2 + gap;
 
-  // positions AV / AR moteur
-  const rearX  = baseX - motorW/2;
-  const frontX = baseX + motorW/2;
+  const motorY = baseY - (E * 60);
 
-  // décalages CEMEQ
-  const rearOffset  = (E + (-motorW/2 * slope)) * scale;
-  const frontOffset = (E + ( motorW/2 * slope)) * scale;
+  const pivotX = baseX + motorW/2 + gap/2;
+  const pivotY = baseY;
 
-  // =========================
-  // SEMELLE
-  // =========================
+  // semelle
   ctx.fillStyle="#1a235a";
   ctx.fillRect(baseX-motorW/2-60, baseY-motorH/2-60,
                motorW+gap+pumpW+120, motorH+120);
 
-  // =========================
-  // POMPE
-  // =========================
+  // pompe
   ctx.fillStyle="#ff9800";
   ctx.fillRect(pumpX, baseY-pumpH/2, pumpW, pumpH);
 
-  // =========================
-  // MOTEUR (trapèze CEMEQ)
-  // =========================
+  // moteur rigide
+  ctx.save();
+  ctx.translate(pivotX, pivotY);
+  ctx.rotate(angle);
+  ctx.translate(-pivotX, -pivotY);
+
   ctx.fillStyle="#00a2ff";
-  ctx.beginPath();
-  ctx.moveTo(rearX,  baseY-motorH/2 + rearOffset);
-  ctx.lineTo(frontX, baseY-motorH/2 + frontOffset);
-  ctx.lineTo(frontX, baseY+motorH/2 + frontOffset);
-  ctx.lineTo(rearX,  baseY+motorH/2 + rearOffset);
-  ctx.closePath();
-  ctx.fill();
-  // =========================
-// PATTES MOTEUR (coins du trapèze)
-// =========================
+  ctx.fillRect(baseX-motorW/2, motorY-motorH/2, motorW, motorH);
 
-const footOffset = 14;
+  ctx.restore();
 
-// coordonnées coins trapèze
-const TL = { x: rearX,  y: baseY-motorH/2 + rearOffset };
-const TR = { x: frontX, y: baseY-motorH/2 + frontOffset };
-const BR = { x: frontX, y: baseY+motorH/2 + frontOffset };
-const BL = { x: rearX,  y: baseY+motorH/2 + rearOffset };
-
-// dessiner
-drawFoot(ctx, TL.x+footOffset, TL.y, labelFoot("A"));
-drawFoot(ctx, TR.x-footOffset, TR.y, labelFoot("B"));
-drawFoot(ctx, BR.x-footOffset, BR.y, labelFoot("C"));
-drawFoot(ctx, BL.x+footOffset, BL.y, labelFoot("D"));
-
-  // =========================
-  // AXES
-  // =========================
-  ctx.strokeStyle="white";
-  ctx.setLineDash([5,5]);
-
-  ctx.beginPath();
-  ctx.moveTo(rearX-100, baseY+rearOffset);
-  ctx.lineTo(frontX,    baseY+frontOffset);
-  ctx.stroke();
-
-  ctx.beginPath();
-  ctx.moveTo(pumpX, baseY);
-  ctx.lineTo(pumpX+pumpW+100, baseY);
-  ctx.stroke();
-  ctx.setLineDash([]);
-
-  // =========================
-  // FLÈCHES (INTERPRÉTATION)
-  // =========================
-  if(Math.abs(C)>0){
-    drawArrow(ctx, rearX, baseY+rearOffset, rearX, baseY);
-    drawArrow(ctx, frontX, baseY+frontOffset, frontX, baseY);
-  }
-
-  // =========================
-  // TITRES
-  // =========================
   ctx.fillStyle="#fff";
   ctx.textAlign="center";
-  ctx.fillText("MOTEUR (mobile)", baseX, baseY-motorH/2-18);
+  ctx.fillText("MOTEUR (mobile)", baseX, motorY-motorH/2-18);
   ctx.fillText("POMPE (fixe)", pumpX+pumpW/2, baseY-pumpH/2-18);
 }
 
@@ -3331,8 +3270,8 @@ function drawSideViewGeneric(ctxTarget){
   const E = trainingMode ? trainState.parV : state.parV;
   const D = geometry.couplingDiameter || 8;
 
-  const scale = 0.7;
-  const slope = (C / D) * 80;
+  // conversion angle réel
+  const angle = (C / D) * 1.8; // amplification visuelle raisonnable
 
   const baseY = h * 0.55;
   const baseX = w * 0.30;
@@ -3341,51 +3280,40 @@ function drawSideViewGeneric(ctxTarget){
 
   const pumpX = baseX + motorW/2 + gap;
 
-  const rearX  = baseX - motorW/2;
-  const frontX = baseX + motorW/2;
+  // translation parallélisme
+  const motorY = baseY - (E * 60);
 
-  const rearOffset  = -(E + (-motorW/2 * slope)) * scale;
-  const frontOffset = -(E + ( motorW/2 * slope)) * scale;
+  // pivot = centre accouplement (fixe)
+  const pivotX = baseX + motorW/2 + gap/2;
+  const pivotY = baseY;
 
-  // base
+  // BASE
   ctx.fillStyle="#1a235a";
   ctx.fillRect(baseX-motorW/2-60, baseY+motorH/2+10,
                motorW+gap+pumpW+120, 16);
 
-  // pompe
+  // POMPE
   ctx.fillStyle="#ff9800";
   ctx.fillRect(pumpX, baseY-pumpH/2, pumpW, pumpH);
 
-  // moteur trapèze
+  // ===== MOTEUR RIGIDE =====
+  ctx.save();
+
+  ctx.translate(pivotX, pivotY);
+  ctx.rotate(angle);
+  ctx.translate(-pivotX, -pivotY);
+
   ctx.fillStyle="#00a2ff";
-  ctx.beginPath();
-  ctx.moveTo(rearX,  baseY-motorH/2 + rearOffset);
-  ctx.lineTo(frontX, baseY-motorH/2 + frontOffset);
-  ctx.lineTo(frontX, baseY+motorH/2 + frontOffset);
-  ctx.lineTo(rearX,  baseY+motorH/2 + rearOffset);
-  ctx.closePath();
-  ctx.fill();
-  // =========================
-// PATTES (vue de profil)
-// =========================
+  ctx.fillRect(baseX-motorW/2, motorY-motorH/2, motorW, motorH);
 
-const footOffset = 14;
-
-const TL = { x: rearX,  y: baseY-motorH/2 + rearOffset };
-const TR = { x: frontX, y: baseY-motorH/2 + frontOffset };
-const BR = { x: frontX, y: baseY+motorH/2 + frontOffset };
-const BL = { x: rearX,  y: baseY+motorH/2 + rearOffset };
-
-drawFoot(ctx, BL.x+footOffset, BL.y, labelFoot("D"));
-drawFoot(ctx, BR.x-footOffset, BR.y, labelFoot("C"));
+  ctx.restore();
 
   // axes
   ctx.strokeStyle="white";
   ctx.setLineDash([5,5]);
-
   ctx.beginPath();
-  ctx.moveTo(rearX-100, baseY+rearOffset);
-  ctx.lineTo(frontX,    baseY+frontOffset);
+  ctx.moveTo(baseX-motorW/2-100, motorY);
+  ctx.lineTo(baseX+motorW/2, motorY);
   ctx.stroke();
 
   ctx.beginPath();
@@ -3394,20 +3322,11 @@ drawFoot(ctx, BR.x-footOffset, BR.y, labelFoot("C"));
   ctx.stroke();
   ctx.setLineDash([]);
 
-  // flèches interprétation
-  if(Math.abs(C)>0){
-    drawArrow(ctx, rearX, baseY+rearOffset, rearX, baseY);
-    drawArrow(ctx, frontX, baseY+frontOffset, frontX, baseY);
-  }
-
   ctx.fillStyle="#fff";
   ctx.textAlign="center";
-  ctx.fillText("MOTEUR (mobile)", baseX, baseY-motorH/2-18);
+  ctx.fillText("MOTEUR (mobile)", baseX, motorY-motorH/2-18);
   ctx.fillText("POMPE (fixe)", pumpX+pumpW/2, baseY-pumpH/2-18);
 }
-
-
-
 // ===== WRAPPERS PRINCIPAUX =====
 function drawTopView(){
   drawTopViewGeneric(topCtx);
