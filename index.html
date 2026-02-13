@@ -2335,12 +2335,20 @@ function isStepOK(stepIndex){
   if(id === "thermal") return true;
 
   // Validation finale → ici on vérifie la machine alignée
-  if(id === "verify"){
-    return ok(state.angV, state.angVTol) &&
-           ok(state.parV, state.parVTol) &&
-           ok(state.angH, state.angHTol) &&
-           ok(state.parH, state.parHTol);
-  }
+  // Validation finale → basée sur les cales réelles (méthode CEMEQ)
+if(id === "verify"){
+
+  const v = computeCemeqVertical();
+  const h = computeAngularShimsHorizontal();
+
+  const tolV = Math.max(state.angVTol, state.parVTol);
+  const tolH = Math.max(state.angHTol, state.parHTol);
+
+  return Math.abs(v.front) <= tolV &&
+         Math.abs(v.rear)  <= tolV &&
+         Math.abs(h.front) <= tolH &&
+         Math.abs(h.rear)  <= tolH;
+}
 
   return true;
 }
