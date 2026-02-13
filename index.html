@@ -1799,58 +1799,40 @@ function updateTraining(){
   const angDisplay = angRaw - (dialState.angular.zero || 0);
 
   // ===============================
-  // DESSIN DES CADRANS
+  // CADRANS
   // ===============================
   drawDial("dialParallel", parDisplay);
   drawDial("dialAngular",  angDisplay);
 
-  // ===============================
-  // TEXTE SOUS CADRANS
-  // ===============================
   const pv = document.getElementById("dialParallelValue");
   const av = document.getElementById("dialAngularValue");
-
   if(pv) pv.textContent = parDisplay.toFixed(2) + " mil";
   if(av) av.textContent = angDisplay.toFixed(2) + " mil";
 
   // ===============================
-  // DESSINS MÉCANIQUES
+  // 🔥 PARTIE MANQUANTE 🔥
+  // FORCER LE DESSIN MÉCANIQUE
   // ===============================
   forceResizeTrainingCanvases();
-  drawTrainingViews();
+
+  if(window.topCtxTest){
+    drawTopViewGeneric(window.topCtxTest);
+  }
+
+  if(window.sideCtxTest){
+    drawSideViewGeneric(window.sideCtxTest);
+  }
 
   // ===============================
-  // TEXTE PÉDAGOGIQUE
+  // TEXTE
   // ===============================
   const explain = document.getElementById("trainingExplain");
   if(explain){
     explain.innerHTML =
       `<b>Défaut actif :</b> ${activeDefect}<br>
-       Lecture brute : ${parDefect ? parRaw.toFixed(2) : angRaw.toFixed(2)} mil`;
+       Lecture brute : ${(parDefect?parRaw:angRaw).toFixed(2)} mil`;
   }
 }
-
-/* =====================================================
-   MAPPING PATTES (lettres ↔ coins)
-   Coins = TL (haut-gauche), TR (haut-droite),
-           BR (bas-droite), BL (bas-gauche)
-===================================================== */
-const FOOT_SCHEMES = {
-  standard: { name:"Standard (A HG, B HD, C BD, D BG)", TL:"A", TR:"B", BR:"C", BL:"D" },
-  invBottom:{ name:"A / B / D / C (inverse bas)",      TL:"A", TR:"B", BR:"D", BL:"C" },
-  rot180:   { name:"Rotation 180°",                    TL:"C", TR:"D", BR:"A", BL:"B" },
-  roles:    { name:"Par rôles (HA, HB, BA, BB)",       TL:"HA",TR:"HB",BR:"BB",BL:"BA" }
-};
-
-
-// mode actif
-let footSchemeKey = "standard";
-
-
-
-
-
-
 // retourne l'étiquette (texte) à afficher pour un coin
 function cornerLabel(corner){
   return FOOT_SCHEMES[footSchemeKey][corner];
