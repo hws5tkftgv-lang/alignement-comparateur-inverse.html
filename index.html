@@ -2425,24 +2425,41 @@ function buildCorrectionMessage(){
     return msg;
   }
 
-  // ---------- CORRECTION VERTICALE (CALCUL CEMEQ DIRECT) ----------
+  // ---------- CORRECTION VERTICALE (CEMEQ AVEC DÉTAIL) ----------
 if(stepId === "shimV"){
 
-  const r = computeCemeqVertical();
+  const C = Number(state.angV) || 0; // angularité
+  const E = Number(state.parV) || 0; // parallélisme
+  const D = Number(geometry.couplingDiameter) || 0;
+  const A = Number(geometry.A) || 0;
+  const B = Number(geometry.B) || 0;
 
-  let msg = "Correction verticale (méthode CEMEQ)\n\n";
+  if(D <= 0 || A <= 0 || B <= 0){
+    return "❌ Données géométriques invalides.";
+  }
 
-  msg += `Entrées mesurées :\n`;
-  msg += `Angularité (C) = ${state.angV.toFixed(2)} mil\n`;
-  msg += `Parallélisme (E) = ${state.parV.toFixed(2)} mil\n\n`;
+  const front = (A * C / D) + E;
+  const rear  = (B * C / D) + E;
 
-  msg += `Résultat :\n`;
-  msg += `Patte AVANT  : ${r.front.toFixed(2)} mil\n`;
-  msg += `Patte ARRIÈRE: ${r.rear.toFixed(2)} mil\n\n`;
+  let msg = "🧮 Calcul des cales verticales (méthode CEMEQ)\n\n";
 
-  msg += "Ces valeurs corrigent simultanément :\n";
-  msg += "• Angularité verticale\n";
-  msg += "• Parallélisme vertical\n";
+  msg += "Formules :\n";
+  msg += "Avant  = (A × C ÷ D) + E\n";
+  msg += "Arrière = (B × C ÷ D) + E\n\n";
+
+  msg += "Remplacement des valeurs :\n\n";
+
+  msg += `Avant  = (${A} × ${C} ÷ ${D}) + ${E}\n`;
+  msg += `       = ${(A*C/D).toFixed(3)} + ${E}\n`;
+  msg += `       = ${front.toFixed(2)} mil\n\n`;
+
+  msg += `Arrière = (${B} × ${C} ÷ ${D}) + ${E}\n`;
+  msg += `       = ${(B*C/D).toFixed(3)} + ${E}\n`;
+  msg += `       = ${rear.toFixed(2)} mil\n\n`;
+
+  msg += "Résultat final :\n";
+  msg += `Patte AVANT  : ${front.toFixed(2)} mil\n`;
+  msg += `Patte ARRIÈRE: ${rear.toFixed(2)} mil\n`;
 
   return msg;
 }
