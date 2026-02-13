@@ -3238,23 +3238,43 @@ function drawTopViewGeneric(ctxTarget){
   ctx.fillStyle="#ff9800";
   ctx.fillRect(pumpX, baseY-pumpH/2, pumpW, pumpH);
 
-  // moteur rigide
   ctx.save();
-  ctx.translate(pivotX, pivotY);
-  ctx.rotate(angle);
-  ctx.translate(-pivotX, -pivotY);
+ctx.translate(pivot.x, pivot.y);
+ctx.rotate(ang);
+ctx.translate(-pivot.x, -pivot.y);
 
-  ctx.fillStyle="#00a2ff";
-  ctx.fillRect(baseX-motorW/2, motorY-motorH/2, motorW, motorH);
+// moteur
+ctx.fillStyle = "#00a2ff";
+ctx.fillRect(motorCx - motorW/2, motorCy - motorH/2, motorW, motorH);
 
-  ctx.restore();
+// pattes
+drawPad("A"); drawPad("B"); drawPad("C"); drawPad("D");
 
-  ctx.fillStyle="#fff";
-  ctx.textAlign="center";
-  ctx.fillText("MOTEUR (mobile)", baseX, motorY-motorH/2-18);
-  ctx.fillText("POMPE (fixe)", pumpX+pumpW/2, baseY-pumpH/2-18);
-}
+// arbre moteur
+ctx.fillStyle = "#bbbbbb";
+ctx.fillRect(
+  motorCx + motorW/2,
+  motorCy - shaftH/2,
+  (gap/2) - 8,
+  shaftH
+);
 
+// demi accouplement
+ctx.fillStyle = "#cfcfcf";
+ctx.fillRect(coupX - 14, motorCy - coupH/2, coupW, coupH);
+
+// ligne d’axe moteur
+ctx.save();
+ctx.strokeStyle = "rgba(255,255,255,0.95)";
+ctx.setLineDash([6,5]);
+ctx.lineWidth = 2.5;
+ctx.beginPath();
+ctx.moveTo(motorCx - motorW/2 - 90, motorCy);
+ctx.lineTo(motorCx + motorW/2 + gap/2, motorCy);
+ctx.stroke();
+ctx.restore();
+
+ctx.restore();
 function drawSideViewGeneric(ctxTarget){
 
   currentView = "side";
@@ -3296,37 +3316,57 @@ function drawSideViewGeneric(ctxTarget){
   ctx.fillStyle="#ff9800";
   ctx.fillRect(pumpX, baseY-pumpH/2, pumpW, pumpH);
 
-  // ===== MOTEUR RIGIDE =====
-  ctx.save();
+  // ===============================
+// BLOC RIGIDE MOTEUR (PHYSIQUE)
+// ===============================
+const pivotX = cx + motorW/2 + gap/2; // centre accouplement
+const pivotY = cy;
 
-  ctx.translate(pivotX, pivotY);
-  ctx.rotate(angle);
-  ctx.translate(-pivotX, -pivotY);
+ctx.save();
+ctx.translate(pivotX, pivotY);
+ctx.rotate(ang);
+ctx.translate(-pivotX, -pivotY);
 
-  ctx.fillStyle="#00a2ff";
-  ctx.fillRect(baseX-motorW/2, motorY-motorH/2, motorW, motorH);
+// ---- CARCASSE ----
+ctx.fillStyle = "#00a2ff";
+ctx.fillRect(cx - motorW/2, cy - motorH/2, motorW, motorH);
 
-  ctx.restore();
+// ---- PATTES ----
+ctx.fillStyle = "#1b6ea8";
+ctx.fillRect(rearFootX - footW/2,  cy + motorH/2 - 2, footW, footH);
+ctx.fillRect(frontFootX - footW/2, cy + motorH/2 - 2, footW, footH);
 
-  // axes
-  ctx.strokeStyle="white";
-  ctx.setLineDash([5,5]);
-  ctx.beginPath();
-  ctx.moveTo(baseX-motorW/2-100, motorY);
-  ctx.lineTo(baseX+motorW/2, motorY);
-  ctx.stroke();
+// ---- ARBRE MOTEUR ----
+ctx.fillStyle = "#bbbbbb";
+ctx.fillRect(
+  cx + motorW/2,
+  cy - shaftH/2,
+  (gap/2) - 8,
+  shaftH
+);
 
-  ctx.beginPath();
-  ctx.moveTo(pumpX, baseY);
-  ctx.lineTo(pumpX+pumpW+100, baseY);
-  ctx.stroke();
-  ctx.setLineDash([]);
+// ---- DEMI ACCOUPLEMENT ----
+ctx.fillStyle = "#cfcfcf";
+ctx.fillRect(
+  cx + motorW/2 + gap/2 - 14,
+  cy - coupH/2,
+  coupW,
+  coupH
+);
 
-  ctx.fillStyle="#fff";
-  ctx.textAlign="center";
-  ctx.fillText("MOTEUR (mobile)", baseX, motorY-motorH/2-18);
-  ctx.fillText("POMPE (fixe)", pumpX+pumpW/2, baseY-pumpH/2-18);
-}
+// ---- AXE MOTEUR (IMPORTANT PEDAGO) ----
+ctx.save();
+ctx.strokeStyle = "rgba(255,255,255,0.95)";
+ctx.setLineDash([6,5]);
+ctx.lineWidth = 2.5;
+
+ctx.beginPath();
+ctx.moveTo(cx - motorW/2 - 100, cy);
+ctx.lineTo(cx + motorW/2 + gap/2, cy);
+ctx.stroke();
+ctx.restore();
+
+ctx.restore();
 // ===== WRAPPERS PRINCIPAUX =====
 function drawTopView(){
   drawTopViewGeneric(topCtx);
