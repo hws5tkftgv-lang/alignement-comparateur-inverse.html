@@ -2425,50 +2425,27 @@ function buildCorrectionMessage(){
     return msg;
   }
 
-  // ---------- CORRECTION VERTICALE FINALE (CEMEQ) ----------
-if(stepId === "angV" || stepId === "parV"){
+  // ---------- CORRECTION VERTICALE (CALCUL CEMEQ DIRECT) ----------
+if(stepId === "shimV"){
 
   const r = computeCemeqVertical();
 
-  if(Math.abs(state.angV) <= state.angVTol && Math.abs(state.parV) <= state.parVTol){
-    return "✔️ Alignement vertical conforme.";
-  }
+  let msg = "Correction verticale (méthode CEMEQ)\n\n";
 
-  let msg = "🧮 Correction verticale (méthode CEMEQ)\n\n";
+  msg += `Entrées mesurées :\n`;
+  msg += `Angularité (C) = ${state.angV.toFixed(2)} mil\n`;
+  msg += `Parallélisme (E) = ${state.parV.toFixed(2)} mil\n\n`;
 
-  msg += `Patte AVANT  = ${r.front.toFixed(2)} mil\n`;
-  msg += `Patte ARRIÈRE = ${r.rear.toFixed(2)} mil\n\n`;
+  msg += `Résultat :\n`;
+  msg += `Patte AVANT  : ${r.front.toFixed(2)} mil\n`;
+  msg += `Patte ARRIÈRE: ${r.rear.toFixed(2)} mil\n\n`;
 
-  msg += "Ces cales corrigent simultanément :\n";
-  msg += "✔ Angularité verticale\n";
-  msg += "✔ Parallélisme vertical\n";
+  msg += "Ces valeurs corrigent simultanément :\n";
+  msg += "• Angularité verticale\n";
+  msg += "• Parallélisme vertical\n";
 
   return msg;
 }
-  // ---------- PARALLÉLISME VERTICAL ----------
-  if(stepId === "parV"){
-    if(ok(state.parV, state.parVTol)){
-      return "✔️ Parallélisme vertical conforme.";
-    }
-
-    const v = state.parV;
-    const realMove = Math.abs(v) / 2;
-
-    let msg = "⬆️ Parallélisme vertical\n\n";
-    msg += "Décalage vertical parallèle\n";
-msg += "Correction réelle = lecture ÷ 2\n\n";
-
-if(v > 0){
-  msg += "Le moteur doit monter\n";
-  msg += `Ajouter ${realMove.toFixed(2)} mil sous toutes les pattes`;
-}else{
-  msg += "Le moteur doit descendre\n";
-  msg += `Retirer ${realMove.toFixed(2)} mil sous toutes les pattes`;
-}
-
-    return msg;
-  }
-
   // ---------- ANGULARITÉ HORIZONTALE ----------
   if(stepId === "angH"){
     if(ok(state.angH, state.angHTol)){
