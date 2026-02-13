@@ -2281,41 +2281,32 @@ function isStepOK(stepIndex){
 
   const id = STEPS[stepIndex].id;
 
-  // Mesures géométriques obligatoires
-  if(id === "measures"){
-    return geometry.couplingDiameter > 0 &&
-           geometry.A > 0 &&
-           geometry.B > 0;
+  // ---------------------------
+  // 1) Pied boiteux obligatoire
+  // ---------------------------
+  if(id !== "softfoot"){
+    const sf = computeSoftFoot();
+    if(sf.delta > state.softFootTol){
+      return false;
+    }
   }
 
-  // Pied boiteux doit être corrigé avant de continuer
-  if(id === "softfoot"){
-    return computeSoftFoot().delta <= state.softFootTol;
+  // ---------------------------
+  // 2) Géométrie obligatoire
+  // ---------------------------
+  if(id !== "softfoot" && id !== "measures"){
+    if(
+      geometry.couplingDiameter <= 0 ||
+      geometry.A <= 0 ||
+      geometry.B <= 0
+    ){
+      return false;
+    }
   }
 
-  // Lectures verticales → toujours OK (on lit simplement)
-  if(id === "readV") return true;
-
-  // Correction verticale → toujours OK (le calcul corrige)
-  if(id === "shimV") return true;
-
-  // Lectures horizontales → toujours OK
-  if(id === "readH") return true;
-
-  // Correction horizontale → toujours OK
-  if(id === "shimH") return true;
-
-  // Thermique
-  if(id === "thermal") return true;
-
-  // Validation finale → ici on vérifie la machine alignée
-  // Validation finale → basée sur les cales réelles (méthode CEMEQ)
-if(id === "verify"){
+  // Aucune autre étape ne bloque
   return true;
 }
-return true;
-}
-
 /* =====================================================
    MESSAGE TEXTE (ZONE INFO)
 ===================================================== */
@@ -2358,6 +2349,7 @@ const ui = {
 ===================================================== */
 
 function buildCorrectionMessage(){
+
   const stepId = STEPS[state.step].id;
 
   // ---------- PIED BOITEUX ----------
@@ -2385,99 +2377,94 @@ function buildCorrectionMessage(){
     return msg;
   }
 
-  // ---------- CORRECTION VERTICALE (CEMEQ AVEC DÉTAIL) ----------
-if(stepId === "shimV"){
+  // =====================================================
+  // CORRECTION VERTICALE — MÉTHODE CEMEQ
+  // =====================================================
+  if(stepId === "shimV"){
 
-  const C = Number(state.angV) || 0; // angularité
-  const E = Number(state.parV) || 0; // parallélisme
-  const D = Number(geometry.couplingDiameter) || 0;
-  const A = Number(geometry.A) || 0;
-  const B = Number(geometry.B) || 0;
+    // CEMEQ = valeurs en pouces
+    const C = Number(state.angV) || 0; // angularité (po)
+    const E = Number(state.parV) || 0; // parallèle (po)
+    const D = Number(geometry.couplingDiameter) || 0;
+    const A = Number(geometry.A) || 0;
+    const B = Number(geometry.B) || 0;
 
-  if(D <= 0 || A <= 0 || B <= 0){
-    return "❌ Données géométriques invalides.";
+    if(D <= 0 || A <= 0 || B <= 0){
+      return "❌ Données géométriques invalides.";
+    }
+
+    // calcul pouces
+    const front_in = (A * C / D) + E;
+    const rear_in  = (B * C / D) + E;
+
+    // conversion mils
+    const front = front_in * 1000;
+    const rear  = rear_in  * 1000;
+
+    let msg = "🧮 Correction verticale — Méthode CEMEQ\n\n";
+
+    msg += "Formules :\n";
+    msg += "Pavant  = (A × C ÷ D) + E\n";
+    msg += "Parrière = (B × C ÷ D) + E\n\n";
+
+    msg += "Remplacement :\n\n";
+
+    msg += `Avant  = (${A} × ${C} ÷ ${D}) + ${E}\n`;
+    msg += `       = ${(A*C/D).toFixed(3)} + ${E}\n`;
+    msg += `       = ${front_in.toFixed(3)} po\n`;
+    msg += `       = ${front.toFixed(2)} mil\n\n`;
+
+    msg += `Arrière = (${B} × ${C} ÷ ${D}) + ${E}\n`;
+    msg += `       = ${(B*C/D).toFixed(3)} + ${E}\n`;
+    msg += `       = ${rear_in.toFixed(3)} po\n`;
+    msg += `       = ${rear.toFixed(2)} mil\n\n`;
+
+    msg += "➡️ Une seule correction corrige :\n";
+    msg += "• Angularité verticale\n";
+    msg += "• Parallélisme vertical\n\n";
+
+    msg += `Patte AVANT  : ${front.toFixed(2)} mil\n`;
+    msg += `Patte ARRIÈRE: ${rear.toFixed(2)} mil`;
+
+    return msg;
   }
 
-  const front = (A * C / D) + E;
-  const rear  = (B * C / D) + E;
+  // =====================================================
+  // CORRECTION HORIZONTALE — MÉTHODE CEMEQ
+  // =====================================================
+  if(stepId === "shimH"){
 
-  let msg = "🧮 Calcul des cales verticales (méthode CEMEQ)\n\n";
+    const C = Number(state.angH) || 0; // pouces
+    const E = Number(state.parH) || 0;
+    const D = Number(geometry.couplingDiameter) || 0;
+    const A = Number(geometry.A) || 0;
+    const B = Number(geometry.B) || 0;
 
-  msg += "Formules :\n";
-  msg += "Avant  = (A × C ÷ D) + E\n";
-  msg += "Arrière = (B × C ÷ D) + E\n\n";
+    if(D <= 0 || A <= 0 || B <= 0){
+      return "❌ Données géométriques invalides.";
+    }
 
-  msg += "Remplacement des valeurs :\n\n";
+    const front_in = (A * C / D) + E;
+    const rear_in  = (B * C / D) + E;
 
-  msg += `Avant  = (${A} × ${C} ÷ ${D}) + ${E}\n`;
-  msg += `       = ${(A*C/D).toFixed(3)} + ${E}\n`;
-  msg += `       = ${front.toFixed(2)} mil\n\n`;
+    const front = front_in * 1000;
+    const rear  = rear_in  * 1000;
 
-  msg += `Arrière = (${B} × ${C} ÷ ${D}) + ${E}\n`;
-  msg += `       = ${(B*C/D).toFixed(3)} + ${E}\n`;
-  msg += `       = ${rear.toFixed(2)} mil\n\n`;
+    let msg = "🧮 Correction horizontale — Méthode CEMEQ\n\n";
 
-  msg += "Résultat final :\n";
-  msg += `Patte AVANT  : ${front.toFixed(2)} mil\n`;
-  msg += `Patte ARRIÈRE: ${rear.toFixed(2)} mil\n`;
+    msg += `Patte AVANT  : ${front.toFixed(2)} mil\n`;
+    msg += `Patte ARRIÈRE: ${rear.toFixed(2)} mil\n\n`;
 
-  return msg;
-}
+    msg += "➡️ Corrige simultanément : angularité + parallélisme horizontal";
 
-// ---------- CORRECTION HORIZONTALE (CEMEQ AVEC DÉTAIL) ----------
-if(stepId === "shimH"){
-
-  const C = Number(state.angH) || 0;
-  const E = Number(state.parH) || 0;
-  const D = Number(geometry.couplingDiameter) || 0;
-  const A = Number(geometry.A) || 0;
-  const B = Number(geometry.B) || 0;
-
-  if(D <= 0 || A <= 0 || B <= 0){
-    return "❌ Données géométriques invalides.";
+    return msg;
   }
-
-  const front = (A * C / D) + E;
-  const rear  = (B * C / D) + E;
-
-  let msg = "🧮 Calcul déplacement horizontal (méthode CEMEQ)\n\n";
-
-  msg += "Formules :\n";
-  msg += "Avant  = (A × C ÷ D) + E\n";
-  msg += "Arrière = (B × C ÷ D) + E\n\n";
-
-  msg += "Remplacement des valeurs :\n\n";
-
-  msg += `Avant  = (${A} × ${C} ÷ ${D}) + ${E}\n`;
-  msg += `       = ${(A*C/D).toFixed(3)} + ${E}\n`;
-  msg += `       = ${front.toFixed(2)} mil\n\n`;
-
-  msg += `Arrière = (${B} × ${C} ÷ ${D}) + ${E}\n`;
-  msg += `       = ${(B*C/D).toFixed(3)} + ${E}\n`;
-  msg += `       = ${rear.toFixed(2)} mil\n\n`;
-
-  msg += "Déplacement moteur :\n";
-
-  if(front > 0 && rear > 0)
-    msg += "👉 Déplacer le moteur vers la GAUCHE\n";
-
-  if(front < 0 && rear < 0)
-    msg += "👉 Déplacer le moteur vers la DROITE\n";
-
-  msg += `\nPatte AVANT  : ${front.toFixed(2)} mil`;
-  msg += `\nPatte ARRIÈRE: ${rear.toFixed(2)} mil`;
-
-  return msg;
-}
-
- 
 
   // ---------- DILATATION ----------
   if(stepId === "thermal"){
     return buildThermalStep();
   }
 
-  // défaut
   return "";
 }
 /* =====================================================
@@ -2487,30 +2474,7 @@ function renderInputsForCurrentStep(){
   const id = STEPS[state.step].id;
   updateNote(id);
 
-  // IMPORTANT: valeurs par défaut = 0, tolérances ≠ 0
-  if(id === "runout"){
-    ui.inputsArea.innerHTML = `
-      <div class="row">
-        <div>
-          <label>Voilage (mils)</label>
-          <input id="in_runout" type="number" step="0.1" value="${state.runout}">
-        </div>
-        <div>
-          <label>Tolérance (mils)</label>
-          <input id="in_runoutTol" type="number" step="0.1" value="${state.runoutTol}">
-        </div>
-      </div>
-    `;
-    wireInputs([
-      ["in_runout", v => state.runout = v],
-      ["in_runoutTol", v => state.runoutTol = Math.max(0, v)],
-    ]);
-    return;
-  }
-
-
-
-
+  
   if(id === "softfoot"){
     ui.inputsArea.innerHTML = `
     
@@ -2633,19 +2597,23 @@ if(id === "readV"){
   ui.inputsArea.innerHTML = `
     <div class="row">
       <div>
-        <label>Angularité verticale (C) 12-6 (mils)</label>
+        <label>Lecture cadran vertical 12-6 — Angularité C (mils)</label>
         <input id="in_angV" type="number" step="0.1" value="${state.angV}">
       </div>
       <div>
-        <label>Parallélisme vertical (E) 12-6 (mils)</label>
+        <label>Lecture cadran vertical 12-6 — Parallélisme E (mils)</label>
         <input id="in_parV" type="number" step="0.1" value="${state.parV}">
       </div>
+    </div>
+    <div class="noteBox">
+      Les lectures cadran sont en mils.  
+      L’application les convertit automatiquement en pouces pour le calcul CEMEQ.
     </div>
   `;
 
   wireInputs([
-    ["in_angV", v => state.angV = v],
-    ["in_parV", v => state.parV = v]
+    ["in_angV", v => state.angV = v/1000], // conversion mil → pouces
+    ["in_parV", v => state.parV = v/1000]
   ]);
   return;
 }
@@ -2655,38 +2623,40 @@ if(id === "shimV"){
 
   ui.inputsArea.innerHTML = `
     <div class="noteBox">
-      Ajouter les cales suivantes :
+      Épaisseur de correction calculée :
       <br><br>
-      <b>AVANT :</b> ${r.front.toFixed(2)} mil
+      <b>Patte AVANT :</b> ${r.front.toFixed(2)} mil
       <br>
-      <b>ARRIÈRE :</b> ${r.rear.toFixed(2)} mil
+      <b>Patte ARRIÈRE :</b> ${r.rear.toFixed(2)} mil
       <br><br>
-      Cette correction règle simultanément
-      l’angularité ET le parallélisme vertical.
+      Une seule correction corrige simultanément :
+      <br>• l’angularité verticale
+      <br>• le parallélisme vertical
     </div>
   `;
   return;
 }
-
-  
   // ===== LECTURES HORIZONTALES =====
 if(id === "readH"){
   ui.inputsArea.innerHTML = `
     <div class="row">
       <div>
-        <label>Angularité horizontale (C) 3-9 (mils)</label>
-        <input id="in_angH" type="number" step="0.1" value="${state.angH}">
+        <label>Lecture cadran horizontal 3-9 — Angularité C (mils)</label>
+        <input id="in_angH" type="number" step="0.1" value="${state.angH*1000}">
       </div>
       <div>
-        <label>Parallélisme horizontal (E) 3-9 (mils)</label>
-        <input id="in_parH" type="number" step="0.1" value="${state.parH}">
+        <label>Lecture cadran horizontal 3-9 — Parallélisme E (mils)</label>
+        <input id="in_parH" type="number" step="0.1" value="${state.parH*1000}">
       </div>
+    </div>
+    <div class="noteBox">
+      Conversion automatique mils → pouces pour calcul CEMEQ
     </div>
   `;
 
   wireInputs([
-    ["in_angH", v => state.angH = v],
-    ["in_parH", v => state.parH = v]
+    ["in_angH", v => state.angH = v/1000],
+    ["in_parH", v => state.parH = v/1000]
   ]);
   return;
 }
