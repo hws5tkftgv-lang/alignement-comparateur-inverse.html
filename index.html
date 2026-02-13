@@ -1033,49 +1033,59 @@ function formatCoefficient(coef){
 function buildHelpHTML(){
   return `
 
-<h3><b>Conventions importantes</b></h3>
+<h3><b>Principe du comparateur inversé</b></h3>
 
 <div class="box">
-<b>Comparateur inversé</b><br>
-Le cadran ne mesure PAS un défaut précis.<br>
+<b>Ce que mesure réellement le cadran</b><br>
+Le comparateur ne mesure PAS un défaut précis.<br>
 Il mesure la différence de position entre l’arbre mobile (moteur) et l’arbre fixe (pompe).<br><br>
-On ne corrige donc jamais la lecture directement :<br>
-on calcule des cales.
+
+Donc :<br>
+❌ On ne corrige jamais directement la lecture<br>
+✔ On calcule des cales à partir de la lecture
 </div>
 
 
 <div class="box">
-<b>Méthode CEMEQ — principe</b><br>
-Une seule correction corrige en même temps :
+<b>Important — unités</b><br>
+Le cadran donne une lecture en <b>mils</b> (0.001 po).<br>
+La formule CEMEQ travaille en <b>pouces</b>.<br><br>
+
+L’application convertit automatiquement :
+<br>
+mils → pouces → calcul → résultat en mils
+</div>
+
+
+
+<h3><b>Méthode CEMEQ</b></h3>
+
+<div class="box">
+Une seule correction corrige simultanément :
 <ul>
 <li>l’angularité</li>
 <li>le parallélisme</li>
 </ul>
 
-Formules :
+Formules utilisées :
 
-P_avant  = (A × C ÷ D) + E<br>
-P_arrière = (B × C ÷ D) + E
+<br><br>
+P<sub>avant</sub>  = (A × C ÷ D) + E<br>
+P<sub>arrière</sub> = (B × C ÷ D) + E<br><br>
+
+Résultat : épaisseur de cales sous les pattes AVANT et ARRIÈRE
 </div>
 
 
 <div class="box">
 <b>Interprétation</b><br>
-Les valeurs Avant et Arrière donnent directement l’épaisseur de cale.<br>
-Le signe indique simplement quelle extrémité est trop haute ou trop basse.
+Les valeurs Avant et Arrière sont des épaisseurs de correction.<br>
+Le signe indique seulement quel côté est trop haut ou trop bas.
 </div>
 
 
 
-<h3><b>Étape 1 — Voilage (Runout)</b></h3>
-<div class="box">
-Vérifier que l’arbre tourne rond.<br>
-La valeur mesurée doit être plus petite que la tolérance.
-</div>
-
-
-
-<h3><b>Étape 2 — Pied boiteux (Soft Foot)</b></h3>
+<h3><b>Étape 1 — Pied boiteux (Soft Foot)</b></h3>
 <div class="box">
 Méthode des diagonales :<br><br>
 
@@ -1084,14 +1094,15 @@ Diag 2 = B + D<br><br>
 
 Δ = plus grande − plus petite<br><br>
 
-Si Δ ≤ 3 mil → OK<br>
-Si Δ > 3 mil → correction ≈ 0.8 × Δ<br>
-On corrige les deux pattes de la diagonale la plus haute
+Si Δ ≤ 3 mil → acceptable<br>
+Si Δ > 3 mil → correction ≈ 0.8 × Δ<br><br>
+
+Toujours corriger les deux pattes de la diagonale la plus haute
 </div>
 
 
 
-<h3><b>Étape 3 — Mesures géométriques</b></h3>
+<h3><b>Étape 2 — Mesures géométriques</b></h3>
 <div class="box">
 D = diamètre de l’accouplement (po)<br>
 A = centre accouplement → pattes avant (po)<br>
@@ -1100,39 +1111,40 @@ B = centre accouplement → pattes arrière (po)
 
 
 
-<h3><b>Étape 4 — Correction verticale (12–6)</b></h3>
+<h3><b>Étape 3 — Correction verticale (12–6)</b></h3>
 <div class="box">
-Lecture verticale = C<br>
-Décalage vertical = E<br><br>
+Lecture cadran → Angularité = C<br>
+Lecture cadran → Parallélisme = E<br><br>
 
-Calcul :
+Calcul des cales :
 
-P_avant  = (A × C ÷ D) + E<br>
-P_arrière = (B × C ÷ D) + E<br><br>
+<br>
+P<sub>avant</sub>  = (A × C ÷ D) + E<br>
+P<sub>arrière</sub> = (B × C ÷ D) + E<br><br>
 
-Cette correction aligne complètement le moteur verticalement.
+Cette seule correction aligne complètement le moteur verticalement
 </div>
 
 
 
-<h3><b>Étape 5 — Correction horizontale (3–9)</b></h3>
+<h3><b>Étape 4 — Correction horizontale (3–9)</b></h3>
 <div class="box">
-Même principe que vertical.<br>
-On utilise la lecture horizontale dans la même formule.<br><br>
+Même formule que vertical<br>
+Seules les lectures changent<br><br>
 
-P_avant  = (A × C ÷ D) + E<br>
-P_arrière = (B × C ÷ D) + E<br><br>
+P<sub>avant</sub>  = (A × C ÷ D) + E<br>
+P<sub>arrière</sub> = (B × C ÷ D) + E<br><br>
 
-On déplace ensuite le moteur latéralement.
+On applique ensuite un déplacement latéral du moteur
 </div>
 
 
 
-<h3><b>Étape 6 — Dilatation thermique</b></h3>
+<h3><b>Étape 5 — Dilatation thermique</b></h3>
 
 <div class="box">
-Quand la machine chauffe, elle grandit en hauteur.<br>
-Le moteur et la pompe ne montent pas pareil.<br>
+Quand la machine fonctionne, elle chauffe et grandit en hauteur.<br>
+Le moteur et la pompe ne montent pas de la même façon.<br>
 On doit donc prévoir la position à chaud.
 </div>
 
@@ -1151,19 +1163,16 @@ aluminium : 0.0000124
 </div>
 
 <div class="box">
-La dilatation thermique :<br>
+La dilatation thermique :
 <ul>
 <li>se calcule après l’alignement</li>
-<li>ne change pas la lecture du cadran</li>
-<li>sert seulement à anticiper la position à chaud</li>
+<li>ne change pas les lectures au cadran</li>
+<li>sert uniquement à anticiper la position à chaud</li>
 </ul>
 </div>
 
 `;
 }
-
-
-
 // 2) ouvrir/fermer/imprimer
 function openHelp(){
   const modal = document.getElementById("helpModal");
@@ -2993,36 +3002,62 @@ function isBlinking(){
   return blinkPhase ? "#ff5252" : "#000";
 }
 function footColor(letter){
-  const step = STEPS[state.step].id;
-  const bad = !isStepOK(state.step);
 
-  if(step === "softfoot" && currentView === "side"){
+  const step = STEPS[state.step].id;
+
+  // ================= SOFT FOOT =================
+  if(step === "softfoot"){
+    const sf = computeSoftFoot();
+
+    if(sf.delta > state.softFootTol && sf.faulty?.includes(letter)){
+      return isBlinking();
+    }
+
     return FOOT_NORMAL;
   }
 
-  if(step === "softfoot"){
-    const sf = computeSoftFoot();
-    if(bad && sf.faulty && sf.faulty.includes(letter)){
+
+  // ================= CORRECTION VERTICALE (CEMEQ) =================
+  if(step === "shimV"){
+
+    const r = computeCemeqVertical();
+
+    // AVANT = pattes A et B
+    if(r.front > 0 && (letter === "A" || letter === "B"))
       return isBlinking();
-    }
+
+    if(r.front < 0 && (letter === "A" || letter === "B"))
+      return isBlinking();
+
+    // ARRIÈRE = pattes C et D
+    if(r.rear > 0 && (letter === "C" || letter === "D"))
+      return isBlinking();
+
+    if(r.rear < 0 && (letter === "C" || letter === "D"))
+      return isBlinking();
+
+    return FOOT_NORMAL;
   }
 
-  if(step === "angV"){
-    const r = computeAngularVertical();
-    if(bad && r && r.pair.includes(letter)){
-      return isBlinking();
-    }
-  }
 
-  if(step === "parV" && bad){
-    return isBlinking();
-  }
+  // ================= CORRECTION HORIZONTALE (CEMEQ) =================
+  if(step === "shimH"){
 
-  if(step === "angH"){
-    const r = computeAngularHorizontal();
-    if(bad && r && r.pair.includes(letter)){
-      return isBlinking();
+    const r = computeCemeqHorizontal();
+
+    // moteur vers gauche → pousser côté droit
+    if(r.front > 0 && r.rear > 0){
+      if(letter === "B" || letter === "D")
+        return isBlinking();
     }
+
+    // moteur vers droite → pousser côté gauche
+    if(r.front < 0 && r.rear < 0){
+      if(letter === "A" || letter === "C")
+        return isBlinking();
+    }
+
+    return FOOT_NORMAL;
   }
 
   return FOOT_NORMAL;
