@@ -2357,11 +2357,7 @@ function buildMessage(){
   const step = STEPS[state.step];
   let txt = `Étape ${step.label}\n\n`;
 
-  if(!isStepOK(state.step)){
-    txt += "⚠️ Hors tolérance\n\n";
-  }else{
-    txt += "✅ Dans la tolérance\n\n";
-  }
+  txt += "Calcul pédagogique — méthode CEMEQ\n\n";
 
   if(step.id === "softfoot"){
     const sf = computeSoftFoot();
@@ -2918,11 +2914,8 @@ function wireInputs(pairs){
 function refreshUI(){
   ui.stepTitle.textContent = `Étape ${STEPS[state.step].label}`;
 
-  const okNow = isStepOK(state.step);
-  ui.stepBadge.textContent = okNow ? "OK" : "NOT OK";
-  ui.stepBadge.classList.toggle("ok", okNow);
-  ui.stepBadge.classList.toggle("bad", !okNow);
-
+  ui.stepBadge.textContent = "Calcul";
+ui.stepBadge.classList.remove("ok","bad");
   renderInputsForCurrentStep();
 
   ui.infoBox.textContent =
@@ -2955,10 +2948,10 @@ function nextStep(){
     }
   }
 
-  if(isStepOK(state.step) && state.step < STEPS.length - 1){
-    state.step++;
-    renderAll();
-  }
+  if(state.step < STEPS.length - 1){
+  state.step++;
+  renderAll();
+}
 }
 
 function prevStep(){
