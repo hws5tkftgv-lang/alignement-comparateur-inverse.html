@@ -3200,173 +3200,138 @@ function blinkColor(col){
   return t ? "#ff5252" : col;
 }
 
-function drawTopViewGeneric(ctxTarget){
+function drawTopViewGeneric(ctx){
 
-  currentView = "top";
+  currentView="top";
 
-  const canvas = ctxTarget.canvas;
-  const { w, h } = resizeCanvas(canvas, ctxTarget);
-  if(w < 10 || h < 10) return;
+  const { w,h } = resizeCanvas(ctx.canvas, ctx);
+  clear(ctx,w,h);
 
-  const ctx = ctxTarget;
-  clear(ctx, w, h);
+  const motorW=200, motorH=80;
+  const pumpW=130, pumpH=80;
+  const gap=90;
+  const shaft=12;
 
-  const C = trainingMode ? trainState.angH : state.angH;
-  const E = trainingMode ? trainState.parH : state.parH;
-  const D = geometry.couplingDiameter || 8;
+  const baseY=h*0.5;
+  const motorX=w*0.30;
+  const pumpX=motorX+motorW+gap;
 
-  const angle = (C / D) * 1.8;
+  const ang=(trainingMode?trainState.angH:state.angH)*2;
+  const par=(trainingMode?trainState.parH:state.parH)*60;
 
-  const baseY = h * 0.5;
-  const baseX = w * 0.30;
+  const pivotX=motorX+motorW+gap/2;
+  const pivotY=baseY;
 
-  const { motorW, motorH, pumpW, pumpH, gap } = GEOM;
-
-  const pumpX = baseX + motorW/2 + gap;
-
-  const motorY = baseY - (E * 60);
-
-  const pivotX = baseX + motorW/2 + gap/2;
-  const pivotY = baseY;
-
-  // semelle
+  // base
   ctx.fillStyle="#1a235a";
-  ctx.fillRect(baseX-motorW/2-60, baseY-motorH/2-60,
-               motorW+gap+pumpW+120, motorH+120);
+  ctx.fillRect(motorX-120,baseY-120,motorW+gap+pumpW+240,240);
 
   // pompe
   ctx.fillStyle="#ff9800";
-  ctx.fillRect(pumpX, baseY-pumpH/2, pumpW, pumpH);
+  ctx.fillRect(pumpX,baseY-pumpH/2,pumpW,pumpH);
 
+  // arbre pompe
+  ctx.fillStyle="#bbb";
+  ctx.fillRect(pumpX-shaft,baseY-6,shaft,12);
+
+  // demi accouplement pompe
+  ctx.fillStyle="#ddd";
+  ctx.fillRect(pivotX+4,baseY-22,12,44);
+
+  // moteur (bloc rigide)
   ctx.save();
-ctx.translate(pivot.x, pivot.y);
-ctx.rotate(ang);
-ctx.translate(-pivot.x, -pivot.y);
+  ctx.translate(pivotX,pivotY);
+  ctx.rotate(ang*Math.PI/180);
+  ctx.translate(-pivotX,-pivotY+par);
 
-// moteur
-ctx.fillStyle = "#00a2ff";
-ctx.fillRect(motorCx - motorW/2, motorCy - motorH/2, motorW, motorH);
+  ctx.fillStyle="#00a2ff";
+  ctx.fillRect(motorX,baseY-motorH/2,motorW,motorH);
 
-// pattes
-drawPad("A"); drawPad("B"); drawPad("C"); drawPad("D");
+  // arbre moteur
+  ctx.fillStyle="#bbb";
+  ctx.fillRect(motorX+motorW,baseY-6,gap/2-8,12);
 
-// arbre moteur
-ctx.fillStyle = "#bbbbbb";
-ctx.fillRect(
-  motorCx + motorW/2,
-  motorCy - shaftH/2,
-  (gap/2) - 8,
-  shaftH
-);
+  // demi accouplement moteur
+  ctx.fillStyle="#ddd";
+  ctx.fillRect(pivotX-16,baseY-22,12,44);
 
-// demi accouplement
-ctx.fillStyle = "#cfcfcf";
-ctx.fillRect(coupX - 14, motorCy - coupH/2, coupW, coupH);
+  // axe moteur
+  ctx.strokeStyle="white";
+  ctx.setLineDash([6,6]);
+  ctx.beginPath();
+  ctx.moveTo(motorX-100,baseY);
+  ctx.lineTo(pivotX,baseY);
+  ctx.stroke();
 
-// ligne d’axe moteur
-ctx.save();
-ctx.strokeStyle = "rgba(255,255,255,0.95)";
-ctx.setLineDash([6,5]);
-ctx.lineWidth = 2.5;
-ctx.beginPath();
-ctx.moveTo(motorCx - motorW/2 - 90, motorCy);
-ctx.lineTo(motorCx + motorW/2 + gap/2, motorCy);
-ctx.stroke();
-ctx.restore();
+  ctx.restore();
+}
 
-ctx.restore();
-function drawSideViewGeneric(ctxTarget){
+function drawSideViewGeneric(ctx){
 
-  currentView = "side";
+  currentView="side";
 
-  const canvas = ctxTarget.canvas;
-  const { w, h } = resizeCanvas(canvas, ctxTarget);
-  if(w < 10 || h < 10) return;
+  const { w,h } = resizeCanvas(ctx.canvas, ctx);
+  clear(ctx,w,h);
 
-  const ctx = ctxTarget;
-  clear(ctx, w, h);
+  const motorW=200, motorH=80;
+  const pumpW=130, pumpH=80;
+  const gap=90;
+  const shaft=12;
 
-  const C = trainingMode ? trainState.angV : state.angV;
-  const E = trainingMode ? trainState.parV : state.parV;
-  const D = geometry.couplingDiameter || 8;
+  const baseY=h*0.60;
+  const motorX=w*0.30;
+  const pumpX=motorX+motorW+gap;
 
-  // conversion angle réel
-  const angle = (C / D) * 1.8; // amplification visuelle raisonnable
+  const ang=(trainingMode?trainState.angV:state.angV)*2;
+  const par=(trainingMode?trainState.parV:state.parV)*60;
 
-  const baseY = h * 0.55;
-  const baseX = w * 0.30;
+  const pivotX=motorX+motorW+gap/2;
+  const pivotY=baseY;
 
-  const { motorW, motorH, pumpW, pumpH, gap } = GEOM;
-
-  const pumpX = baseX + motorW/2 + gap;
-
-  // translation parallélisme
-  const motorY = baseY - (E * 60);
-
-  // pivot = centre accouplement (fixe)
-  const pivotX = baseX + motorW/2 + gap/2;
-  const pivotY = baseY;
-
-  // BASE
+  // sol
   ctx.fillStyle="#1a235a";
-  ctx.fillRect(baseX-motorW/2-60, baseY+motorH/2+10,
-               motorW+gap+pumpW+120, 16);
+  ctx.fillRect(motorX-120,baseY+50,motorW+gap+pumpW+240,18);
 
-  // POMPE
+  // pompe
   ctx.fillStyle="#ff9800";
-  ctx.fillRect(pumpX, baseY-pumpH/2, pumpW, pumpH);
+  ctx.fillRect(pumpX,baseY-pumpH/2,pumpW,pumpH);
 
-  // ===============================
-// BLOC RIGIDE MOTEUR (PHYSIQUE)
-// ===============================
-const pivotX = cx + motorW/2 + gap/2; // centre accouplement
-const pivotY = cy;
+  // arbre pompe
+  ctx.fillStyle="#bbb";
+  ctx.fillRect(pumpX-shaft,baseY-6,shaft,12);
 
-ctx.save();
-ctx.translate(pivotX, pivotY);
-ctx.rotate(ang);
-ctx.translate(-pivotX, -pivotY);
+  // demi accouplement pompe
+  ctx.fillStyle="#ddd";
+  ctx.fillRect(pivotX+4,baseY-22,12,44);
 
-// ---- CARCASSE ----
-ctx.fillStyle = "#00a2ff";
-ctx.fillRect(cx - motorW/2, cy - motorH/2, motorW, motorH);
+  // moteur bloc rigide
+  ctx.save();
+  ctx.translate(pivotX,pivotY);
+  ctx.rotate(ang*Math.PI/180);
+  ctx.translate(-pivotX,-pivotY+par);
 
-// ---- PATTES ----
-ctx.fillStyle = "#1b6ea8";
-ctx.fillRect(rearFootX - footW/2,  cy + motorH/2 - 2, footW, footH);
-ctx.fillRect(frontFootX - footW/2, cy + motorH/2 - 2, footW, footH);
+  ctx.fillStyle="#00a2ff";
+  ctx.fillRect(motorX,baseY-motorH/2,motorW,motorH);
 
-// ---- ARBRE MOTEUR ----
-ctx.fillStyle = "#bbbbbb";
-ctx.fillRect(
-  cx + motorW/2,
-  cy - shaftH/2,
-  (gap/2) - 8,
-  shaftH
-);
+  // arbre moteur
+  ctx.fillStyle="#bbb";
+  ctx.fillRect(motorX+motorW,baseY-6,gap/2-8,12);
 
-// ---- DEMI ACCOUPLEMENT ----
-ctx.fillStyle = "#cfcfcf";
-ctx.fillRect(
-  cx + motorW/2 + gap/2 - 14,
-  cy - coupH/2,
-  coupW,
-  coupH
-);
+  // demi accouplement moteur
+  ctx.fillStyle="#ddd";
+  ctx.fillRect(pivotX-16,baseY-22,12,44);
 
-// ---- AXE MOTEUR (IMPORTANT PEDAGO) ----
-ctx.save();
-ctx.strokeStyle = "rgba(255,255,255,0.95)";
-ctx.setLineDash([6,5]);
-ctx.lineWidth = 2.5;
+  // ligne d’axe moteur
+  ctx.strokeStyle="white";
+  ctx.setLineDash([6,6]);
+  ctx.beginPath();
+  ctx.moveTo(motorX-100,baseY);
+  ctx.lineTo(pivotX,baseY);
+  ctx.stroke();
 
-ctx.beginPath();
-ctx.moveTo(cx - motorW/2 - 100, cy);
-ctx.lineTo(cx + motorW/2 + gap/2, cy);
-ctx.stroke();
-ctx.restore();
+  ctx.restore();
+}
 
-ctx.restore();
 // ===== WRAPPERS PRINCIPAUX =====
 function drawTopView(){
   drawTopViewGeneric(topCtx);
