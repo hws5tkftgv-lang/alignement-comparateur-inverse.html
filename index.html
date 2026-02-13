@@ -970,6 +970,9 @@ Les pattes A / B / C / D seront affichées ici.
 // ===============================
 // GLOBALS TRAINING (OBLIGATOIRE)
 // ===============================
+const COUPLING_HALF_GAP = 12;   // espace entre les deux flasques
+const FLANGE_WIDTH = 10;        // épaisseur d’un flasque
+
 let trainingMode = false;
 
 let trainMount = "motor";
@@ -3242,7 +3245,14 @@ function drawTopViewGeneric(ctx){
   ctx.fillRect(pumpX, baseY - pumpH/2, pumpW, pumpH);
 
   ctx.fillStyle="#bbb";
-  ctx.fillRect(pumpX - gap/2, baseY - shaft/2, gap/2, shaft);
+  const pumpShaftLen = gap/2 - (COUPLING_HALF_GAP/2 + FLANGE_WIDTH);
+
+ctx.fillRect(
+  pumpX - pumpShaftLen,
+  baseY - shaft/2,
+  pumpShaftLen,
+  shaft
+);
 
   drawRealCoupling(ctx, couplingX, baseY, 0);
 
@@ -3255,9 +3265,15 @@ function drawTopViewGeneric(ctx){
   ctx.fillStyle="#00a2ff";
   ctx.fillRect(motorX - motorW/2, motorY - motorH/2, motorW, motorH);
 
-  ctx.fillStyle="#bbb";
-  ctx.fillRect(motorX + motorW/2, motorY - shaft/2, gap/2, shaft);
+  const motorShaftLen = gap/2 - (COUPLING_HALF_GAP/2 + FLANGE_WIDTH);
 
+ctx.fillStyle="#bbb";
+ctx.fillRect(
+  motorX + motorW/2,
+  motorY - shaft/2,
+  motorShaftLen,
+  shaft
+);
   drawRealCoupling(ctx, couplingX, couplingY, ang);
 
   // ligne d’axe moteur
@@ -3321,7 +3337,14 @@ function drawSideViewGeneric(ctx){
   ctx.fillRect(pumpX, baseY - pumpH/2, pumpW, pumpH);
 
   ctx.fillStyle="#bbb";
-  ctx.fillRect(pumpX - gap/2, baseY - shaft/2, gap/2, shaft);
+  const pumpShaftLen = gap/2 - (COUPLING_HALF_GAP/2 + FLANGE_WIDTH);
+
+ctx.fillRect(
+  pumpX - pumpShaftLen,
+  baseY - shaft/2,
+  pumpShaftLen,
+  shaft
+);
 
   drawRealCoupling(ctx, couplingX, baseY, 0);
 
@@ -3334,8 +3357,16 @@ function drawSideViewGeneric(ctx){
   ctx.fillStyle="#00a2ff";
   ctx.fillRect(motorX - motorW/2, motorY - motorH/2, motorW, motorH);
 
-  ctx.fillStyle="#bbb";
-  ctx.fillRect(motorX + motorW/2, motorY - shaft/2, gap/2, shaft);
+  const motorShaftLen = gap/2 - (COUPLING_HALF_GAP/2 + FLANGE_WIDTH);
+
+ctx.fillStyle="#bbb";
+ctx.fillRect(
+  motorX + motorW/2,
+  motorY - shaft/2,
+  motorShaftLen,
+  shaft
+);
+  
 
   drawRealCoupling(ctx, couplingX, couplingY, ang);
 
