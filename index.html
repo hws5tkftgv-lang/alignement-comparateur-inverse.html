@@ -3264,6 +3264,23 @@ function drawTopViewGeneric(ctxTarget){
   ctx.lineTo(rearX,  baseY+motorH/2 + rearOffset);
   ctx.closePath();
   ctx.fill();
+  // =========================
+// PATTES MOTEUR (coins du trapèze)
+// =========================
+
+const footOffset = 14;
+
+// coordonnées coins trapèze
+const TL = { x: rearX,  y: baseY-motorH/2 + rearOffset };
+const TR = { x: frontX, y: baseY-motorH/2 + frontOffset };
+const BR = { x: frontX, y: baseY+motorH/2 + frontOffset };
+const BL = { x: rearX,  y: baseY+motorH/2 + rearOffset };
+
+// dessiner
+drawFoot(ctx, TL.x+footOffset, TL.y, labelFoot("A"));
+drawFoot(ctx, TR.x-footOffset, TR.y, labelFoot("B"));
+drawFoot(ctx, BR.x-footOffset, BR.y, labelFoot("C"));
+drawFoot(ctx, BL.x+footOffset, BL.y, labelFoot("D"));
 
   // =========================
   // AXES
@@ -3348,6 +3365,19 @@ function drawSideViewGeneric(ctxTarget){
   ctx.lineTo(rearX,  baseY+motorH/2 + rearOffset);
   ctx.closePath();
   ctx.fill();
+  // =========================
+// PATTES (vue de profil)
+// =========================
+
+const footOffset = 14;
+
+const TL = { x: rearX,  y: baseY-motorH/2 + rearOffset };
+const TR = { x: frontX, y: baseY-motorH/2 + frontOffset };
+const BR = { x: frontX, y: baseY+motorH/2 + frontOffset };
+const BL = { x: rearX,  y: baseY+motorH/2 + rearOffset };
+
+drawFoot(ctx, BL.x+footOffset, BL.y, labelFoot("D"));
+drawFoot(ctx, BR.x-footOffset, BR.y, labelFoot("C"));
 
   // axes
   ctx.strokeStyle="white";
