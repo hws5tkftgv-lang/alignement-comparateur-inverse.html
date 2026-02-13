@@ -2241,21 +2241,6 @@ function buildThermalStep(){
    CALCUL CORRECTION ANGULAIRE (mils réels)
    B × C / A
 ===================================================== */
-function computeAngularShimsVertical(){
-  const v = state.angV;                // mils
-  const D = geometry.couplingDiameter; // po
-  const A = geometry.A;                // po (centre→avant)
-  const B = geometry.B;                // po (centre→arrière)
-
-  if(D <= 0) return { front:0, rear:0 };
-
-  const slope = v / D;     // mil/po
-
-  const front = slope * A; // mil
-  const rear  = slope * B; // mil  ✅ (PAS A+B)
-
-  return { front, rear };
-}
 
 
 /* =====================================================
@@ -2362,15 +2347,14 @@ function isStepOK(stepIndex){
 if(id === "verify"){
 
   const v = computeCemeqVertical();
-  const h = computeAngularShimsHorizontal();
+  const h = computeCemeqHorizontal();
 
-  const tolV = Math.max(state.angVTol, state.parVTol);
-  const tolH = Math.max(state.angHTol, state.parHTol);
+  const tol = 2; // tolérance alignement finale (mils)
 
-  return Math.abs(v.front) <= tolV &&
-         Math.abs(v.rear)  <= tolV &&
-         Math.abs(h.front) <= tolH &&
-         Math.abs(h.rear)  <= tolH;
+  return Math.abs(v.front) <= tol &&
+         Math.abs(v.rear)  <= tol &&
+         Math.abs(h.front) <= tol &&
+         Math.abs(h.rear)  <= tol;
 }
 
   return true;
