@@ -3285,7 +3285,8 @@ ctx.fillRect(
   pumpShaftLen,
   shaft
 );
-  drawPumpFlange(ctx, couplingX, couplingY_pump);
+  const pumpFlangeX = pumpShaftEnd - MACHINE.coupling.flangeWidth/2;
+drawPumpFlange(ctx, pumpFlangeX, couplingY_pump);
 
   // ================= MOTEUR MOBILE =================
   ctx.save();
@@ -3385,7 +3386,8 @@ ctx.fillRect(
   shaft
 );
 
-  drawPumpFlange(ctx, couplingX, couplingY_pump);
+  const pumpFlangeX = pumpShaftEnd - MACHINE.coupling.flangeWidth/2;
+drawPumpFlange(ctx, pumpFlangeX, couplingY_pump);
 
   // ================= MOTEUR MOBILE =================
   ctx.save();
