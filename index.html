@@ -3324,6 +3324,9 @@ ctx.fillRect(
 drawPumpFlange(ctx, pumpFlangeX, couplingY_pump);
 
   // ================= MOTEUR MOBILE =================
+  // pattes moteur (repère monde — jamais pivoté)
+drawMotorFeet(ctx, motorX, baseY, motorW, motorH);
+  
   ctx.save();
   ctx.translate(motorX, motorY);
 ctx.rotate(ang);
@@ -3358,7 +3361,7 @@ ctx.fillRect(
 
   ctx.restore();
   // pattes moteur (posées au sol — ne tournent pas)
-drawMotorFeet(ctx, motorX, motorY + shiftY, motorW, motorH);
+
 
   // ================= TITRES =================
   ctx.fillStyle="#fff";
@@ -3439,7 +3442,11 @@ ctx.fillRect(
 drawPumpFlange(ctx, pumpFlangeX, couplingY_pump);
 
   // ================= MOTEUR MOBILE =================
-  ctx.save();
+ 
+  // pattes moteur (repère monde — jamais pivoté)
+drawMotorFeet(ctx, motorX, baseY, motorW, motorH);
+  
+   ctx.save();
   ctx.translate(motorX, motorY);
 ctx.rotate(ang);
 ctx.translate(-motorX, -motorY);
@@ -3475,7 +3482,7 @@ ctx.fillRect(
 
   ctx.restore();
   // pattes moteur (posées au sol — ne tournent pas)
-drawMotorFeet(ctx, motorX, motorY + shiftY, motorW, motorH);
+
 
   // ================= TITRES =================
   ctx.fillStyle="#fff";
