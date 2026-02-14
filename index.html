@@ -1036,85 +1036,16 @@ canvas{
 }
 
 
-/* ==========================================
-   TRAINING FULLSCREEN PAGE (VRAI MODE APP)
-========================================== */
-
-#trainingPage{
-  position:fixed;
-  inset:0;
-  width:100vw;
-  height:100vh;
-  background:#0b1436;
-  z-index:999999;
-  display:none;
-  overflow:hidden;
-}
-
-/* empêche le site derrière d’exister visuellement */
-body.training-on .wrap,
-body.training-on .headerBar{
-  visibility:hidden;
-}
-
-/* mais pas le training */
-body.training-on #trainingPage{
-  visibility:visible;
-}
-
-/* layout interne */
 #trainingContent{
-  position:absolute;
-  inset:0;
-  display:flex;
-  flex-direction:column;
-}
-
-/* zone canvas */
-.trainingCanvasWrap{
+  padding:15px;
+  overflow:auto;
   flex:1;
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-  padding:12px;
-}
-
-/* cartes */
-.trainingCanvasCard{
-  background:#121c4a;
-  border-radius:14px;
-  position:relative;
-  overflow:hidden;
-}
-
-/* canvases toujours visibles */
-.trainingCanvasCard canvas{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
 }
 /* ================= TRAINING FULLSCREEN CANVAS ================= */
 
-.trainingViews{
-  display:flex;
-  flex-direction:column;
-  gap:18px;
-  padding:14px;
-}
 
-.trainingViewBox{
-  background:#000;
-  border-radius:16px;
-  padding:10px;
-  overflow:hidden;
-}
 
-.trainingViewBox canvas{
-  width:100%;
-  height:38vh;
-  display:block;
-}
+
 
 .trainingNote{
   margin:14px;
