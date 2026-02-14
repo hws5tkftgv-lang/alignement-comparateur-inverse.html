@@ -850,9 +850,7 @@ body.modal-open{
   flex-direction:column;
 }
 
-.trainingHidden{
-  display:none !important;
-}
+
 
 /* barre du haut */
 .trainingTopBar{
@@ -1073,7 +1071,7 @@ Les pattes A / B / C / D seront affichées ici.
   <!-- =========================================================
                         TRAINING FULLSCREEN
 ========================================================= -->
-<div id="trainingPage" class="trainingHidden">
+<div id="trainingPage">
 
   <div class="trainingTopBar">
     <div class="trainingTitle">🎓 Mode Training</div>
@@ -1687,19 +1685,16 @@ let activeDial = "parallel"; // "parallel" ou "angular"
 
 function openTraining(){
 
-  // ===============================
-  // ACTIVER MODE TRAINING
-  // ===============================
   trainingMode = true;
 
   const page = document.getElementById("trainingPage");
-const content = document.getElementById("trainingContent");
+  const content = document.getElementById("trainingContent");
+  if(!page || !content) return;
 
-if(!page || !content) return;
+  // affiche
+  page.classList.add("trainingVisible");
+  document.body.classList.add("trainingLock");
 
-// affiche la page fullscreen
-page.classList.remove("trainingHidden");
-document.body.classList.add("training-on");
   content.innerHTML = buildTrainingHTML();
 
   // ===============================
@@ -1888,11 +1883,10 @@ function closeTraining(){
   trainingMode = false;
 
   const page = document.getElementById("trainingPage");
-  if(page) page.classList.add("trainingHidden");
+  if(page) page.classList.remove("trainingVisible");
 
-  document.body.classList.remove("training-on");
+  document.body.classList.remove("trainingLock");
 }
-
 function drawDial(canvasId, needleVal){
 
   const canvas = document.getElementById(canvasId);
