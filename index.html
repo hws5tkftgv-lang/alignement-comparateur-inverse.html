@@ -3098,13 +3098,22 @@ function footColor(letter){
 
   return FOOT_NORMAL;
 }
-function drawFoot(ctx,x,y,label){
+function drawFoot(ctx, x, y, label){
+
+  const footW = 20;
+  const footH = 10;
+
+  // patte
   ctx.fillStyle = footColor(label);
-  ctx.fillRect(x-10,y-5,20,10);
-  ctx.fillStyle="#fff";
-  ctx.font="12px Arial";
-  ctx.textAlign="center";
-  ctx.fillText(label,x,y+18);
+  ctx.fillRect(x - footW/2, y - footH/2, footW, footH);
+
+  // texte toujours AU-DESSUS de la patte
+  ctx.fillStyle = "#fff";
+  ctx.font = "12px Arial";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "bottom";
+
+  ctx.fillText(label, x, y - footH/2 - 4);
 }
 function drawMotorFeet(ctx, x, y, w, h, visible=["A","B","C","D"]){
 
