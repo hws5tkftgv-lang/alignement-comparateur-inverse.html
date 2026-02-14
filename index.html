@@ -2949,14 +2949,23 @@ const sideCtx = sideCanvas.getContext("2d");
 
 
 function resizeCanvas(canvas, ctx){
+
   const rect = canvas.getBoundingClientRect();
 
-  // 🛑 PROTECTION CRITIQUE
-  const w = Math.max(1, Math.floor(rect.width));
-  const h = Math.max(1, Math.floor(rect.height));
+  // 🛑 Si Safari n’a pas encore calculé la hauteur
+  let w = Math.floor(rect.width);
+  let h = Math.floor(rect.height);
 
-  if (canvas.width !== w) canvas.width = w;
-  if (canvas.height !== h) canvas.height = h;
+  if(h < 40){
+    h = canvas.parentElement.clientHeight || 280;
+  }
+
+  if(w < 40){
+    w = canvas.parentElement.clientWidth || 400;
+  }
+
+  if(canvas.width !== w)  canvas.width  = w;
+  if(canvas.height !== h) canvas.height = h;
 
   return { w, h };
 }
