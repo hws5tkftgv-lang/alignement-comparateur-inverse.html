@@ -3233,11 +3233,13 @@ function drawTopViewGeneric(ctx){
   const shiftY = parH * scale;
   const ang = angH * rotGain * dialSign;
 
-  const motorX = baseX;
-  const motorY = baseY + shiftY;
+  // --- Pivot MONDE (fixe)
+const couplingX = baseX + motorW/2 + gap/2;
+const couplingY = baseY;
 
-  const couplingX = motorX + motorW/2 + gap/2;
-  const couplingY = motorY;
+// --- Moteur mobile
+const motorX = baseX;
+const motorY = baseY + shiftY;
 
   // ================= POMPE FIXE =================
   const pumpX = motorX + motorW/2 + gap;
@@ -3321,12 +3323,13 @@ function drawSideViewGeneric(ctx){
   const shiftY = parV * scale;
   const ang = -angV * rotGain * dialSign;
 
-  const motorX = baseX;
-  const motorY = baseY + shiftY;
+  // --- Pivot MONDE (fixe)
+const couplingX = baseX + motorW/2 + gap/2;
+const couplingY = baseY;
 
-  const couplingX = motorX + motorW/2 + gap/2;
-  const couplingY = motorY;
-
+// --- Moteur mobile
+const motorX = baseX;
+const motorY = baseY + shiftY;
   // semelle
   ctx.fillStyle="#1a235a";
   ctx.fillRect(0, baseY + pumpH/2 + 15, w, 20);
