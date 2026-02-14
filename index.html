@@ -841,14 +841,6 @@ body.modal-open{
 
 /* ===== TRAINING FULLSCREEN ===== */
 
-#trainingPage{
-  position:fixed;
-  inset:0;
-  background:#0b1436;
-  z-index:9999;
-  display:flex;
-  flex-direction:column;
-}
 
 
 
@@ -930,25 +922,6 @@ body.modal-open{
 
 /* ===== TRAINING FULLSCREEN ===== */
 
-#trainingPage{
-  position:fixed;
-  inset:0;
-  width:100vw;
-  height:100dvh;
-  background:#0b1436;
-  z-index:9999;
-
-  display:flex;
-  flex-direction:column;
-
-  transform:translateY(100%);
-  transition:transform .35s ease;
-}
-
-/* visible */
-#trainingPage.trainingVisible{
-  transform:translateY(0);
-}
 
 /* empêche scroll arrière */
 body.trainingLock{
@@ -994,9 +967,6 @@ canvas{
   backface-visibility: hidden;
 }
 
-#trainingPage{
-  transform: translate3d(0,0,0);
-}
 
 /* empêche Safari de garder une texture figée */
 .trainingCanvasCard canvas{
@@ -1007,19 +977,27 @@ canvas{
   display:none;
 }
 
+
+
 #trainingPage{
   position:fixed;
   inset:0;
+  width:100vw;
+  height:100dvh;
   background:#0b1436;
   z-index:9999;
+
+  display:none;
+  flex-direction:column;
 }
 
-/* FIX CANVAS iOS */
-#trainingPage canvas{
-  transform: translateZ(0);
-  will-change: transform;
+#trainingPage.active{
+  display:flex;
 }
 
+body.trainingLock{
+  overflow:hidden;
+}
 </style>
 </head>
 
@@ -1689,8 +1667,23 @@ function isParallel(defect){
 let activeDefect = "angV";
 
 let activeDial = "parallel"; // "parallel" ou "angular"
-
 function openTraining(){
+
+  const page = document.getElementById("trainingPage");
+  if(!page) return;
+
+  // affiche immédiatement
+  page.style.display = "flex";
+  document.body.classList.add("trainingLock");
+
+  // attendre que le navigateur calcule la taille réelle
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{
+      startTraining();   // ← ton ancien gros code
+    });
+  });
+}
+function startTraining(){
 
   trainingMode = true;
 
@@ -1900,12 +1893,13 @@ setTimeout(() => {
 
 
 function closeTraining(){
+
   trainingMode = false;
 
   const page = document.getElementById("trainingPage");
-  if(page) page.classList.add("trainingHidden");
+  if(page) page.style.display = "none";
 
-  document.body.classList.remove("trainingActive");
+  document.body.classList.remove("trainingLock");
 }
 function drawDial(canvasId, needleVal){
 
