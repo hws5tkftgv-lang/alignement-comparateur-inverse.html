@@ -3102,19 +3102,19 @@ function drawFoot(ctx,x,y,label){
   ctx.textAlign="center";
   ctx.fillText(label,x,y+18);
 }
-function drawMotorFeet(ctx, x, y, w, h){
+function drawMotorFeet(ctx, x, y, w, h, visible=["A","B","C","D"]){
 
-  const offsetX = w * 0.32;   // distance du centre vers gauche/droite
-  const offsetY = h * 0.55;   // distance du centre vers haut/bas
+  const offsetX = w * 0.32;
+  const offsetY = h * 0.55;
 
   const feet = {
-    A: { x: x - offsetX, y: y - offsetY }, // haut gauche
-    B: { x: x + offsetX, y: y - offsetY }, // haut droite
-    C: { x: x + offsetX, y: y + offsetY }, // bas droite
-    D: { x: x - offsetX, y: y + offsetY }  // bas gauche
+    A: { x: x - offsetX, y: y - offsetY },
+    B: { x: x + offsetX, y: y - offsetY },
+    C: { x: x + offsetX, y: y + offsetY },
+    D: { x: x - offsetX, y: y + offsetY }
   };
 
-  for(const key in feet){
+  for(const key of visible){
     drawFoot(ctx, feet[key].x, feet[key].y, key);
   }
 }
@@ -3461,7 +3461,8 @@ ctx.translate(-motorX, -motorY);
   ctx.fillStyle="#00a2ff";
   ctx.fillRect(motorX - motorW/2, motorY - motorH/2, motorW, motorH);
   // PATTES SOLIDAIRES DU MOTEUR
-drawMotorFeet(ctx, motorX, motorY, motorW, motorH);
+// seulement les pattes visibles en profil
+drawMotorFeet(ctx, motorX, motorY, motorW, motorH, ["C","D"]);
 
   const motorShaftLen = gap/2 - MACHINE.coupling.flangeWidth - MACHINE.shaft.visibleLengthOffset;
 
