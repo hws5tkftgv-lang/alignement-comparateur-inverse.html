@@ -1878,6 +1878,19 @@ drawTrainingViews();
     drawDial("dialAngular", 0);
   },60);
 }
+// ⚠️ redraw après ouverture fullscreen (corrige les blocs noirs)
+setTimeout(() => {
+
+  forceResizeTrainingCanvases();
+
+  if(window.topCtxTest && window.sideCtxTest){
+    drawTopViewGeneric(window.topCtxTest);
+    drawSideViewGeneric(window.sideCtxTest);
+  }
+
+}, 50);
+
+
 function closeTraining(){
 
   trainingMode = false;
@@ -3118,16 +3131,26 @@ function resizeCanvas(canvas, ctx){
 ===================================================== */
 
 function forceResizeTrainingCanvases(){
+
+  let resized = false;
+
   if(window.topCanvasTest && window.topCtxTest){
     const r = window.topCanvasTest.getBoundingClientRect();
-    window.topCanvasTest.width  = Math.max(1, Math.floor(r.width));
-    window.topCanvasTest.height = Math.max(1, Math.floor(r.height));
+    window.topCanvasTest.width  = Math.max(10, Math.floor(r.width));
+    window.topCanvasTest.height = Math.max(10, Math.floor(r.height));
+    resized = true;
   }
 
   if(window.sideCanvasTest && window.sideCtxTest){
     const r = window.sideCanvasTest.getBoundingClientRect();
-    window.sideCanvasTest.width  = Math.max(1, Math.floor(r.width));
-    window.sideCanvasTest.height = Math.max(1, Math.floor(r.height));
+    window.sideCanvasTest.width  = Math.max(10, Math.floor(r.width));
+    window.sideCanvasTest.height = Math.max(10, Math.floor(r.height));
+    resized = true;
+  }
+
+  if(resized){
+    drawTopViewGeneric(window.topCtxTest);
+    drawSideViewGeneric(window.sideCtxTest);
   }
 }
 
@@ -3738,6 +3761,17 @@ window.addEventListener("orientationchange", () => {
       forceResizeTrainingCanvases();
       updateTraining();
     }, 150);
+  }
+});
+// 🔧 iOS Safari : redraw quand la barre du bas apparaît/disparaît
+window.addEventListener("resize", () => {
+  if(trainingMode){
+    forceResizeTrainingCanvases();
+
+    if(window.topCtxTest && window.sideCtxTest){
+      drawTopViewGeneric(window.topCtxTest);
+      drawSideViewGeneric(window.sideCtxTest);
+    }
   }
 });
 
