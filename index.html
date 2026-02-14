@@ -3103,17 +3103,24 @@ function drawFoot(ctx, x, y, label){
   const footW = 20;
   const footH = 10;
 
-  // patte
+  // dessin patte
   ctx.fillStyle = footColor(label);
   ctx.fillRect(x - footW/2, y - footH/2, footW, footH);
 
-  // texte toujours AU-DESSUS de la patte
+  // texte
   ctx.fillStyle = "#fff";
   ctx.font = "12px Arial";
   ctx.textAlign = "center";
-  ctx.textBaseline = "bottom";
 
-  ctx.fillText(label, x, y - footH/2 - 4);
+  // position selon la patte
+  if(label === "A" || label === "B"){
+    ctx.textBaseline = "bottom";
+    ctx.fillText(label, x, y - footH/2 - 4);
+  }
+  else{
+    ctx.textBaseline = "top";
+    ctx.fillText(label, x, y + footH/2 + 4);
+  }
 }
 function drawMotorFeet(ctx, x, y, w, h, visible=["A","B","C","D"]){
 
