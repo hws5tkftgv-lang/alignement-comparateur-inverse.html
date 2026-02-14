@@ -839,8 +839,147 @@ body.modal-open{
   display: block;
 }
 
+/* ===== TRAINING FULLSCREEN ===== */
 
+#trainingPage{
+  position:fixed;
+  inset:0;
+  background:#0b1436;
+  z-index:9999;
+  display:flex;
+  flex-direction:column;
+}
 
+.trainingHidden{
+  display:none !important;
+}
+
+/* barre du haut */
+.trainingTopBar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:12px 18px;
+  background:#121c4a;
+  border-bottom:2px solid rgba(255,255,255,.08);
+}
+
+.trainingTitle{
+  font-size:18px;
+  font-weight:700;
+}
+
+.trainingControls{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.trainingControls select,
+.trainingControls button{
+  padding:6px 10px;
+  border-radius:8px;
+  border:none;
+}
+
+/* contenu */
+.trainingBody{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+
+#trainingContent{
+  padding:15px;
+  overflow:auto;
+}
+
+/* zone dessins */
+.trainingCanvasZone{
+  flex:1;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+  padding:14px;
+}
+
+.trainingCanvasCard{
+  background:#000;
+  border-radius:12px;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+}
+
+.trainingCanvasCard canvas{
+  flex:1;
+  width:100%;
+  height:100%;
+}
+
+/* mobile */
+@media(max-width:900px){
+  .trainingCanvasZone{
+    grid-template-columns:1fr;
+  }
+}
+
+/* ===== TRAINING FULLSCREEN ===== */
+
+#trainingPage{
+  position:fixed;
+  inset:0;
+  width:100vw;
+  height:100dvh;
+  background:#0b1436;
+  z-index:9999;
+
+  display:flex;
+  flex-direction:column;
+
+  transform:translateY(100%);
+  transition:transform .35s ease;
+}
+
+/* visible */
+#trainingPage.trainingVisible{
+  transform:translateY(0);
+}
+
+/* empêche scroll arrière */
+body.trainingLock{
+  overflow:hidden;
+  touch-action:none;
+}
+
+/* ================= TRAINING FULLSCREEN ================= */
+
+#trainingModal{
+  position:fixed;
+  inset:0;
+  width:100vw;
+  height:100dvh;
+  background:#0b1436;
+  z-index:9999;
+
+  display:flex;
+  flex-direction:column;
+
+  transform:translateY(100%);
+  transition:transform .35s ease;
+}
+
+/* visible */
+#trainingModal.trainingVisible{
+  transform:translateY(0);
+}
+
+/* empêche scroll derrière */
+body.trainingLock{
+  overflow:hidden;
+  touch-action:none;
+}
 </style>
 </head>
 
@@ -931,39 +1070,45 @@ Les pattes A / B / C / D seront affichées ici.
   </div>
 
 </div>
-  <!-- =========================
-     MODAL 🎓 TRAINING
-========================= -->
-<div id="trainingModal" style="display:none;">
-  <div id="trainingBackdrop"></div>
+  <!-- =========================================================
+                        TRAINING FULLSCREEN
+========================================================= -->
+<div id="trainingPage" class="trainingHidden">
 
-  <div id="trainingPanel">
-    <div class="helpHeader">
-    <div class="trainingOptions">
-  <div class="opt">
-    <label>Montage cadran sur:</label>
-    <select id="trainMount">
-      <option value="motor">Moteur</option>
-      <option value="pump">Pompe</option>
-    </select>
+  <div class="trainingTopBar">
+    <div class="trainingTitle">🎓 Mode Training</div>
+
+    <div class="trainingControls">
+      <label>Montage cadran:</label>
+      <select id="trainMount">
+        <option value="motor">Moteur</option>
+        <option value="pump">Pompe</option>
+      </select>
+
+      <button id="btnTrainingClose">Fermer ✕</button>
+    </div>
   </div>
 
-  
-</div>
+  <div class="trainingBody">
 
-      <div class="helpActions">
-        <button id="btnTrainingClose" type="button" class="helpBtn secondary">
-          Fermer ✕
-        </button>
+    <!-- contenu injecté par JS -->
+    <div id="trainingContent"></div>
+
+    <!-- canvases training -->
+    <div class="trainingCanvasZone">
+      <div class="trainingCanvasCard">
+        <div class="canvasHeader">Vue de dessus</div>
+        <canvas id="topCanvasTest"></canvas>
+      </div>
+
+      <div class="trainingCanvasCard">
+        <div class="canvasHeader">Vue de profil</div>
+        <canvas id="sideCanvasTest"></canvas>
       </div>
     </div>
 
-    <div id="trainingContent" class="helpContent">
-      <!-- injecté par JS -->
-    </div>
-    
   </div>
-</div>
+
 </div>
 <script>
 "use strict";
@@ -1566,9 +1711,9 @@ function openTraining(){
     window.sideCtxTest = sc.getContext("2d");
   }
 
-  modal.style.display = "block";
-  document.body.classList.add("modal-open","training-on");
-
+  modal.style.display = "block"; // on garde pour compatibilité
+modal.classList.add("trainingVisible");
+document.body.classList.add("trainingLock");
   trainingLockScroll();
   trainingResizeModalHeight();
   trainingAttachResizeListeners();
@@ -1740,20 +1885,16 @@ drawTrainingViews();
   },60);
 }
 function closeTraining(){
+
   trainingMode = false;
 
   const modal = document.getElementById("trainingModal");
-  if(!modal) return;
+  if(modal){
+    modal.classList.remove("trainingVisible");
+  }
 
-  modal.style.display = "none";
-
-  document.body.classList.remove("modal-open");
-  document.body.classList.remove("training-on");
-
-  trainingDetachResizeListeners();
-  trainingUnlockScroll();
+  document.body.classList.remove("trainingLock","training-on","modal-open");
 }
-
 
 function drawDial(canvasId, needleVal){
 
