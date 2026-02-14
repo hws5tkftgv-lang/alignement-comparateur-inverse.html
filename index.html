@@ -1692,10 +1692,14 @@ function openTraining(){
   // ===============================
   trainingMode = true;
 
-  const modal   = document.getElementById("trainingModal");
-  const content = document.getElementById("trainingContent");
-  if(!modal || !content) return;
+  const page = document.getElementById("trainingPage");
+const content = document.getElementById("trainingContent");
 
+if(!page || !content) return;
+
+// affiche la page fullscreen
+page.classList.remove("trainingHidden");
+document.body.classList.add("training-on");
   content.innerHTML = buildTrainingHTML();
 
   // ===============================
@@ -1711,12 +1715,7 @@ function openTraining(){
     window.sideCtxTest = sc.getContext("2d");
   }
 
-  modal.style.display = "block"; // on garde pour compatibilité
-modal.classList.add("trainingVisible");
-document.body.classList.add("trainingLock");
-  trainingLockScroll();
-  trainingResizeModalHeight();
-  trainingAttachResizeListeners();
+  document.body.classList.add("training-on");
 
   // ===============================
   // UI REFS
@@ -1888,12 +1887,10 @@ function closeTraining(){
 
   trainingMode = false;
 
-  const modal = document.getElementById("trainingModal");
-  if(modal){
-    modal.classList.remove("trainingVisible");
-  }
+  const page = document.getElementById("trainingPage");
+  if(page) page.classList.add("trainingHidden");
 
-  document.body.classList.remove("trainingLock","training-on","modal-open");
+  document.body.classList.remove("training-on");
 }
 
 function drawDial(canvasId, needleVal){
