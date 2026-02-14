@@ -3197,22 +3197,16 @@ function drawPumpFlange(ctx, cx, cy){
   ctx.fillRect(cx + gap/2, cy - flangeR, flangeW, flangeR*2);
 }
 
-function drawMotorFlange(ctx, cx, cy, angle){
+function drawMotorFlange(ctx, cx, cy){
 
   const flangeR = 16;
   const flangeW = 10;
   const gap = 12;
 
-  ctx.save();
-  ctx.translate(cx, cy);
-  ctx.rotate(angle);
-
   ctx.fillStyle = "#d0d0d0";
 
   // flasque côté moteur (mobile)
-  ctx.fillRect(-gap/2 - flangeW, -flangeR, flangeW, flangeR*2);
-
-  ctx.restore();
+  ctx.fillRect(cx - gap/2 - flangeW, cy - flangeR, flangeW, flangeR*2);
 }
 function drawTopViewGeneric(ctx){
 
@@ -3240,14 +3234,14 @@ function drawTopViewGeneric(ctx){
   const shiftY = parH * scale;
   const ang = angH * rotGain * dialSign;
 
-  // --- Pivot MONDE (fixe)
-const couplingX = baseX + motorW/2 + gap/2;
-const couplingY = baseY;
-
-// --- Moteur mobile
+  // --- Position moteur (réel)
 const motorX = baseX;
 const motorY = baseY + shiftY;
 
+// --- Couplage : X fixe, mais Y du côté moteur suit le moteur
+const couplingX = baseX + motorW/2 + gap/2;
+const couplingY_motor = motorY; // ✅ suit le moteur
+const couplingY_pump  = baseY;  // ✅ pompe reste fixe
   // ================= POMPE FIXE =================
   const pumpX = motorX + motorW/2 + gap;
   ctx.fillStyle="#ff9800";
@@ -3263,13 +3257,13 @@ ctx.fillRect(
   shaft
 );
 
-  drawPumpFlange(ctx, couplingX, baseY);
+  drawPumpFlange(ctx, couplingX, couplingY_pump);
 
   // ================= MOTEUR MOBILE =================
   ctx.save();
-  ctx.translate(couplingX, couplingY);
+  ctx.translate(couplingX, couplingY_motor);
   ctx.rotate(ang);
-  ctx.translate(-couplingX, -couplingY);
+  ctx.translate(-couplingX, -couplingY_motor);
 
   ctx.fillStyle="#00a2ff";
   ctx.fillRect(motorX - motorW/2, motorY - motorH/2, motorW, motorH);
@@ -3283,7 +3277,7 @@ ctx.fillRect(
   motorShaftLen,
   shaft
 );
-  drawMotorFlange(ctx, couplingX, couplingY, ang);
+  drawMotorFlange(ctx, couplingX, couplingY_motor);
 
   // ligne d’axe moteur
   ctx.setLineDash([6,5]);
