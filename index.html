@@ -1240,7 +1240,24 @@ const MATERIAL_COEFF = {
   bronze:    0.0000100
 };
 
+function waitCanvasReady(canvas, callback){
 
+  let tries = 0;
+
+  function check(){
+    const rect = canvas.getBoundingClientRect();
+
+    if(rect.width > 50 && rect.height > 50){
+      callback();
+      return;
+    }
+
+    tries++;
+    if(tries < 40) requestAnimationFrame(check);
+  }
+
+  requestAnimationFrame(check);
+}
 function materialOptions(selected){
   return Object.keys(MATERIAL_COEFF)
     .map(key => {
@@ -1904,24 +1921,12 @@ if (slider) {
   // INIT + iPHONE FIX
   // ===============================
   initTrainingDials();
-drawTrainingViews();
-  // attendre que la page soit réellement affichée
-setTimeout(() => {
 
-  trainingResizeModalHeight();
-  forceResizeTrainingCanvases();
+waitCanvasReady(window.topCanvasTest, ()=>{
+  trainingRequestResize();
   drawTrainingViews();
   updateTraining();
-
-}, 80);
-  // Safari iOS : redraw forcé
-  setTimeout(()=>{
-    drawDial("dialParallel", 0);
-    drawDial("dialAngular", 0);
-  },60);
-}
-
-
+});
 
 function closeTraining(){
 
