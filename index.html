@@ -3324,13 +3324,14 @@ function drawSideViewGeneric(ctx){
   const shiftY = parV * scale;
   const ang = -angV * rotGain * dialSign;
 
-  // --- Pivot MONDE (fixe)
-const couplingX = baseX + motorW/2 + gap/2;
-const couplingY = baseY;
-
-// --- Moteur mobile
+  // --- Position moteur (réel)
 const motorX = baseX;
 const motorY = baseY + shiftY;
+
+// --- Couplage : X fixe, mais Y du côté moteur suit le moteur
+const couplingX = baseX + motorW/2 + gap/2;
+const couplingY_motor = motorY; // ✅ suit le moteur
+const couplingY_pump  = baseY;  // ✅ pompe reste fixe
   // semelle
   ctx.fillStyle="#1a235a";
   ctx.fillRect(0, baseY + pumpH/2 + 15, w, 20);
@@ -3350,13 +3351,13 @@ ctx.fillRect(
   shaft
 );
 
-  drawPumpFlange(ctx, couplingX, baseY);
+  drawPumpFlange(ctx, couplingX, couplingY_pump);
 
   // ================= MOTEUR MOBILE =================
   ctx.save();
-  ctx.translate(couplingX, couplingY);
+  ctx.translate(couplingX, couplingY_motor);
   ctx.rotate(ang);
-  ctx.translate(-couplingX, -couplingY);
+  ctx.translate(-couplingX, -couplingY_motor);
 
   ctx.fillStyle="#00a2ff";
   ctx.fillRect(motorX - motorW/2, motorY - motorH/2, motorW, motorH);
@@ -3372,7 +3373,7 @@ ctx.fillRect(
 );
   
 
-  drawMotorFlange(ctx, couplingX, couplingY, ang);
+  drawMotorFlange(ctx, couplingX, couplingY_motor);
 
   // ligne d’axe moteur
   ctx.setLineDash([6,5]);
