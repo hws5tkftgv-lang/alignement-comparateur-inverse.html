@@ -3286,10 +3286,9 @@ ctx.fillRect(
 
   // ================= MOTEUR MOBILE =================
   ctx.save();
-  ctx.translate(couplingX, couplingY_motor);
-  ctx.rotate(ang);
-  ctx.translate(-couplingX, -couplingY_motor);
-
+  ctx.translate(motorX, motorY);
+ctx.rotate(ang);
+ctx.translate(-motorX, -motorY);
   ctx.fillStyle="#00a2ff";
   ctx.fillRect(motorX - motorW/2, motorY - motorH/2, motorW, motorH);
 
@@ -3380,9 +3379,9 @@ ctx.fillRect(
 
   // ================= MOTEUR MOBILE =================
   ctx.save();
-  ctx.translate(couplingX, couplingY_motor);
-  ctx.rotate(ang);
-  ctx.translate(-couplingX, -couplingY_motor);
+  ctx.translate(motorX, motorY);
+ctx.rotate(ang);
+ctx.translate(-motorX, -motorY);
 
   ctx.fillStyle="#00a2ff";
   ctx.fillRect(motorX - motorW/2, motorY - motorH/2, motorW, motorH);
