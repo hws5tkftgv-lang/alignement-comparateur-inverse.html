@@ -576,10 +576,7 @@ body.modal-open{
    TRAINING — SUPPRESSION DU BLOC INTRO PÉDAGOGIQUE
    (titre + but pédagogique)
 ===================================================== */
-#trainingModal h2,
-#trainingModal .noteBox{
-  display: none !important;
-}
+
 /* =====================================================
    TRAINING — SUPPRESSION DU TITRE "COMPRÉHENSION DU CADRAN"
 ===================================================== */
@@ -1244,12 +1241,12 @@ Les pattes A / B / C / D seront affichées ici.
     <div class="trainingCanvasZone">
       <div class="trainingCanvasCard">
         <div class="canvasHeader">Vue de dessus</div>
-        <canvas id="topCanvasTest"></canvas>
+        <canvas id="topViewTest"></canvas>
       </div>
 
       <div class="trainingCanvasCard">
         <div class="canvasHeader">Vue de profil</div>
-        <canvas id="sideCanvasTest"></canvas>
+       <canvas id="sideViewTest"></canvas>
       </div>
     </div>
 
@@ -1663,19 +1660,6 @@ function buildTrainingHTML(){
 <!-- ============================
      VISUALISATION TRAINING (fullscreen)
 ============================= -->
-<div class="trainingViews">
-
-  <div class="trainingViewBox">
-    <div class="canvasHeader">Vue de dessus</div>
-    <canvas id="topViewTest"></canvas>
-  </div>
-
-  <div class="trainingViewBox">
-    <div class="canvasHeader">Vue de profil</div>
-    <canvas id="sideViewTest"></canvas>
-  </div>
-
-</div>
 
 <div id="trainingExplain" class="noteBox trainingNote">
 —
