@@ -3276,9 +3276,9 @@ const couplingY_pump  = baseY;  // ✅ pompe reste fixe
   ctx.fillStyle="#bbb";
   const pumpShaftLen = gap/2 - MACHINE.coupling.flangeWidth - MACHINE.shaft.visibleLengthOffset;
 ctx.fillRect(
-  pumpX - pumpShaftLen,
+  pumpX - pumpShaftLen - MACHINE.shaft.visibleLengthOffset,
   baseY - shaft/2,
-  pumpShaftLen,
+  pumpShaftLen + MACHINE.shaft.visibleLengthOffset,
   shaft
 );
 
@@ -3373,9 +3373,9 @@ const couplingY_pump  = baseY;  // ✅ pompe reste fixe
   const pumpShaftLen = gap/2 - MACHINE.coupling.flangeWidth - MACHINE.shaft.visibleLengthOffset;
 
 ctx.fillRect(
-  pumpX - pumpShaftLen,
+  pumpX - pumpShaftLen - MACHINE.shaft.visibleLengthOffset,
   baseY - shaft/2,
-  pumpShaftLen,
+  pumpShaftLen + MACHINE.shaft.visibleLengthOffset,
   shaft
 );
 
