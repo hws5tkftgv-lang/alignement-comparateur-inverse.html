@@ -3322,7 +3322,7 @@ ctx.translate(-motorX, -motorY);
   ctx.fillStyle="#00a2ff";
   ctx.fillRect(motorX - motorW/2, motorY - motorH/2, motorW, motorH);
   // 🔵 ICI — PATTES SOLIDAIRES DU MOTEUR
-drawMotorFeet(ctx, motorX, motorY, motorW, motorH);
+
 
   const motorShaftLen = gap/2 - MACHINE.coupling.flangeWidth - MACHINE.shaft.visibleLengthOffset;
 
@@ -3348,6 +3348,8 @@ ctx.fillRect(
   ctx.stroke();
 
   ctx.restore();
+  // pattes moteur (posées au sol — ne tournent pas)
+drawMotorFeet(ctx, motorX, motorY + shiftY, motorW, motorH);
 
   // ================= TITRES =================
   ctx.fillStyle="#fff";
@@ -3435,7 +3437,7 @@ ctx.translate(-motorX, -motorY);
 
   ctx.fillStyle="#00a2ff";
   ctx.fillRect(motorX - motorW/2, motorY - motorH/2, motorW, motorH);
-  drawMotorFeet(ctx, motorX, motorY, motorW, motorH);
+  
 
   const motorShaftLen = gap/2 - MACHINE.coupling.flangeWidth - MACHINE.shaft.visibleLengthOffset;
 
@@ -3463,6 +3465,8 @@ ctx.fillRect(
   ctx.stroke();
 
   ctx.restore();
+  // pattes moteur (posées au sol — ne tournent pas)
+drawMotorFeet(ctx, motorX, motorY + shiftY, motorW, motorH);
 
   // ================= TITRES =================
   ctx.fillStyle="#fff";
