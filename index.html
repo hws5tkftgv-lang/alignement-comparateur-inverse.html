@@ -967,6 +967,33 @@ Les pattes A / B / C / D seront affichées ici.
 </div>
 <script>
 "use strict";
+/* =====================================================
+   GÉOMÉTRIE MÉCANIQUE MAÎTRE (UNE SEULE SOURCE)
+===================================================== */
+const MACHINE = {
+
+  motor:{
+    width:220,
+    height:90
+  },
+
+  pump:{
+    width:140,
+    height:90
+  },
+
+  coupling:{
+    gap:120,
+    flangeRadius:26,
+    flangeWidth:16
+  },
+
+  shaft:{
+    diameter:12,
+    visibleLengthOffset:22
+  }
+
+};
 // ===============================
 // GLOBALS TRAINING (OBLIGATOIRE)
 // ===============================
@@ -3224,13 +3251,12 @@ function drawTopViewGeneric(ctx){
   const baseY = h*0.5;
   const baseX = w*0.35;
 
-  const motorW = 220;
-  const motorH = 90;
-  const pumpW = 140;
-  const pumpH = 90;
-  const gap = 120;
-  const shaft = 12;
-
+  const motorW = MACHINE.motor.width;
+const motorH = MACHINE.motor.height;
+const pumpW  = MACHINE.pump.width;
+const pumpH  = MACHINE.pump.height;
+const gap    = MACHINE.coupling.gap;
+const shaft  = MACHINE.shaft.diameter;
   const shiftY = parH * scale;
   const ang = angH * rotGain * dialSign;
 
@@ -3248,8 +3274,7 @@ const couplingY_pump  = baseY;  // ✅ pompe reste fixe
   ctx.fillRect(pumpX, baseY - pumpH/2, pumpW, pumpH);
 
   ctx.fillStyle="#bbb";
-  const pumpShaftLen = gap/2 - (COUPLING_HALF_GAP/2 + FLANGE_WIDTH);
-
+  const pumpShaftLen = gap/2 - MACHINE.coupling.flangeWidth - MACHINE.shaft.visibleLengthOffset;
 ctx.fillRect(
   pumpX - pumpShaftLen,
   baseY - shaft/2,
@@ -3268,7 +3293,7 @@ ctx.fillRect(
   ctx.fillStyle="#00a2ff";
   ctx.fillRect(motorX - motorW/2, motorY - motorH/2, motorW, motorH);
 
-  const motorShaftLen = gap/2 - (COUPLING_HALF_GAP/2 + FLANGE_WIDTH);
+  const motorShaftLen = gap/2 - MACHINE.coupling.flangeWidth - MACHINE.shaft.visibleLengthOffset;
 
 ctx.fillStyle="#bbb";
 ctx.fillRect(
@@ -3314,12 +3339,12 @@ function drawSideViewGeneric(ctx){
   const baseY = h*0.60;
   const baseX = w*0.35;
 
-  const motorW = 220;
-  const motorH = 90;
-  const pumpW = 140;
-  const pumpH = 90;
-  const gap = 120;
-  const shaft = 12;
+  const motorW = MACHINE.motor.width;
+const motorH = MACHINE.motor.height;
+const pumpW  = MACHINE.pump.width;
+const pumpH  = MACHINE.pump.height;
+const gap    = MACHINE.coupling.gap;
+const shaft  = MACHINE.shaft.diameter;
 
   const shiftY = parV * scale;
   const ang = -angV * rotGain * dialSign;
@@ -3342,7 +3367,7 @@ const couplingY_pump  = baseY;  // ✅ pompe reste fixe
   ctx.fillRect(pumpX, baseY - pumpH/2, pumpW, pumpH);
 
   ctx.fillStyle="#bbb";
-  const pumpShaftLen = gap/2 - (COUPLING_HALF_GAP/2 + FLANGE_WIDTH);
+  const pumpShaftLen = gap/2 - MACHINE.coupling.flangeWidth - MACHINE.shaft.visibleLengthOffset;
 
 ctx.fillRect(
   pumpX - pumpShaftLen,
@@ -3362,7 +3387,7 @@ ctx.fillRect(
   ctx.fillStyle="#00a2ff";
   ctx.fillRect(motorX - motorW/2, motorY - motorH/2, motorW, motorH);
 
-  const motorShaftLen = gap/2 - (COUPLING_HALF_GAP/2 + FLANGE_WIDTH);
+  const motorShaftLen = gap/2 - MACHINE.coupling.flangeWidth - MACHINE.shaft.visibleLengthOffset;
 
 ctx.fillStyle="#bbb";
 ctx.fillRect(
