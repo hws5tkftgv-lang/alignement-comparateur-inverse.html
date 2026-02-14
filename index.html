@@ -970,6 +970,9 @@ Les pattes A / B / C / D seront affichées ici.
 /* =====================================================
    GÉOMÉTRIE MÉCANIQUE MAÎTRE (UNE SEULE SOURCE)
 ===================================================== */
+const MACHINE_LAYOUT = {
+  machineOffset: -40   // négatif = rapproche la pompe
+};
 const MACHINE = {
 
   motor:{
@@ -3269,7 +3272,9 @@ const couplingX = baseX + motorW/2 + gap/2;
 const couplingY_motor = motorY; // ✅ suit le moteur
 const couplingY_pump  = baseY;  // ✅ pompe reste fixe
   // ================= POMPE FIXE =================
-  const pumpX = couplingX + gap/2 + MACHINE.coupling.flangeWidth;
+  const pumpX =
+  couplingX + gap/2 + MACHINE.coupling.flangeWidth + pumpW/2
+  + MACHINE_LAYOUT.machineOffset;
   ctx.fillStyle="#ff9800";
   ctx.fillRect(pumpX, baseY - pumpH/2, pumpW, pumpH);
 
@@ -3369,7 +3374,9 @@ const couplingY_pump  = baseY;  // ✅ pompe reste fixe
   ctx.fillRect(0, baseY + pumpH/2 + 15, w, 20);
 
   // ================= POMPE FIXE =================
-  const pumpX = couplingX + gap/2 + MACHINE.coupling.flangeWidth;
+  const pumpX =
+  couplingX + gap/2 + MACHINE.coupling.flangeWidth + pumpW/2
+  + MACHINE_LAYOUT.machineOffset;
   ctx.fillStyle="#ff9800";
   ctx.fillRect(pumpX, baseY - pumpH/2, pumpW, pumpH);
 
