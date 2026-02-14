@@ -3265,7 +3265,15 @@ function drawTopViewGeneric(ctx){
   const rotGain = 0.0012;
 
   const baseY = h*0.5;
-  const baseX = w*0.35;
+  // largeur totale mécanique
+const totalLength =
+  MACHINE.motor.width +
+  MACHINE.coupling.gap +
+  MACHINE.pump.width +
+  MACHINE_LAYOUT.machineOffset;
+
+// centre mécanique réel
+const baseX = (w - totalLength) / 2 + MACHINE.motor.width/2;
 
   const motorW = MACHINE.motor.width;
 const motorH = MACHINE.motor.height;
@@ -3364,7 +3372,15 @@ function drawSideViewGeneric(ctx){
   const rotGain = 0.0012;
 
   const baseY = h*0.60;
-  const baseX = w*0.35;
+  // largeur totale mécanique
+const totalLength =
+  MACHINE.motor.width +
+  MACHINE.coupling.gap +
+  MACHINE.pump.width +
+  MACHINE_LAYOUT.machineOffset;
+
+// centre mécanique réel
+const baseX = (w - totalLength) / 2 + MACHINE.motor.width/2;
 
   const motorW = MACHINE.motor.width;
 const motorH = MACHINE.motor.height;
