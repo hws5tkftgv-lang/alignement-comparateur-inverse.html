@@ -3085,7 +3085,20 @@ function drawFoot(ctx,x,y,label){
   ctx.textAlign="center";
   ctx.fillText(label,x,y+18);
 }
+function drawMotorFeet(ctx, motorX, motorY, motorW, motorH){
 
+  // positions des 4 pattes dans le repère du moteur
+  const offX = motorW * 0.32;
+  const offY = motorH * 0.55;
+
+  // ⚠️ IMPORTANT :
+  // drawFoot prend (x,y,label) et utilise footColor(label)
+  // label = A,B,C,D (les pattes du MOTEUR)
+  drawFoot(ctx, motorX - offX, motorY - offY, "A"); // haut-gauche
+  drawFoot(ctx, motorX + offX, motorY - offY, "B"); // haut-droite
+  drawFoot(ctx, motorX + offX, motorY + offY, "C"); // bas-droite
+  drawFoot(ctx, motorX - offX, motorY + offY, "D"); // bas-gauche
+}
 function drawArrow(ctx, x1, y1, x2, y2, color="#ff5252"){
 
   const scale = ctx.canvas.width / 900; // adapte automatiquement au canvas
@@ -3300,6 +3313,8 @@ ctx.rotate(ang);
 ctx.translate(-motorX, -motorY);
   ctx.fillStyle="#00a2ff";
   ctx.fillRect(motorX - motorW/2, motorY - motorH/2, motorW, motorH);
+  // 🔵 ICI — PATTES SOLIDAIRES DU MOTEUR
+drawMotorFeet(ctx, motorX, motorY, motorW, motorH);
 
   const motorShaftLen = gap/2 - MACHINE.coupling.flangeWidth - MACHINE.shaft.visibleLengthOffset;
 
@@ -3404,6 +3419,7 @@ ctx.translate(-motorX, -motorY);
 
   ctx.fillStyle="#00a2ff";
   ctx.fillRect(motorX - motorW/2, motorY - motorH/2, motorW, motorH);
+  drawMotorFeet(ctx, motorX, motorY, motorW, motorH);
 
   const motorShaftLen = gap/2 - MACHINE.coupling.flangeWidth - MACHINE.shaft.visibleLengthOffset;
 
