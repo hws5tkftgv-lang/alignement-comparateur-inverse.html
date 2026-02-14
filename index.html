@@ -970,6 +970,7 @@ Les pattes A / B / C / D seront affichées ici.
 /* =====================================================
    GÉOMÉTRIE MÉCANIQUE MAÎTRE (UNE SEULE SOURCE)
 ===================================================== */
+const VIEW_OFFSET_X = 140; // ajuste à ton goût
 const MACHINE_LAYOUT = {
   machineOffset: -145 // négatif = rapproche la pompe
 };
@@ -1004,6 +1005,9 @@ const MACHINE = {
   }
 
 };
+
+
+
 // ===============================
 // GLOBALS TRAINING (OBLIGATOIRE)
 // ===============================
@@ -3290,7 +3294,7 @@ const totalLength =
   MACHINE.coupling.gap +
   MACHINE.pump.width;
 
-const baseX = (w - totalLength) / 2 + MACHINE.motor.width/2;
+const baseX = (w - totalLength) / 2 + MACHINE.motor.width/2 + VIEW_OFFSET_X;
 
   const motorW = MACHINE.motor.width;
 const motorH = MACHINE.motor.height;
@@ -3401,7 +3405,7 @@ const totalLength =
   MACHINE.coupling.gap +
   MACHINE.pump.width;
 
-const baseX = (w - totalLength) / 2 + MACHINE.motor.width/2;
+const baseX = (w - totalLength) / 2 + MACHINE.motor.width/2 + VIEW_OFFSET_X;
 
   const motorW = MACHINE.motor.width;
 const motorH = MACHINE.motor.height;
