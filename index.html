@@ -958,10 +958,9 @@ body.trainingLock{
 }
 
 /* ====== iOS CANVAS FIX ====== */
-canvas{
+.trainingCanvasCard canvas{
   transform: translateZ(0);
 }
-
 .trainingCanvasCard{
   transform: translateZ(0);
   backface-visibility: hidden;
@@ -1027,7 +1026,17 @@ canvas{
 }
 
 
+/* ===== FIX TRAINING CANVAS (bloc noir) ===== */
 
+.trainingCanvasCard::before{
+  display:none !important;
+}
+
+.trainingCanvasCard canvas{
+  position:relative;
+  z-index:5;
+  background:#000;
+}
 
 </style>
 </head>
