@@ -3185,11 +3185,12 @@ function blinkColor(col){
   return t ? "#ff5252" : col;
 }
 
-function drawRealCoupling(ctx, cx, cy, angle){
+function drawCouplingHalf(ctx, cx, cy, angle, side){
+  // side: "motor" (gauche) ou "pump" (droite)
 
   const flangeR = 16;
-  const flangeW = 10;
-  const gap = 12;
+  const gap = COUPLING_HALF_GAP;     // 12 (ton global)
+  const flangeW = FLANGE_WIDTH;      // 10 (ton global)
 
   ctx.save();
   ctx.translate(cx, cy);
@@ -3197,15 +3198,16 @@ function drawRealCoupling(ctx, cx, cy, angle){
 
   ctx.fillStyle = "#d0d0d0";
 
-  // flasque moteur
-  ctx.fillRect(-gap/2 - flangeW, -flangeR, flangeW, flangeR*2);
-
-  // flasque pompe
-  ctx.fillRect(gap/2, -flangeR, flangeW, flangeR*2);
+  if(side === "motor"){
+    // moitié gauche
+    ctx.fillRect(-gap/2 - flangeW, -flangeR, flangeW, flangeR*2);
+  } else if(side === "pump"){
+    // moitié droite
+    ctx.fillRect(gap/2, -flangeR, flangeW, flangeR*2);
+  }
 
   ctx.restore();
 }
-
 
 function drawTopViewGeneric(ctx){
 
@@ -3254,7 +3256,7 @@ ctx.fillRect(
   shaft
 );
 
-  drawRealCoupling(ctx, couplingX, baseY, 0);
+  drawCouplingHalf(ctx, couplingX, baseY, 0, "pump");
 
   // ================= MOTEUR MOBILE =================
   ctx.save();
@@ -3274,7 +3276,7 @@ ctx.fillRect(
   motorShaftLen,
   shaft
 );
-  drawRealCoupling(ctx, couplingX, couplingY, ang);
+  drawCouplingHalf(ctx, couplingX, couplingY, ang, "motor");
 
   // ligne d’axe moteur
   ctx.setLineDash([6,5]);
@@ -3346,7 +3348,7 @@ ctx.fillRect(
   shaft
 );
 
-  drawRealCoupling(ctx, couplingX, baseY, 0);
+  drawCouplingHalf(ctx, couplingX, baseY, 0, "pump");
 
   // ================= MOTEUR MOBILE =================
   ctx.save();
@@ -3368,7 +3370,7 @@ ctx.fillRect(
 );
   
 
-  drawRealCoupling(ctx, couplingX, couplingY, ang);
+  drawCouplingHalf(ctx, couplingX, couplingY, ang, "motor");
 
   // ligne d’axe moteur
   ctx.setLineDash([6,5]);
