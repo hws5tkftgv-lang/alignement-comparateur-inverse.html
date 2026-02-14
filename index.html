@@ -1054,6 +1054,47 @@ canvas{
 .trainingNote.center{
   text-align:center;
 }
+
+
+/* ================= TRAINING CANVAS LAYOUT ================= */
+
+.trainingCanvasZone{
+  width:100%;
+  height:60vh;
+  min-height:420px;
+
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+.trainingView{
+  flex:1;
+  background:#000;
+  border-radius:14px;
+  position:relative;
+  overflow:hidden;
+}
+
+.trainingViewTitle{
+  position:absolute;
+  top:10px;
+  left:14px;
+  color:#fff;
+  font-weight:700;
+  opacity:.85;
+  pointer-events:none;
+}
+
+.trainingView canvas{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  display:block;
+}
+
+
 </style>
 </head>
 
@@ -1108,17 +1149,19 @@ Vue de dessus (horizontal) et vue de profil (vertical).
 Les pattes A / B / C / D seront affichées ici.
       </p>
 
-      <div class="canvasGrid">
-        <div class="canvasCard">
-          <div class="canvasHeader">Vue de dessus (TopView)</div>
-          <canvas id="topView"></canvas>
-        </div>
-        <div class="canvasCard">
-          <div class="canvasHeader">Vue de profil (SideView)</div>
-          <canvas id="sideView"></canvas>
-        </div>
-      </div>
-      
+      <div class="trainingCanvasZone">
+
+  <div class="trainingView">
+    <div class="trainingViewTitle">Vue de dessus</div>
+    <canvas id="topViewTest"></canvas>
+  </div>
+
+  <div class="trainingView">
+    <div class="trainingViewTitle">Vue de profil</div>
+    <canvas id="sideViewTest"></canvas>
+  </div>
+
+</div>
       
       
 <!-- =========================
@@ -1767,6 +1810,23 @@ requestAnimationFrame(()=>{
 // seulement maintenant on injecte le HTML
 const content = document.getElementById("trainingContent");
 if(content) content.innerHTML = buildTrainingHTML();
+const tc = document.getElementById("topViewTest");
+const sc = document.getElementById("sideViewTest");
+
+if(tc && sc){
+  window.topCanvasTest  = tc;
+  window.sideCanvasTest = sc;
+  window.topCtxTest  = tc.getContext("2d");
+  window.sideCtxTest = sc.getContext("2d");
+}
+
+// attendre le vrai layout Safari
+requestAnimationFrame(()=>{
+  setTimeout(()=>{
+    forceResizeTrainingCanvases();
+    wakeUpTrainingCanvas();
+  },50);
+});
   // ===============================
   // CANVAS TRAINING
   // ===============================
@@ -3196,27 +3256,47 @@ function resizeCanvas(canvas, ctx){
 
 function forceResizeTrainingCanvases(){
 
-  function fix(canvas, ctx){
+  const zone = document.querySelector(".trainingCanvasZone");
+  if(!zone) return;
+
+  const rect = zone.getBoundingClientRect();
+  if(rect.width === 0 || rect.height === 0) return;
+
+  const dpr = window.devicePixelRatio || 1;
+
+  const viewHeight = Math.floor(rect.height / 2);
+  const viewWidth  = Math.floor(rect.width);
+
+  function apply(canvas, ctx){
     if(!canvas || !ctx) return;
 
-    const dpr = window.devicePixelRatio || 1;
+    canvas.style.width  = viewWidth + "px";
+    canvas.style.height = viewHeight + "px";
 
-    const cssWidth  = canvas.clientWidth;
-    const cssHeight = canvas.clientHeight;
+    canvas.width  = Math.round(viewWidth  * dpr);
+    canvas.height = Math.round(viewHeight * dpr);
 
-    const newWidth  = Math.round(cssWidth  * dpr);
-    const newHeight = Math.round(cssHeight * dpr);
-
-    if(canvas.width !== newWidth || canvas.height !== newHeight){
-      canvas.width  = newWidth;
-      canvas.height = newHeight;
-
-      ctx.setTransform(dpr,0,0,dpr,0,0);
-    }
+    ctx.setTransform(dpr,0,0,dpr,0,0);
   }
 
-  fix(window.topCanvasTest,  window.topCtxTest);
-  fix(window.sideCanvasTest, window.sideCtxTest);
+  apply(window.topCanvasTest,  window.topCtxTest);
+  apply(window.sideCanvasTest, window.sideCtxTest);
+
+  drawTopViewGeneric(window.topCtxTest);
+  drawSideViewGeneric(window.sideCtxTest);
+}
+function wakeUpTrainingCanvas(){
+  setTimeout(()=>{
+    if(window.topCanvasTest){
+      window.topCanvasTest.width += 1;
+      window.topCanvasTest.width -= 1;
+    }
+    if(window.sideCanvasTest){
+      window.sideCanvasTest.width += 1;
+      window.sideCanvasTest.width -= 1;
+    }
+    forceResizeTrainingCanvases();
+  },80);
 }
 
 function clear(ctx,w,h){
