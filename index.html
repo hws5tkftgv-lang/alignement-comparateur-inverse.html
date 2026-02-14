@@ -998,6 +998,37 @@ canvas{
 body.trainingLock{
   overflow:hidden;
 }
+
+/* empêche le canvas d’être sous la carte */
+.canvasCard{
+  position:relative;
+  overflow:hidden;
+}
+
+/* le canvas doit être dans le bon layer */
+.canvasCard canvas{
+  position:relative;
+  z-index:2;
+  display:block;
+  background:transparent !important;
+}
+
+/* le fond de la carte passe derrière */
+.canvasCard::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:#000;
+  z-index:1;
+  border-radius:14px;
+}
+canvas{
+  transform:translateZ(0);
+}
+
+
+
+
 </style>
 </head>
 
