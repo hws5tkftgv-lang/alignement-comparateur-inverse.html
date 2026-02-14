@@ -3908,6 +3908,11 @@ window.addEventListener("orientationchange", () => {
     }, 150);
   }
 });
+window.addEventListener("resize", () => {
+  if(trainingMode){
+    forceResizeTrainingCanvases();
+  }
+});
 // 🔧 iOS Safari : redraw quand la barre du bas apparaît/disparaît
 window.addEventListener("resize", () => {
   if(trainingMode){
