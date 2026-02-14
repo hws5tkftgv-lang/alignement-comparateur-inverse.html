@@ -3275,13 +3275,16 @@ const couplingY_pump  = baseY;  // ✅ pompe reste fixe
 
   ctx.fillStyle="#bbb";
   const pumpShaftLen = gap/2 - MACHINE.coupling.flangeWidth - MACHINE.shaft.visibleLengthOffset;
+
+const pumpShaftStart = pumpX;                 // bord machine
+const pumpShaftEnd   = pumpX - pumpShaftLen;  // vers accouplement
+
 ctx.fillRect(
-  pumpX - pumpShaftLen - MACHINE.shaft.visibleLengthOffset,
+  pumpShaftEnd,
   baseY - shaft/2,
-  pumpShaftLen + MACHINE.shaft.visibleLengthOffset,
+  pumpShaftLen,
   shaft
 );
-
   drawPumpFlange(ctx, couplingX, couplingY_pump);
 
   // ================= MOTEUR MOBILE =================
@@ -3372,10 +3375,13 @@ const couplingY_pump  = baseY;  // ✅ pompe reste fixe
   ctx.fillStyle="#bbb";
   const pumpShaftLen = gap/2 - MACHINE.coupling.flangeWidth - MACHINE.shaft.visibleLengthOffset;
 
+const pumpShaftStart = pumpX;                 // bord machine
+const pumpShaftEnd   = pumpX - pumpShaftLen;  // vers accouplement
+
 ctx.fillRect(
-  pumpX - pumpShaftLen - MACHINE.shaft.visibleLengthOffset,
+  pumpShaftEnd,
   baseY - shaft/2,
-  pumpShaftLen + MACHINE.shaft.visibleLengthOffset,
+  pumpShaftLen,
   shaft
 );
 
