@@ -1605,23 +1605,6 @@ function initTrainingDials(){
 // ===============================
 let __trainingScrollY = 0;
 
-function trainingLockScroll(){
-  __trainingScrollY = window.scrollY || 0;
-  document.body.style.position = "fixed";
-  document.body.style.top = `-${__trainingScrollY}px`;
-  document.body.style.left = "0";
-  document.body.style.right = "0";
-  document.body.style.width = "100%";
-}
-
-function trainingUnlockScroll(){
-  document.body.style.position = "";
-  document.body.style.top = "";
-  document.body.style.left = "";
-  document.body.style.right = "";
-  document.body.style.width = "";
-  window.scrollTo(0, __trainingScrollY);
-}
 
 // ===============================
 // TRAINING — MODAL HEIGHT (visualViewport)
@@ -1629,14 +1612,15 @@ function trainingUnlockScroll(){
 let __trainingResizeRAF = 0;
 
 function trainingResizeModalHeight(){
-  const modal = document.getElementById("trainingModal");
-  if(!modal) return;
+
+  const page = document.getElementById("trainingPage");
+  if(!page) return;
 
   const vh = (window.visualViewport && window.visualViewport.height)
     ? window.visualViewport.height
     : window.innerHeight;
 
-  modal.style.height = `${Math.round(vh)}px`;
+  page.style.height = `${Math.round(vh)}px`;
 }
 
 function trainingRequestResize(){
@@ -1650,25 +1634,6 @@ function trainingRequestResize(){
   });
 }
 
-function trainingAttachResizeListeners(){
-  window.addEventListener("resize", trainingRequestResize, { passive:true });
-  window.addEventListener("orientationchange", trainingRequestResize, { passive:true });
-
-  if(window.visualViewport){
-    window.visualViewport.addEventListener("resize", trainingRequestResize, { passive:true });
-    window.visualViewport.addEventListener("scroll", trainingRequestResize, { passive:true });
-  }
-}
-
-function trainingDetachResizeListeners(){
-  window.removeEventListener("resize", trainingRequestResize);
-  window.removeEventListener("orientationchange", trainingRequestResize);
-
-  if(window.visualViewport){
-    window.visualViewport.removeEventListener("resize", trainingRequestResize);
-    window.visualViewport.removeEventListener("scroll", trainingRequestResize);
-  }
-}
 
 
 
@@ -1916,49 +1881,23 @@ if (slider) {
   // ===============================
   initTrainingDials();
 drawTrainingViews();
-  requestAnimationFrame(()=>{
-    trainingRequestResize();
-    updateTraining();
-  });
+  // attendre que la page soit réellement affichée
+setTimeout(() => {
 
+  trainingResizeModalHeight();
+  forceResizeTrainingCanvases();
+  drawTrainingViews();
+  updateTraining();
+
+}, 80);
   // Safari iOS : redraw forcé
   setTimeout(()=>{
     drawDial("dialParallel", 0);
     drawDial("dialAngular", 0);
   },60);
 }
-// ⚠️ redraw après ouverture fullscreen (corrige les blocs noirs)
-setTimeout(() => {
-
-  forceResizeTrainingCanvases();
-
-  if(window.topCtxTest && window.sideCtxTest){
-    drawTopViewGeneric(window.topCtxTest);
-    drawSideViewGeneric(window.sideCtxTest);
-  }
-
-}, 50);
 
 
-// ===== iOS CANVAS WAKE UP =====
-setTimeout(() => {
-
-  if(window.topCanvasTest){
-    window.topCanvasTest.width += 1;
-    window.topCanvasTest.width -= 1;
-  }
-
-  if(window.sideCanvasTest){
-    window.sideCanvasTest.width += 1;
-    window.sideCanvasTest.width -= 1;
-  }
-
-  if(window.topCtxTest && window.sideCtxTest){
-    drawTopViewGeneric(window.topCtxTest);
-    drawSideViewGeneric(window.sideCtxTest);
-  }
-
-}, 120);
 
 function closeTraining(){
   trainingMode = false;
