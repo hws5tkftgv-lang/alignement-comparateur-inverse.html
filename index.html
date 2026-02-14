@@ -983,6 +983,43 @@ body.trainingLock{
   overflow:hidden;
   touch-action:none;
 }
+
+/* ====== iOS CANVAS FIX ====== */
+canvas{
+  transform: translateZ(0);
+}
+
+.trainingCanvasCard{
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+#trainingPage{
+  transform: translate3d(0,0,0);
+}
+
+/* empêche Safari de garder une texture figée */
+.trainingCanvasCard canvas{
+  will-change: contents;
+}
+
+.trainingHidden{
+  display:none;
+}
+
+#trainingPage{
+  position:fixed;
+  inset:0;
+  background:#0b1436;
+  z-index:9999;
+}
+
+/* FIX CANVAS iOS */
+#trainingPage canvas{
+  transform: translateZ(0);
+  will-change: transform;
+}
+
 </style>
 </head>
 
@@ -1692,16 +1729,23 @@ function openTraining(){
 
   trainingMode = true;
 
-  const page = document.getElementById("trainingPage");
-  const content = document.getElementById("trainingContent");
-  if(!page || !content) return;
+const page = document.getElementById("trainingPage");
+if(!page) return;
 
-  // affiche
-  page.classList.add("trainingVisible");
-  document.body.classList.add("trainingLock");
+// afficher fullscreen
+page.classList.remove("trainingHidden");
+document.body.classList.add("trainingActive");
 
-  content.innerHTML = buildTrainingHTML();
+// 🔥 CRITIQUE iOS : recrée le layer graphique AVANT de créer les canvas
+requestAnimationFrame(()=>{
+  page.style.transform = "translateZ(0)";
+  page.offsetHeight;
+  page.style.transform = "";
+});
 
+// seulement maintenant on injecte le HTML
+const content = document.getElementById("trainingContent");
+if(content) content.innerHTML = buildTrainingHTML();
   // ===============================
   // CANVAS TRAINING
   // ===============================
@@ -1894,16 +1938,35 @@ setTimeout(() => {
   }
 
 }, 50);
+}
 
+// ===== iOS CANVAS WAKE UP =====
+setTimeout(() => {
+
+  if(window.topCanvasTest){
+    window.topCanvasTest.width += 1;
+    window.topCanvasTest.width -= 1;
+  }
+
+  if(window.sideCanvasTest){
+    window.sideCanvasTest.width += 1;
+    window.sideCanvasTest.width -= 1;
+  }
+
+  if(window.topCtxTest && window.sideCtxTest){
+    drawTopViewGeneric(window.topCtxTest);
+    drawSideViewGeneric(window.sideCtxTest);
+  }
+
+}, 120);
 
 function closeTraining(){
-
   trainingMode = false;
 
   const page = document.getElementById("trainingPage");
-  if(page) page.classList.remove("trainingVisible");
+  if(page) page.classList.add("trainingHidden");
 
-  document.body.classList.remove("trainingLock");
+  document.body.classList.remove("trainingActive");
 }
 function drawDial(canvasId, needleVal){
 
@@ -1976,6 +2039,17 @@ function drawDial(canvasId, needleVal){
 
 
 function updateTraining(){
+  // ===== iOS FORCE REDRAW LAYER =====
+if(window.topCanvasTest){
+  window.topCanvasTest.style.opacity = "0.99";
+  window.topCanvasTest.offsetHeight;
+  window.topCanvasTest.style.opacity = "1";
+}
+if(window.sideCanvasTest){
+  window.sideCanvasTest.style.opacity = "0.99";
+  window.sideCanvasTest.offsetHeight;
+  window.sideCanvasTest.style.opacity = "1";
+}
   if(!trainingMode) return;
 
   // ===============================
