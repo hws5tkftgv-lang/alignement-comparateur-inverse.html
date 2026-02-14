@@ -3301,7 +3301,11 @@ ctx.fillRect(
   motorShaftLen,
   shaft
 );
-  drawMotorFlange(ctx, couplingX, couplingY_motor);
+  drawMotorFlange(
+  ctx,
+  motorX + motorW/2 + motorShaftLen + MACHINE.coupling.flangeWidth/2,
+  motorY
+);
 
   // ligne d’axe moteur
   ctx.setLineDash([6,5]);
@@ -3397,7 +3401,11 @@ ctx.fillRect(
 );
   
 
-  drawMotorFlange(ctx, couplingX, couplingY_motor);
+  drawMotorFlange(
+  ctx,
+  motorX + motorW/2 + motorShaftLen + MACHINE.coupling.flangeWidth/2,
+  motorY
+);
 
   // ligne d’axe moteur
   ctx.setLineDash([6,5]);
