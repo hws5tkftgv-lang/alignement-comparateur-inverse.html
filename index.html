@@ -3102,19 +3102,21 @@ function drawFoot(ctx,x,y,label){
   ctx.textAlign="center";
   ctx.fillText(label,x,y+18);
 }
-function drawMotorFeet(ctx, motorX, motorY, motorW, motorH){
+function drawMotorFeet(ctx, x, y, w, h){
 
-  // positions des 4 pattes dans le repère du moteur
-  const offX = motorW * 0.32;
-  const offY = motorH * 0.55;
+  const offsetX = w * 0.32;   // distance du centre vers gauche/droite
+  const offsetY = h * 0.55;   // distance du centre vers haut/bas
 
-  // ⚠️ IMPORTANT :
-  // drawFoot prend (x,y,label) et utilise footColor(label)
-  // label = A,B,C,D (les pattes du MOTEUR)
-  drawFoot(ctx, motorX - offX, motorY - offY, "A"); // haut-gauche
-  drawFoot(ctx, motorX + offX, motorY - offY, "B"); // haut-droite
-  drawFoot(ctx, motorX + offX, motorY + offY, "C"); // bas-droite
-  drawFoot(ctx, motorX - offX, motorY + offY, "D"); // bas-gauche
+  const feet = {
+    A: { x: x - offsetX, y: y - offsetY }, // haut gauche
+    B: { x: x + offsetX, y: y - offsetY }, // haut droite
+    C: { x: x + offsetX, y: y + offsetY }, // bas droite
+    D: { x: x - offsetX, y: y + offsetY }  // bas gauche
+  };
+
+  for(const key in feet){
+    drawFoot(ctx, feet[key].x, feet[key].y, key);
+  }
 }
 function drawArrow(ctx, x1, y1, x2, y2, color="#ff5252"){
 
