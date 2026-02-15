@@ -1791,6 +1791,29 @@ function openTraining(){
     });
   });
 }
+
+function trainingFirstRender(){
+
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{
+
+      forceResizeTrainingCanvases();
+
+      if(window.topCtxTest && window.sideCtxTest){
+        drawTopViewGeneric(window.topCtxTest);
+        drawSideViewGeneric(window.sideCtxTest);
+      }
+
+      updateTraining();
+
+    });
+  });
+
+}
+
+
+
+
 function startTraining(){
 
   trainingMode = true;
@@ -1991,11 +2014,8 @@ if (slider) {
   // ===============================
   initTrainingDials();
 
-waitCanvasReady(window.topCanvasTest, ()=>{
-  trainingRequestResize();
-  drawTrainingViews();
-  updateTraining();
-});
+// rendu fiable après layout navigateur
+trainingFirstRender();
 }
 function closeTraining(){
 
