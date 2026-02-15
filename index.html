@@ -1081,11 +1081,30 @@ canvas{
 body.trainingActive > *:not(#trainingPage){
   display:none !important;
 }
+
+
+.trainingHidden{
+  display:none;
+}
+
+.trainingVisible{
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  background:#0b1436;
+  display:flex;
+  flex-direction:column;
+}
+
+
 </style>
 </head>
 
 <body>
 
+<!-- ===================================================== -->
+<!-- HEADER -->
+<!-- ===================================================== -->
 <div class="headerBar">
   <div style="display:flex; align-items:center; justify-content:center; gap:10px;">
     <span>Alignement d’arbres — Comparateur inversé (mils)</span>
@@ -1095,69 +1114,76 @@ body.trainingActive > *:not(#trainingPage){
       style="flex:0; padding:6px 10px; border-radius:10px; border:none; background:rgba(255,255,255,.15); color:#fff; font-weight:900; cursor:pointer;">
       ℹ️
     </button>
+
     <button id="btnTraining"
-  type="button"
-  style="flex:0; padding:6px 12px; border-radius:10px; border:none; background:#4caf50; color:#fff; font-weight:900; cursor:pointer;">
-  🎓 Training
-</button>
+      type="button"
+      style="flex:0; padding:6px 12px; border-radius:10px; border:none; background:#4caf50; color:#fff; font-weight:900; cursor:pointer;">
+      🎓 Training
+    </button>
   </div>
 </div>
 
+
+<!-- ===================================================== -->
+<!-- PAGE NORMALE -->
+<!-- ===================================================== -->
 <div class="wrap">
   <div class="grid">
-    
-      <div class="step" id="stepCard">
-  <div class="stepHead">
-    <div class="stepTitle" id="stepTitle">—</div>
-    <div class="badge" id="stepBadge">Info</div>
-  </div>
 
-  <!-- Inputs générés par JS selon l'étape -->
-  <div id="inputsArea"></div>
-  <div id="formulaBox" class="formulaBox"></div>
+    <!-- ===== ETAPES ===== -->
+    <div class="step" id="stepCard">
+      <div class="stepHead">
+        <div class="stepTitle" id="stepTitle">—</div>
+        <div class="badge" id="stepBadge">Info</div>
+      </div>
 
-  <div class="navRow">
-    <button class="secondary" id="btnPrev" type="button">◀ Précédent</button>
-    <button id="btnNext" type="button">Suivant ▶</button>
-  </div>
-<div id="noteBox" class="noteBox" style="margin-top:10px;">
-—
-</div>
-  <div class="infoBox" id="infoBox">—</div>
-</div>
-    
+      <div id="inputsArea"></div>
+      <div id="formulaBox" class="formulaBox"></div>
 
-    <!-- ===== DESSINS ===== -->
+      <div class="navRow">
+        <button class="secondary" id="btnPrev" type="button">◀ Précédent</button>
+        <button id="btnNext" type="button">Suivant ▶</button>
+      </div>
+
+      <div id="noteBox" class="noteBox" style="margin-top:10px;">—</div>
+      <div class="infoBox" id="infoBox">—</div>
+    </div>
+
+
+    <!-- ===== DESSINS PRINCIPAUX ===== -->
     <div class="card">
       <h2>Dessins pédagogiques</h2>
       <p>
-Vue de dessus (horizontal) et vue de profil (vertical).
-Les pattes A / B / C / D seront affichées ici.
+        Vue de dessus (horizontal) et vue de profil (vertical).
+        Les pattes A / B / C / D seront affichées ici.
       </p>
 
       <div class="trainingCanvasZone">
 
-  <div class="trainingView">
-    <div class="trainingViewTitle">Vue de dessus</div>
-   <canvas id="topView"></canvas>
-  </div>
+        <div class="trainingView">
+          <div class="trainingViewTitle">Vue de dessus</div>
+          <canvas id="topView"></canvas>
+        </div>
 
-  <div class="trainingView">
-    <div class="trainingViewTitle">Vue de profil</div>
-    <canvas id="sideView"></canvas>
-  </div>
+        <div class="trainingView">
+          <div class="trainingViewTitle">Vue de profil</div>
+          <canvas id="sideView"></canvas>
+        </div>
 
+      </div>
+    </div>
+
+  </div>
 </div>
-      
-      
-<!-- =========================
-     MODAL AIDE / FORMULES
-========================= -->
-<div id="helpModal" class="print-scope" style="display:none;">
 
+
+<!-- ===================================================== -->
+<!-- AIDE -->
+<!-- ===================================================== -->
+<div id="helpModal" class="print-scope" style="display:none;">
   <div id="helpBackdrop"></div>
 
-  <div id="helpPanel" role="dialog" aria-modal="true" aria-label="Aide et formules">
+  <div id="helpPanel" role="dialog" aria-modal="true">
     <div class="helpHeader">
       <div class="helpTitle">ℹ️ Guide — Formules & Conventions (Alignement)</div>
 
@@ -1167,16 +1193,16 @@ Les pattes A / B / C / D seront affichées ici.
       </div>
     </div>
 
-    <div id="helpContent" class="helpContent">
-      <!-- injecté par JS -->
-    </div>
+    <div id="helpContent" class="helpContent"></div>
   </div>
-
 </div>
-  <!-- =========================================================
-                        TRAINING FULLSCREEN
-========================================================= -->
-<div id="trainingPage">
+
+
+
+<!-- ===================================================== -->
+<!-- TRAINING FULLSCREEN -->
+<!-- ===================================================== -->
+<div id="trainingPage" class="trainingHidden">
 
   <div class="trainingTopBar">
     <div class="trainingTitle">🎓 Mode Training</div>
@@ -1194,11 +1220,12 @@ Les pattes A / B / C / D seront affichées ici.
 
   <div class="trainingBody">
 
-    <!-- contenu injecté par JS -->
+    <!-- CONTENU PEDAGOGIQUE (texte, boutons etc) -->
     <div id="trainingContent"></div>
 
-    <!-- canvases training -->
+    <!-- CANVAS TRAINING (SEPARÉS DE LA PAGE PRINCIPALE) -->
     <div class="trainingCanvasZone">
+
       <div class="trainingCanvasCard">
         <div class="canvasHeader">Vue de dessus</div>
         <canvas id="topViewTest"></canvas>
@@ -1206,13 +1233,15 @@ Les pattes A / B / C / D seront affichées ici.
 
       <div class="trainingCanvasCard">
         <div class="canvasHeader">Vue de profil</div>
-       <canvas id="sideViewTest"></canvas>
+        <canvas id="sideViewTest"></canvas>
       </div>
+
     </div>
 
   </div>
 
 </div>
+
 <script>
 "use strict";
 /* =====================================================
