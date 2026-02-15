@@ -3272,24 +3272,7 @@ function forceResizeTrainingCanvases(){
   fit(window.sideCanvasTest, window.sideCtxTest);
 }
 
-  function apply(canvas, ctx){
-    if(!canvas || !ctx) return;
-
-    canvas.style.width  = viewWidth + "px";
-    canvas.style.height = viewHeight + "px";
-
-    canvas.width  = Math.round(viewWidth  * dpr);
-    canvas.height = Math.round(viewHeight * dpr);
-
-    ctx.setTransform(dpr,0,0,dpr,0,0);
-  }
-
-  apply(window.topCanvasTest,  window.topCtxTest);
-  apply(window.sideCanvasTest, window.sideCtxTest);
-
-  drawTopViewGeneric(window.topCtxTest);
-  drawSideViewGeneric(window.sideCtxTest);
-}
+  
 function wakeUpTrainingCanvas(){
   setTimeout(()=>{
     if(window.topCanvasTest){
