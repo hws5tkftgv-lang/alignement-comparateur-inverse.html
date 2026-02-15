@@ -3183,45 +3183,40 @@ Pattes à corriger : ${faultyTxt}`
    Wire inputs (lecture -> state -> redraw)
 ===================================================== */
 function wireInputs(pairs){
-  pairs.forEach(([inputId, setter]) => {
-    const input = document.getElementById(inputId);
+
+  pairs.forEach(([id, setter]) => {
+
+    const input = document.getElementById(id);
     if(!input) return;
 
     const isSelect = input.tagName === "SELECT";
 
-    input.addEventListener("input", () => {
-      // saisie libre
-    });
+    function apply(){
+      let raw = input.value;
 
-    input.addEventListener("keydown", (e) => {
-      if(e.key === "Enter"){
-        input.blur();
+      if(isSelect){
+        setter(raw);
+      }else{
+        raw = raw.replace(",", ".");
+        if(raw.trim() === "") raw = "0";
+        const v = parseFloat(raw);
+        setter(Number.isFinite(v) ? v : 0);
       }
-    });
 
-    input.addEventListener("blur", () => {
+      recomputeAlignment();
+      renderAll();
 
-  let raw = input.value;
+      // si training actif → redraw pédagogique
+      if(trainingMode){
+        drawTrainingViews();
+        updateTraining();
+      }
+    }
 
-  if(isSelect){
-    setter(raw);
-    recomputeAlignment();
-    renderAll();            // ← AJOUT CRITIQUE
-    return;
-  }
-
-  raw = raw.trim();
-  if(raw === ""){
-    raw = "0";
-    input.value = "0";
-  }
-
-  const v = parseFloat(raw);
-  setter(Number.isFinite(v) ? v : 0);
-
-  recomputeAlignment();
-  renderAll();              // ← AJOUT CRITIQUE
-});
+    // 🔥 IMPORTANT : tous les cas mobiles + desktop
+    input.addEventListener("input", apply);
+    input.addEventListener("change", apply);
+    input.addEventListener("keyup", apply);
   });
 }
 /* =====================================================
