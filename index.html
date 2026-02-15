@@ -1736,6 +1736,33 @@ let dialState = {
 // ==========================================
 // LECTURE MÉCANIQUE RÉELLE (SOURCE UNIQUE)
 // ==========================================
+
+function recomputeAlignment(){
+
+  // met à jour les valeurs internes
+  readAllInputs();
+
+  // calculs pédagogiques
+  computeSoftFoot();
+  computeAngular();
+  computeParallel();
+
+  // affichage texte
+  updateStepInfo();
+
+  // affichage graphique
+  drawTopView();
+  drawSideView();
+
+  // training si actif
+  if(trainingMode){
+    drawTrainingViews();
+    updateTraining();
+  }
+}
+
+
+
 function getMechanicalReading(defect){
 
   const v = Number(trainState[defect]) || 0;
@@ -2099,6 +2126,7 @@ function drawDial(canvasId, needleVal){
 
 
 function updateTraining(){
+  recomputeAlignment();
   
   if(!trainingMode) return;
 
@@ -3121,31 +3149,26 @@ function wireInputs(pairs){
     });
 
     input.addEventListener("blur", () => {
-      let raw = input.value;
 
-      // 🟢 CAS SELECT (matériau)
-      if(isSelect){
-        setter(raw);
-        refreshUI();
-        drawTopView();
-        drawSideView();
-        return;
-      }
+  let raw = input.value;
 
-      // 🔵 CAS NUMÉRIQUE
-      raw = raw.trim();
-      if(raw === ""){
-        raw = "0";
-        input.value = "0";
-      }
+  if(isSelect){
+    setter(raw);
+    recomputeAlignment();
+    return;
+  }
 
-      const v = parseFloat(raw);
-      setter(Number.isFinite(v) ? v : 0);
+  raw = raw.trim();
+  if(raw === ""){
+    raw = "0";
+    input.value = "0";
+  }
 
-      refreshUI();
-      drawTopView();
-      drawSideView();
-    });
+  const v = parseFloat(raw);
+  setter(Number.isFinite(v) ? v : 0);
+
+  recomputeAlignment();
+});
   });
 }
 /* =====================================================
@@ -3214,8 +3237,15 @@ function prevStep(){
     renderAll();
   }
 }
-ui.btnPrev.addEventListener("click", prevStep);
-ui.btnNext.addEventListener("click", nextStep);
+ui.btnPrev.addEventListener("click", ()=>{
+  prevStep();
+  recomputeAlignment();
+});
+
+ui.btnNext.addEventListener("click", ()=>{
+  nextStep();
+  recomputeAlignment();
+});
 /* =====================================================
    BLOC 3 — DESSINS & SYNCHRO
 ===================================================== */
@@ -3835,6 +3865,8 @@ function renderAll(){
   drawSideView();
 }
 window.addEventListener("load", () => {
+  
+  recomputeAlignment(); 
 
   // ===== ORIENTATION =====
   const layoutSelect = document.getElementById("footLayout");
