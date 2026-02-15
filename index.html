@@ -1022,42 +1022,40 @@ canvas{
 
 /* ================= TRAINING CANVAS LAYOUT ================= */
 
-.trainingCanvasZone{
+
+/* ================= TRAINING CANVAS LAYOUT (SCOPÉ) ================= */
+
+/* ✅ Ne s'applique QUE dans la page training */
+#trainingPage .trainingCanvasZone{
   width:100%;
-  height:60vh;
+  flex:1;
   min-height:420px;
 
   display:flex;
   flex-direction:column;
   gap:14px;
+
+  /* IMPORTANT: éviter la boucle "contenu -> hauteur -> contenu" */
+  height:auto;
 }
 
-.trainingView{
-  flex:1;
+/* cartes */
+#trainingPage .trainingCanvasCard{
   background:#000;
-  border-radius:14px;
-  position:relative;
+  border-radius:12px;
   overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  min-height:220px;
 }
 
-.trainingViewTitle{
-  position:absolute;
-  top:10px;
-  left:14px;
-  color:#fff;
-  font-weight:700;
-  opacity:.85;
-  pointer-events:none;
-}
-
-.trainingView canvas{
-  position:absolute;
-  inset:0;
+/* le canvas doit prendre l'espace restant */
+#trainingPage .trainingCanvasCard canvas{
   width:100%;
-  height:100%;
+  flex:1;
+  height:auto;      /* ← le CSS contrôle, pas le JS */
   display:block;
 }
-
 /* ============================
    TRAINING = PAGE ROOT LAYER
 ============================ */
@@ -2123,20 +2121,14 @@ if(window.sideCanvasTest){
   if(pv) pv.textContent = parDisplay.toFixed(2) + " mil";
   if(av) av.textContent = angDisplay.toFixed(2) + " mil";
 
-  // ===============================
-  // 🔥 PARTIE MANQUANTE 🔥
-  // FORCER LE DESSIN MÉCANIQUE
-  // ===============================
-  forceResizeTrainingCanvases();
-
+    // ✅ On ne resize PAS à chaque tick de slider (sinon boucles/layout jank).
+  // Le resize est fait seulement à l'ouverture + orientation/resize.
   if(window.topCtxTest){
     drawTopViewGeneric(window.topCtxTest);
   }
-
   if(window.sideCtxTest){
     drawSideViewGeneric(window.sideCtxTest);
   }
-
   // ===============================
   // TEXTE
   // ===============================
@@ -3255,17 +3247,30 @@ function resizeCanvas(canvas, ctx){
 ===================================================== */
 
 function forceResizeTrainingCanvases(){
-
-  const zone = document.querySelector("#trainingPage.active .trainingCanvasZone");
-  if(!zone) return;
-
-  const rect = zone.getBoundingClientRect();
-  if(rect.width === 0 || rect.height === 0) return;
+  if(!trainingMode) return;
 
   const dpr = window.devicePixelRatio || 1;
 
-  const viewHeight = Math.floor(rect.height / 2);
-  const viewWidth  = Math.floor(rect.width);
+  function fit(canvas, ctx){
+    if(!canvas || !ctx) return;
+
+    // ✅ On lit la taille RÉELLE affichée (CSS) du canvas
+    const r = canvas.getBoundingClientRect();
+    if(r.width < 10 || r.height < 10) return;
+
+    const w = Math.round(r.width  * dpr);
+    const h = Math.round(r.height * dpr);
+
+    // ✅ On ajuste la résolution interne sans toucher au layout
+    if(canvas.width !== w)  canvas.width  = w;
+    if(canvas.height !== h) canvas.height = h;
+
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+
+  fit(window.topCanvasTest,  window.topCtxTest);
+  fit(window.sideCanvasTest, window.sideCtxTest);
+}
 
   function apply(canvas, ctx){
     if(!canvas || !ctx) return;
