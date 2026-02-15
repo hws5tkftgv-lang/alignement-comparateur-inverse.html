@@ -1251,10 +1251,10 @@ const MACHINE_LAYOUT = {
 };
 // disposition des pattes pour le calcul soft foot
 const FOOT_SCHEMES = {
-  A: [0,1],
-  B: [2,3],
-  C: [0,2],
-  D: [1,3]
+  A: { TL:"A", TR:"B", BR:"C", BL:"D" }, // standard
+  B: { TL:"A", TR:"B", BR:"D", BL:"C" }, // invBottom (A/B/D/C)
+  C: { TL:"C", TR:"D", BR:"A", BL:"B" }, // rot180
+  D: { TL:"A", TR:"C", BR:"B", BL:"D" }  // exemple alternatif (ajuste si tu veux)
 };
 const MACHINE = {
 
@@ -1739,25 +1739,38 @@ let dialState = {
 
 function recomputeAlignment(){
 
-  // met à jour les valeurs internes
-  readAllInputs();
+  // 1) lecture inputs (si la fonction existe)
+  if(typeof readAllInputs === "function"){
+    readAllInputs();
+  }
 
-  // calculs pédagogiques
-  computeSoftFoot();
-  computeAngular();
-  computeParallel();
+  // 2) calculs (si existent)
+  if(typeof computeSoftFoot === "function"){
+    computeSoftFoot();
+  }
+  if(typeof computeAngular === "function"){
+    computeAngular();
+  }
+  if(typeof computeParallel === "function"){
+    computeParallel();
+  }
 
-  // affichage texte
-  updateStepInfo();
+  // 3) UI texte (si existe)
+  if(typeof updateStepInfo === "function"){
+    updateStepInfo();
+  }else{
+    // fallback minimal : rafraîchir UI existante
+    if(typeof refreshUI === "function") refreshUI();
+  }
 
-  // affichage graphique
-  drawTopView();
-  drawSideView();
+  // 4) dessins (toujours safe)
+  if(typeof drawTopView === "function")  drawTopView();
+  if(typeof drawSideView === "function") drawSideView();
 
-  // training si actif
+  // 5) training
   if(trainingMode){
-    drawTrainingViews();
-    updateTraining();
+    if(typeof drawTrainingViews === "function") drawTrainingViews();
+    if(typeof updateTraining === "function"){} // évite boucle (updateTraining appelle recomputeAlignment)
   }
 }
 
@@ -2396,26 +2409,24 @@ function mapFeetToCorners(){
 ===================================================== */
 function computeSoftFoot(){
 
-  const feet = mapFeetToCorners();
+  const scheme = FOOT_SCHEMES[footSchemeKey] || FOOT_SCHEMES.A;
 
-  const diag1 = feet.TL + feet.BR;   // diagonale TL ↔ BR
-  const diag2 = feet.TR + feet.BL;   // diagonale TR ↔ BL
+  const TL = Number(state.softFoot[scheme.TL] || 0);
+  const TR = Number(state.softFoot[scheme.TR] || 0);
+  const BR = Number(state.softFoot[scheme.BR] || 0);
+  const BL = Number(state.softFoot[scheme.BL] || 0);
+
+  const diag1 = TL + BR; // TL ↔ BR
+  const diag2 = TR + BL; // TR ↔ BL
 
   const delta = Math.abs(diag1 - diag2);
   const correction = delta * 0.8;
 
   let faulty = null;
+  if(diag1 > diag2) faulty = [scheme.TL, scheme.BR];
+  if(diag2 > diag1) faulty = [scheme.TR, scheme.BL];
 
-  if(diag1 > diag2) faulty = ["TL","BR"];
-  if(diag2 > diag1) faulty = ["TR","BL"];
-
-  return {
-    diagAC: diag1,
-    diagBD: diag2,
-    delta,
-    correction,
-    faulty
-  };
+  return { diagAC: diag1, diagBD: diag2, delta, correction, faulty };
 }
 /* =====================================================
    ANGULARITÉ VERTICALE — PAIRES
@@ -3865,9 +3876,9 @@ function renderAll(){
   drawSideView();
 }
 window.addEventListener("load", () => {
-  
-  recomputeAlignment(); 
-
+  renderAll();          // UI + dessins
+  recomputeAlignment(); // calc (safe maintenant)
+});
   // ===== ORIENTATION =====
   const layoutSelect = document.getElementById("footLayout");
   if(layoutSelect){
