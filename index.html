@@ -3206,6 +3206,7 @@ function wireInputs(pairs){
   if(isSelect){
     setter(raw);
     recomputeAlignment();
+    renderAll();            // ← AJOUT CRITIQUE
     return;
   }
 
@@ -3219,6 +3220,7 @@ function wireInputs(pairs){
   setter(Number.isFinite(v) ? v : 0);
 
   recomputeAlignment();
+  renderAll();              // ← AJOUT CRITIQUE
 });
   });
 }
