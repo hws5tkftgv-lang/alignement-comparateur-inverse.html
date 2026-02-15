@@ -1349,7 +1349,36 @@ function installDynamicInputListener(){
   });
 
 }
+function bindNumericInput(id, setter){
 
+  const el = document.getElementById(id);
+  if(!el) return;
+
+  // IMPORTANT : ne rien faire pendant la frappe
+  el.addEventListener("input", () => {
+    // on laisse l’utilisateur écrire tranquille
+  });
+
+  // Appliquer la valeur seulement quand terminé
+  function apply(){
+    const v = parseFloat(el.value);
+    if(!isNaN(v)){
+      setter(v);
+      recomputeAlignment();
+      renderAll();
+    }
+  }
+
+  el.addEventListener("change", apply);
+  el.addEventListener("blur", apply);
+
+  // Entrée clavier
+  el.addEventListener("keydown", e=>{
+    if(e.key === "Enter"){
+      el.blur();
+    }
+  });
+}
 
 
 function waitCanvasReady(canvas, callback){
@@ -2995,8 +3024,8 @@ if(id === "readV"){
   `;
 
   wireInputs([
-    ["in_angV", v => state.angV = v/1000], // conversion mil → pouces
-    ["in_parV", v => state.parV = v/1000]
+ bindNumericInput("in_angV", v => state.angV = v/1000);
+bindNumericInput("in_parV", v => state.parV = v/1000);
   ]);
   return;
 }
@@ -3038,8 +3067,8 @@ if(id === "readH"){
   `;
 
   wireInputs([
-    ["in_angH", v => state.angH = v/1000],
-    ["in_parH", v => state.parH = v/1000]
+    bindNumericInput("in_angH", v => state.angH = v/1000);
+bindNumericInput("in_parH", v => state.parH = v/1000);
   ]);
   return;
 }
