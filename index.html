@@ -1153,12 +1153,12 @@ Les pattes A / B / C / D seront affichées ici.
 
   <div class="trainingView">
     <div class="trainingViewTitle">Vue de dessus</div>
-    <canvas id="topViewTest"></canvas>
+   <canvas id="topView"></canvas>
   </div>
 
   <div class="trainingView">
     <div class="trainingViewTitle">Vue de profil</div>
-    <canvas id="sideViewTest"></canvas>
+    <canvas id="sideView"></canvas>
   </div>
 
 </div>
@@ -1830,15 +1830,7 @@ requestAnimationFrame(()=>{
   // ===============================
   // CANVAS TRAINING
   // ===============================
-  const tc = document.getElementById("topViewTest");
-  const sc = document.getElementById("sideViewTest");
-
-  if(tc && sc){
-    window.topCanvasTest  = tc;
-    window.sideCanvasTest = sc;
-    window.topCtxTest  = tc.getContext("2d");
-    window.sideCtxTest = sc.getContext("2d");
-  }
+  
 
   document.body.classList.add("training-on");
 
@@ -3256,7 +3248,7 @@ function resizeCanvas(canvas, ctx){
 
 function forceResizeTrainingCanvases(){
 
-  const zone = document.querySelector(".trainingCanvasZone");
+  const zone = document.querySelector("#trainingPage.active .trainingCanvasZone");
   if(!zone) return;
 
   const rect = zone.getBoundingClientRect();
