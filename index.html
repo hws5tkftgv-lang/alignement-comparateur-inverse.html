@@ -2768,7 +2768,10 @@ const ui = {
 
 function buildCorrectionMessage(){
 
-  const stepId = STEPS[state.step].id;
+  const step = STEPS[state.step];
+  if(!step) return "";
+
+  const stepId = step.id;
 
   // ---------- PIED BOITEUX ----------
   if(stepId === "softfoot"){
@@ -3277,55 +3280,45 @@ ui.stepBadge.classList.remove("ok","bad");
    Navigation
 ===================================================== */
 function nextStep(){
-  // Sous-étapes de "measures"
+
   if(STEPS[state.step].id === "measures"){
     if(state.measureStep < 2){
       state.measureStep++;
-      renderAll();
-      return;
     }else{
       state.measureStep = 0;
       state.step++;
-      renderAll();
-      return;
     }
+  }else if(state.step < STEPS.length - 1){
+    state.step++;
   }
 
-  if(state.step < STEPS.length - 1){
-  state.step++;
-  renderAll();
-}
+  // 🔴 ORDRE CRITIQUE
+  recomputeAlignment();
+  refreshUI();
+  drawTopView();
+  drawSideView();
 }
 
 function prevStep(){
-  // Sous-étapes de "measures"
+
   if(STEPS[state.step].id === "measures"){
     if(state.measureStep > 0){
       state.measureStep--;
-      renderAll();
-      return;
     }else{
-      // revenir à l'étape précédente
       state.step--;
-      renderAll();
-      return;
     }
-  }
-
-  if(state.step > 0){
+  }else if(state.step > 0){
     state.step--;
-    renderAll();
   }
-}
-ui.btnPrev.addEventListener("click", ()=>{
-  prevStep();
-  recomputeAlignment();
-});
 
-ui.btnNext.addEventListener("click", ()=>{
-  nextStep();
+  // 🔴 ORDRE CRITIQUE
   recomputeAlignment();
-});
+  refreshUI();
+  drawTopView();
+  drawSideView();
+}
+ui.btnPrev.addEventListener("click", prevStep);
+ui.btnNext.addEventListener("click", nextStep);
 /* =====================================================
    BLOC 3 — DESSINS & SYNCHRO
 ===================================================== */
