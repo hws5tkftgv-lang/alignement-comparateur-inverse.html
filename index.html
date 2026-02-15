@@ -3089,7 +3089,7 @@ else if(id === "thermal"){
     <label>Température ambiante (°F)</label>
     <input type="number"
            value="${state.tempAmb}"
-           oninput="state.tempAmb = Number(this.value)">
+         oninput="state.tempAmb = Number(this.value); thermalApply();">
   </div>
 
   <!-- MOTEUR -->
@@ -3101,14 +3101,14 @@ else if(id === "thermal"){
         <label>Température d’opération (°F)</label>
         <input type="number"
                value="${state.motor.tempOp}"
-               oninput="state.motor.tempOp = Number(this.value)">
+             oninput="state.motor.tempOp = Number(this.value); thermalApply();" >
       </div>
 
       <div>
         <label>Hauteur d’axe (po)</label>
         <input type="number"
                value="${state.motor.axisHeight}"
-               oninput="state.motor.axisHeight = Number(this.value)">
+            oninput="state.motor.axisHeight = Number(this.value); thermalApply();" >
       </div>
     </div>
 
@@ -3136,14 +3136,14 @@ else if(id === "thermal"){
         <label>Température d’opération (°F)</label>
         <input type="number"
                value="${state.pump.tempOp}"
-               oninput="state.pump.tempOp = Number(this.value)">
+            oninput="state.pump.tempOp = Number(this.value); thermalApply();" >
       </div>
 
       <div>
         <label>Hauteur d’axe (po)</label>
         <input type="number"
                value="${state.pump.axisHeight}"
-               oninput="state.pump.axisHeight = Number(this.value)">
+            oninput="state.pump.axisHeight = Number(this.value); thermalApply();" >
       </div>
     </div>
 
@@ -3156,7 +3156,7 @@ else if(id === "thermal"){
 
 <select onchange="
   state.pump.material = this.value;
-  renderAll();
+  thermalApply();
 ">
   ${materialOptions(state.pump.material)}
 </select>
@@ -3933,6 +3933,12 @@ function drawTrainingViews(){
 // ======================================================
 // RENDER GLOBAL
 // ======================================================
+
+function thermalApply(){
+  recomputeAlignment();
+  renderAll();
+}
+
 function renderAll(){
 
   // 🔴 NE PAS DETRUIRE LES INPUTS pendant la saisie
