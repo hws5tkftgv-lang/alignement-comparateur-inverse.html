@@ -3870,27 +3870,40 @@ function drawTrainingViews(){
     
   }
 }
+// ======================================================
+// RENDER GLOBAL
+// ======================================================
 function renderAll(){
   refreshUI();
   drawTopView();
   drawSideView();
 }
+
+
+// ======================================================
+// INITIALISATION PAGE
+// ======================================================
 window.addEventListener("load", () => {
-  renderAll();          // UI + dessins
-  recomputeAlignment(); // calc (safe maintenant)
-});
-  // ===== ORIENTATION =====
+
+  // --- rendu initial ---
+  renderAll();
+  recomputeAlignment();
+
+  // =========================
+  // ORIENTATION PATTES
+  // =========================
   const layoutSelect = document.getElementById("footLayout");
   if(layoutSelect){
     layoutSelect.value = footLayout;
-
     layoutSelect.addEventListener("change", () => {
       footLayout = layoutSelect.value;
       renderAll();
     });
   }
 
-  // ===== ℹ️ AIDE / FORMULES =====
+  // =========================
+  // BOUTONS AIDE
+  // =========================
   const btnHelp = document.getElementById("btnHelp");
   const btnHelpClose = document.getElementById("btnHelpClose");
   const btnHelpPrint = document.getElementById("btnHelpPrint");
@@ -3901,6 +3914,7 @@ window.addEventListener("load", () => {
   if(btnHelpPrint) btnHelpPrint.addEventListener("click", printHelp);
   if(helpBackdrop) helpBackdrop.addEventListener("click", closeHelp);
 
+  // ESC ferme tout
   document.addEventListener("keydown", (e) => {
     if(e.key === "Escape"){
       closeHelp();
@@ -3908,23 +3922,23 @@ window.addEventListener("load", () => {
     }
   });
 
-  // ===== 🎓 TRAINING =====
+  // =========================
+  // TRAINING
+  // =========================
   const btnTraining = document.getElementById("btnTraining");
   const btnTrainingClose = document.getElementById("btnTrainingClose");
-  const trainingBackdrop = document.getElementById("trainingBackdrop");
 
   if(btnTraining) btnTraining.addEventListener("click", openTraining);
   if(btnTrainingClose) btnTrainingClose.addEventListener("click", closeTraining);
-  if(trainingBackdrop) trainingBackdrop.addEventListener("click", closeTraining);
 
-
-  
-
-  renderAll();
 });
-// ============================================
-// 📱 iOS / Safari — FIX ORIENTATION TRAINING
-// ============================================
+
+
+// ======================================================
+// 📱 iOS / SAFARI FIXES (TRAINING)
+// ======================================================
+
+// rotation écran
 window.addEventListener("orientationchange", () => {
   if(trainingMode){
     setTimeout(() => {
@@ -3933,12 +3947,15 @@ window.addEventListener("orientationchange", () => {
     }, 150);
   }
 });
+
+// resize normal
 window.addEventListener("resize", () => {
   if(trainingMode){
     forceResizeTrainingCanvases();
   }
 });
-// 🔧 iOS Safari : redraw quand la barre du bas apparaît/disparaît
+
+// iOS barre bas qui apparaît/disparaît
 window.addEventListener("resize", () => {
   if(trainingMode){
     forceResizeTrainingCanvases();
