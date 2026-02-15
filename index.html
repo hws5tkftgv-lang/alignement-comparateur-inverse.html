@@ -3660,8 +3660,8 @@ function drawTopViewGeneric(ctx){
   const parH = trainingMode ? trainState.parH : state.parH;
   const angH = trainingMode ? trainState.angH : state.angH;
 
-  const scale = 0.25;
-  const rotGain = 0.0012;
+  const scale = 2.0;     // ✅ déplacement visible
+const rotGain = 0.02;  // ✅ rotation visible
 
   const baseY = h*0.5;
   // largeur totale mécanique
@@ -3771,8 +3771,8 @@ function drawSideViewGeneric(ctx){
   const parV = trainingMode ? trainState.parV : state.parV;
   const angV = trainingMode ? trainState.angV : state.angV;
 
-  const scale = 0.25;
-  const rotGain = 0.0012;
+  const scale = 2.0;
+const rotGain = 0.02;
 
   const baseY = h*0.60;
   // largeur totale mécanique
