@@ -1794,9 +1794,9 @@ function recomputeAlignment(){
     if(typeof refreshUI === "function") refreshUI();
   }
 
-  // 4) dessins (toujours safe)
-  if(typeof drawTopView === "function")  drawTopView();
-  if(typeof drawSideView === "function") drawSideView();
+  // 4) dessins PRINCIPAUX — TOUJOURS FORCÉS
+drawTopView();
+drawSideView();
 
   // 5) training
   if(trainingMode){
@@ -3912,8 +3912,11 @@ function drawTrainingViews(){
 // ======================================================
 function renderAll(){
   refreshUI();
-  drawTopView();
-  drawSideView();
+
+  requestAnimationFrame(()=>{
+    drawTopView();
+    drawSideView();
+  });
 }
 
 
