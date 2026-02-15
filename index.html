@@ -3657,8 +3657,8 @@ function drawTopViewGeneric(ctx){
   const { w, h } = resizeCanvas(ctx.canvas, ctx);
   clear(ctx,w,h);
 
-  const parH = trainingMode ? trainState.parH : state.parH;
-  const angH = trainingMode ? trainState.angH : state.angH;
+  const parH = trainingMode ? trainState.parH : state.parH * 1000;
+const angH = trainingMode ? trainState.angH : state.angH * 1000;
 
   const scale = 2.0;     // ✅ déplacement visible
 const rotGain = 0.02;  // ✅ rotation visible
@@ -3768,8 +3768,8 @@ function drawSideViewGeneric(ctx){
   const { w, h } = resizeCanvas(ctx.canvas, ctx);
   clear(ctx,w,h);
 
-  const parV = trainingMode ? trainState.parV : state.parV;
-  const angV = trainingMode ? trainState.angV : state.angV;
+  const parV = trainingMode ? trainState.parV : state.parV * 1000;
+const angV = trainingMode ? trainState.angV : state.angV * 1000;
 
   const scale = 2.0;
 const rotGain = 0.02;
