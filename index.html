@@ -3935,8 +3935,17 @@ function drawTrainingViews(){
 // ======================================================
 
 function thermalApply(){
+  goToThermalStep();
   recomputeAlignment();
   renderAll();
+}
+
+
+function goToThermalStep(){
+  const idx = STEPS.findIndex(s => s.id === "thermal");
+  if(idx >= 0){
+    currentStepIndex = idx;
+  }
 }
 
 function renderAll(){
