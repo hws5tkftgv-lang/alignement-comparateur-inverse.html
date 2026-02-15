@@ -1354,6 +1354,12 @@ function bindNumericInput(id, setter){
   const el = document.getElementById(id);
   if(!el) return;
 
+  // ===== BONUS iPHONE CLAVIER NUMÉRIQUE =====
+  el.setAttribute("inputmode","decimal");
+  el.setAttribute("enterkeyhint","done");
+  el.autocomplete = "off";
+  el.spellcheck = false;
+
   // IMPORTANT : ne rien faire pendant la frappe
   el.addEventListener("input", () => {
     // on laisse l’utilisateur écrire tranquille
@@ -1372,15 +1378,13 @@ function bindNumericInput(id, setter){
   el.addEventListener("change", apply);
   el.addEventListener("blur", apply);
 
-  // Entrée clavier
+  // Entrée clavier iOS
   el.addEventListener("keydown", e=>{
     if(e.key === "Enter"){
       el.blur();
     }
   });
 }
-
-
 function waitCanvasReady(canvas, callback){
 
   let tries = 0;
@@ -3025,7 +3029,7 @@ if(id === "readV"){
 
   wireInputs([
  bindNumericInput("in_angV", v => state.angV = v/1000);
-bindNumericInput("in_parV", v => state.parV = v/1000);
+ bindNumericInput("in_parV", v => state.parV = v/1000);
   ]);
   return;
 }
