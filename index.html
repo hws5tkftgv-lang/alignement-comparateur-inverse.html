@@ -1321,6 +1321,37 @@ const MATERIAL_COEFF = {
   bronze:    0.0000100
 };
 
+function installDynamicInputListener(){
+
+  const zone = document.getElementById("inputsArea");
+  if(!zone) return;
+
+  // frappe clavier
+  zone.addEventListener("input", () => {
+    recomputeAlignment();
+    renderAll();
+
+    if(trainingMode){
+      updateTraining();
+      drawTrainingViews();
+    }
+  });
+
+  // changement manuel (mobile / sélection / copier coller)
+  zone.addEventListener("change", () => {
+    recomputeAlignment();
+    renderAll();
+
+    if(trainingMode){
+      updateTraining();
+      drawTrainingViews();
+    }
+  });
+
+}
+
+
+
 function waitCanvasReady(canvas, callback){
 
   let tries = 0;
@@ -2624,30 +2655,39 @@ function isStepOK(stepIndex){
 
   const id = STEPS[stepIndex].id;
 
-  // ---------------------------
-  // 1) Pied boiteux obligatoire
-  // ---------------------------
-  if(id !== "softfoot"){
-    const sf = computeSoftFoot();
-    if(sf.delta > state.softFootTol){
-      return false;
-    }
+  // -----------------------------------
+  // SOFT FOOT : toujours calculable
+  // -----------------------------------
+  if(id === "softfoot"){
+    return true;
   }
 
-  // ---------------------------
-  // 2) Géométrie obligatoire
-  // ---------------------------
-  if(id !== "softfoot" && id !== "measures"){
-    if(
-      geometry.couplingDiameter <= 0 ||
-      geometry.A <= 0 ||
-      geometry.B <= 0
-    ){
-      return false;
-    }
+  // -----------------------------------
+  // MESURES CADRAN : toujours calculable
+  // -----------------------------------
+  if(id === "measures" || id === "vertical" || id === "horizontal"){
+    return true;
   }
 
-  // Aucune autre étape ne bloque
+  // -----------------------------------
+  // AUTRES ÉTAPES : exigent géométrie
+  // -----------------------------------
+  if(
+    geometry.couplingDiameter <= 0 ||
+    geometry.A <= 0 ||
+    geometry.B <= 0
+  ){
+    return false;
+  }
+
+  // -----------------------------------
+  // Pied boiteux doit être corrigé AVANT correction finale
+  // -----------------------------------
+  const sf = computeSoftFoot();
+  if(sf.delta > state.softFootTol){
+    return false;
+  }
+
   return true;
 }
 /* =====================================================
