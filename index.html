@@ -3937,14 +3937,16 @@ function drawTrainingViews(){
 function thermalApply(){
   goToThermalStep();
   recomputeAlignment();
-  renderAll();
+  refreshUI();     // ✅ direct (évite blocage userIsTyping)
+  drawTopView();
+  drawSideView();
 }
-
 
 function goToThermalStep(){
   const idx = STEPS.findIndex(s => s.id === "thermal");
   if(idx >= 0){
-    currentStepIndex = idx;
+    state.step = idx;          // ✅ LA bonne variable
+    state.measureStep = 0;     // (sécuritaire si tu viens de "measures")
   }
 }
 
