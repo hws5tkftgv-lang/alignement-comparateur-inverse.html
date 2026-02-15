@@ -1768,48 +1768,42 @@ let activeDefect = "angV";
 let activeDial = "parallel"; // "parallel" ou "angular"
 
 
+// ======================================================
+// ATTEND QUE LE CANVAS AIT UNE VRAIE TAILLE (FIX iOS/SAFARI)
+// ======================================================
+function waitCanvasVisible(canvas, callback){
 
+  if(!canvas) return;
+
+  function loop(){
+
+    const rect = canvas.getBoundingClientRect();
+
+    // 0px = le navigateur n'a pas fini le layout
+    if(rect.width > 20 && rect.height > 20){
+      callback();
+      return;
+    }
+
+    requestAnimationFrame(loop);
+  }
+
+  requestAnimationFrame(loop);
+}
 
 
 function openTraining(){
 
   const page = document.getElementById("trainingPage");
-  const content = document.getElementById("trainingContent");
-  if(!page || !content) return;
+  if(!page) return;
 
-  // ACTIVE MODE PAGE (coupe la page principale)
   document.body.classList.add("trainingActive");
   page.classList.add("active");
 
-  // on injecte le HTML
-  content.innerHTML = buildTrainingHTML();
-
-  // laisse le navigateur créer la nouvelle couche avant de démarrer
-  requestAnimationFrame(()=>{
-    requestAnimationFrame(()=>{
-      startTraining();
-    });
-  });
+  startTraining();
 }
 
-function trainingFirstRender(){
 
-  requestAnimationFrame(()=>{
-    requestAnimationFrame(()=>{
-
-      forceResizeTrainingCanvases();
-
-      if(window.topCtxTest && window.sideCtxTest){
-        drawTopViewGeneric(window.topCtxTest);
-        drawSideViewGeneric(window.sideCtxTest);
-      }
-
-      updateTraining();
-
-    });
-  });
-
-}
 
 
 
@@ -1846,12 +1840,7 @@ if(tc && sc){
 }
 
 // attendre le vrai layout Safari
-requestAnimationFrame(()=>{
-  setTimeout(()=>{
-    forceResizeTrainingCanvases();
-    wakeUpTrainingCanvas();
-  },50);
-});
+
   // ===============================
   // CANVAS TRAINING
   // ===============================
@@ -2009,14 +1998,21 @@ if (slider) {
     });
   }
 
-  // ===============================
-  // INIT + iPHONE FIX
-  // ===============================
   initTrainingDials();
 
-// rendu fiable après layout navigateur
-trainingFirstRender();
-}
+// attendre les DEUX canvas visibles
+waitCanvasVisible(window.topCanvasTest, () => {
+
+  waitCanvasVisible(window.sideCanvasTest, () => {
+
+    forceResizeTrainingCanvases();
+
+    drawTrainingViews();   // <- IMPORTANT
+    updateTraining();
+
+  });
+
+});
 function closeTraining(){
 
   trainingMode = false;
@@ -2102,17 +2098,7 @@ function drawDial(canvasId, needleVal){
 
 
 function updateTraining(){
-  // ===== iOS FORCE REDRAW LAYER =====
-if(window.topCanvasTest){
-  window.topCanvasTest.style.opacity = "0.99";
-  window.topCanvasTest.offsetHeight;
-  window.topCanvasTest.style.opacity = "1";
-}
-if(window.sideCanvasTest){
-  window.sideCanvasTest.style.opacity = "0.99";
-  window.sideCanvasTest.offsetHeight;
-  window.sideCanvasTest.style.opacity = "1";
-}
+  
   if(!trainingMode) return;
 
   // ===============================
@@ -3293,19 +3279,6 @@ function forceResizeTrainingCanvases(){
 }
 
   
-function wakeUpTrainingCanvas(){
-  setTimeout(()=>{
-    if(window.topCanvasTest){
-      window.topCanvasTest.width += 1;
-      window.topCanvasTest.width -= 1;
-    }
-    if(window.sideCanvasTest){
-      window.sideCanvasTest.width += 1;
-      window.sideCanvasTest.width -= 1;
-    }
-    forceResizeTrainingCanvases();
-  },80);
-}
 
 function clear(ctx,w,h){
   ctx.clearRect(0,0,w,h);
