@@ -3831,9 +3831,7 @@ const motorY = baseY + shiftY;
 const couplingX = baseX + motorW/2 + gap/2;
 const couplingY_motor = motorY; // ✅ suit le moteur
 const couplingY_pump  = baseY;  // ✅ pompe reste fixe
-  // semelle
-  ctx.fillStyle="#1a235a";
-  ctx.fillRect(0, baseY + pumpH/2 + 15, w, 20);
+  // (semelle retirée volontairement)
 
   // ================= POMPE FIXE =================
   const pumpX =
