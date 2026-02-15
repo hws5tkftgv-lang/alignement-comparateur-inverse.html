@@ -1242,6 +1242,8 @@ body.trainingActive > *:not(#trainingPage){
 
 <script>
 "use strict";
+
+let userIsTyping = false;
 /* =====================================================
    GÉOMÉTRIE MÉCANIQUE MAÎTRE (UNE SEULE SOURCE)
 ===================================================== */
@@ -3221,6 +3223,17 @@ function wireInputs(pairs){
 
     const isSelect = input.tagName === "SELECT";
 
+    // ===== L'utilisateur commence à écrire =====
+    input.addEventListener("focus", ()=>{
+      userIsTyping = true;
+    });
+
+    // ===== L'utilisateur termine =====
+    input.addEventListener("blur", ()=>{
+      userIsTyping = false;
+      apply();
+    });
+
     function apply(){
       let raw = input.value;
 
@@ -3235,18 +3248,7 @@ function wireInputs(pairs){
 
       recomputeAlignment();
       renderAll();
-
-      // si training actif → redraw pédagogique
-      if(trainingMode){
-        drawTrainingViews();
-        updateTraining();
-      }
     }
-
-    // 🔥 IMPORTANT : tous les cas mobiles + desktop
-    input.addEventListener("input", apply);
-    input.addEventListener("change", apply);
-    input.addEventListener("keyup", apply);
   });
 }
 /* =====================================================
@@ -3939,6 +3941,10 @@ function drawTrainingViews(){
 // RENDER GLOBAL
 // ======================================================
 function renderAll(){
+
+  // 🔴 NE PAS DETRUIRE LES INPUTS pendant la saisie
+  if(userIsTyping) return;
+
   refreshUI();
 
   requestAnimationFrame(()=>{
@@ -3946,7 +3952,6 @@ function renderAll(){
     drawSideView();
   });
 }
-
 
 // ======================================================
 // INITIALISATION PAGE
