@@ -3014,23 +3014,22 @@ if(id === "readV"){
     <div class="row">
       <div>
         <label>Lecture cadran vertical 12-6 — Angularité C (mils)</label>
-        <input id="in_angV" type="number" step="0.1" value="${state.angV}">
+        <input id="in_angV" type="number" step="0.1" value="${state.angV*1000}">
       </div>
       <div>
         <label>Lecture cadran vertical 12-6 — Parallélisme E (mils)</label>
-        <input id="in_parV" type="number" step="0.1" value="${state.parV}">
+        <input id="in_parV" type="number" step="0.1" value="${state.parV*1000}">
       </div>
     </div>
     <div class="noteBox">
-      Les lectures cadran sont en mils.  
+      Les lectures cadran sont en mils.
       L’application les convertit automatiquement en pouces pour le calcul CEMEQ.
     </div>
   `;
 
-  wireInputs([
- bindNumericInput("in_angV", v => state.angV = v/1000);
- bindNumericInput("in_parV", v => state.parV = v/1000);
-  ]);
+  bindNumericInput("in_angV", v => state.angV = v/1000);
+  bindNumericInput("in_parV", v => state.parV = v/1000);
+
   return;
 }
 // ===== CORRECTION VERTICALE =====
@@ -3070,13 +3069,11 @@ if(id === "readH"){
     </div>
   `;
 
-  wireInputs([
-    bindNumericInput("in_angH", v => state.angH = v/1000);
-bindNumericInput("in_parH", v => state.parH = v/1000);
-  ]);
+  bindNumericInput("in_angH", v => state.angH = v/1000);
+  bindNumericInput("in_parH", v => state.parH = v/1000);
+
   return;
 }
-  
   
   
 else if(id === "thermal"){
