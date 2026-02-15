@@ -308,11 +308,7 @@ canvas{
   border-radius:4px;
   font-size:13px;
 }
-  #trainingModal{
-  position:fixed;
-  inset:0;
-  z-index:9998;
-}
+  
 
 #trainingBackdrop{
   position:absolute;
@@ -402,11 +398,7 @@ canvas{
   font-weight: 600;
   display: inline-block;
 }
-#trainingModal{
-  position:fixed;
-  inset:0;
-  z-index:9999;
-}
+
 
 #trainingBackdrop{
   position:absolute;
@@ -581,11 +573,6 @@ body.modal-open{
    TRAINING — SUPPRESSION DU TITRE "COMPRÉHENSION DU CADRAN"
 ===================================================== */
 
-/* Supprime le titre texte dans le contenu du modal */
-#trainingModal #trainingPanel h1,
-#trainingModal #trainingPanel h2:first-of-type{
-  display: none !important;
-}
 
 
 
@@ -593,20 +580,13 @@ body.modal-open{
    TRAINING — SUPPRESSION DU TITRE INTERNE (SOUS LE BANDEAU)
 ===================================================== */
 
-#trainingModal #trainingPanel .wrap > h2:first-of-type,
-#trainingModal #trainingPanel .wrap > .card > h2:first-of-type{
-  display: none !important;
-}
 
 /* =====================================================
    TRAINING — SUPPRESSION DU TITRE
    "Mode entraînement — Compréhension du cadran"
 ===================================================== */
 
-#trainingModal #trainingPanel h1,
-#trainingModal #trainingPanel h2{
-  display: none !important;
-}
+
 
 .trainingOptions{
   display:flex;
@@ -928,25 +908,9 @@ body.trainingLock{
 
 /* ================= TRAINING FULLSCREEN ================= */
 
-#trainingModal{
-  position:fixed;
-  inset:0;
-  width:100vw;
-  height:100dvh;
-  background:#0b1436;
-  z-index:9999;
 
-  display:flex;
-  flex-direction:column;
 
-  transform:translateY(100%);
-  transition:transform .35s ease;
-}
 
-/* visible */
-#trainingModal.trainingVisible{
-  transform:translateY(0);
-}
 
 /* empêche scroll derrière */
 body.trainingLock{
@@ -1094,7 +1058,29 @@ canvas{
   display:block;
 }
 
+/* ============================
+   TRAINING = PAGE ROOT LAYER
+============================ */
 
+#trainingPage{
+  position:fixed;
+  inset:0;
+  z-index:999999;
+  background:#0b1436;
+  display:none;
+  overflow:auto;
+  -webkit-overflow-scrolling:touch;
+}
+
+/* quand actif */
+#trainingPage.active{
+  display:block;
+}
+
+/* LA PAGE PRINCIPALE DISPARAIT PHYSIQUEMENT */
+body.trainingActive > *:not(#trainingPage){
+  display:none !important;
+}
 </style>
 </head>
 
@@ -1694,28 +1680,9 @@ let __trainingScrollY = 0;
 // ===============================
 let __trainingResizeRAF = 0;
 
-function trainingResizeModalHeight(){
 
-  const page = document.getElementById("trainingPage");
-  if(!page) return;
 
-  const vh = (window.visualViewport && window.visualViewport.height)
-    ? window.visualViewport.height
-    : window.innerHeight;
 
-  page.style.height = `${Math.round(vh)}px`;
-}
-
-function trainingRequestResize(){
-  if(__trainingResizeRAF) return;
-  __trainingResizeRAF = requestAnimationFrame(() => {
-    __trainingResizeRAF = 0;
-    trainingResizeModalHeight();
-    forceResizeTrainingCanvases();
-    drawTrainingViews();
-    updateTraining();
-  });
-}
 
 
 
@@ -1772,20 +1739,28 @@ function isParallel(defect){
 let activeDefect = "angV";
 
 let activeDial = "parallel"; // "parallel" ou "angular"
+
+
+
+
+
 function openTraining(){
-  document.getElementById("trainingPage").style.display = "block";
 
   const page = document.getElementById("trainingPage");
-  if(!page) return;
+  const content = document.getElementById("trainingContent");
+  if(!page || !content) return;
 
-  // affiche immédiatement
-  page.style.display = "flex";
-  document.body.classList.add("trainingLock");
+  // ACTIVE MODE PAGE (coupe la page principale)
+  document.body.classList.add("trainingActive");
+  page.classList.add("active");
 
-  // attendre que le navigateur calcule la taille réelle
+  // on injecte le HTML
+  content.innerHTML = buildTrainingHTML();
+
+  // laisse le navigateur créer la nouvelle couche avant de démarrer
   requestAnimationFrame(()=>{
     requestAnimationFrame(()=>{
-      startTraining();   // ← ton ancien gros code
+      startTraining();
     });
   });
 }
@@ -1996,14 +1971,18 @@ waitCanvasReady(window.topCanvasTest, ()=>{
 });
 }
 function closeTraining(){
-  document.getElementById("trainingPage").style.display = "none";
 
   trainingMode = false;
 
   const page = document.getElementById("trainingPage");
-  if(page) page.style.display = "none";
+  if(page) page.classList.remove("active");
 
-  document.body.classList.remove("trainingLock");
+  document.body.classList.remove("trainingActive");
+
+  // IMPORTANT : redraw page principale après retour
+  setTimeout(()=>{
+    if(typeof renderAll === "function") renderAll();
+  },50);
 }
 function drawDial(canvasId, needleVal){
 
