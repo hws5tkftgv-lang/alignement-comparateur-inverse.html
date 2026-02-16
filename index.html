@@ -1247,6 +1247,7 @@ let userIsTyping = false;
 /* =====================================================
    GÉOMÉTRIE MÉCANIQUE MAÎTRE (UNE SEULE SOURCE)
 ===================================================== */
+
 const VIEW_OFFSET_X = 100; // ajuste à ton goût
 const MACHINE_LAYOUT = {
   machineOffset: -145 // négatif = rapproche la pompe
@@ -1307,6 +1308,8 @@ let angularReading = 0;   // C = angularité (12-6)
 // ===============================
 const SLIDER_GAIN = 0.20;      // sensibilité (0.2 à 0.4)
 const SLIDER_DEADBAND = 0.5;   // zone morte anti micro-bruit iOS
+const TRAINING_ROT_GAIN = 0.006;   // ⬅️ angle training (0.003 à 0.01 idéal)
+const NORMAL_ROT_GAIN   = 0.02;    // ⬅️ angle cours normal
 // refs canvases training (sécuritaire)
 window.topCanvasTest = null;
 window.sideCanvasTest = null;
@@ -3778,8 +3781,7 @@ function drawTopViewGeneric(ctx){
 const angH = trainingMode ? trainState.angH : state.angH * 100;
 
   const scale = 2.0;     // ✅ déplacement visible
-const rotGain = 0.02;  // ✅ rotation visible
-
+const rotGain = trainingMode ? TRAINING_ROT_GAIN : NORMAL_ROT_GAIN;
   const baseY = h*0.5;
   // largeur totale mécanique
 const totalLength =
@@ -3889,7 +3891,7 @@ function drawSideViewGeneric(ctx){
 const angV = trainingMode ? trainState.angV : state.angV * 100;
 
   const scale = 2.0;
-const rotGain = 0.02;
+const rotGain = trainingMode ? TRAINING_ROT_GAIN : NORMAL_ROT_GAIN;
 
   const baseY = h*0.60;
   // largeur totale mécanique
