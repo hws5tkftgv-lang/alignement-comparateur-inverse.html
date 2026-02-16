@@ -2729,20 +2729,52 @@ function isStepOK(stepIndex){
    MESSAGE TEXTE (ZONE INFO)
 ===================================================== */
 function buildMessage(){
+
   const step = STEPS[state.step];
+  if(!step) return "";
+
+  const id = step.id;
+
   let txt = `Étape ${step.label}\n\n`;
 
-  txt += "Calcul pédagogique — méthode CEMEQ\n\n";
-
-  if(step.id === "softfoot"){
+  // ---------- SOFT FOOT ----------
+  if(id === "softfoot"){
     const sf = computeSoftFoot();
+
     txt += `Diag AC = ${sf.diagAC}\n`;
     txt += `Diag BD = ${sf.diagBD}\n`;
     txt += `Δ = ${sf.delta}\n`;
-    txt += `Correction ≈ ${sf.correction}\n`;
+
     if(sf.faulty){
       txt += `Pattes à corriger : ${labelFeet(sf.faulty)}`;
     }
+
+    return txt;
+  }
+
+  // ---------- MESURES ----------
+  if(id === "measures"){
+    return txt + "Entrer les dimensions réelles de la machine.";
+  }
+
+  // ---------- LECTURES ----------
+  if(id === "readV" || id === "readH"){
+    return txt + "Entrer les lectures au comparateur.";
+  }
+
+  // ---------- CORRECTIONS ALIGNEMENT ----------
+  if(id === "shimV" || id === "shimH"){
+    return txt + "Calcul pédagogique — méthode CEMEQ";
+  }
+
+  // ---------- THERMAL ----------
+  if(id === "thermal"){
+    return txt + "Compensation thermique (hors alignement)";
+  }
+
+  // ---------- VALIDATION ----------
+  if(id === "verify"){
+    return txt + "Validation finale de l’alignement";
   }
 
   return txt;
