@@ -1805,12 +1805,21 @@ let dialState = {
 
 function recomputeAlignment(){
 
-  // 1) lecture inputs (si la fonction existe)
+  const stepId = STEPS[state.step]?.id;
+
+  // ⛔ THERMAL = PAS D’ALIGNEMENT
+  if(stepId === "thermal"){
+    drawTopView();
+    drawSideView();
+    return;
+  }
+
+  // 1) lecture inputs
   if(typeof readAllInputs === "function"){
     readAllInputs();
   }
 
-  // 2) calculs (si existent)
+  // 2) calculs
   if(typeof computeSoftFoot === "function"){
     computeSoftFoot();
   }
@@ -1821,22 +1830,20 @@ function recomputeAlignment(){
     computeParallel();
   }
 
-  // 3) UI texte (si existe)
+  // 3) UI texte
   if(typeof updateStepInfo === "function"){
     updateStepInfo();
   }else{
-    // fallback minimal : rafraîchir UI existante
     if(typeof refreshUI === "function") refreshUI();
   }
 
-  // 4) dessins PRINCIPAUX — TOUJOURS FORCÉS
-drawTopView();
-drawSideView();
+  // 4) dessins
+  drawTopView();
+  drawSideView();
 
   // 5) training
   if(trainingMode){
     if(typeof drawTrainingViews === "function") drawTrainingViews();
-    if(typeof updateTraining === "function"){} // évite boucle (updateTraining appelle recomputeAlignment)
   }
 }
 
