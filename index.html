@@ -2445,14 +2445,14 @@ function updateNote(stepId){
         "Corriger le pied boiteux AVANT tout autre ajustement.";
       break;
 
-    case "vert":
-  txt = "La lecture au comparateur donne directement les cales à installer selon la méthode CEMEQ.";
-break;
+    case "shimV":
+  note.textContent = "La lecture au comparateur donne les cales à installer selon la méthode CEMEQ.";
+  break;
 
-case "horz":
-  txt = "Même principe : la lecture sert uniquement à calculer les déplacements latéraux.";
-break;
-      
+case "shimH":
+  note.textContent = "Même principe : la lecture sert à calculer le déplacement latéral (méthode CEMEQ).";
+  break;
+
     case "thermal":
       note.textContent =
         "La dilatation thermique se calcule APRÈS l’alignement à froid. Elle ne modifie pas les lectures au cadran.";
@@ -2577,6 +2577,59 @@ function computeParallelHorizontal(){
     };
   }
   return null;
+}
+
+
+// =====================================================
+// THERMAL — CALCULS (OBLIGATOIRE)
+// =====================================================
+function calcThermalGrowthMils(axisHeightIn, materialKey, tempOpF, tempAmbF){
+  const H = Number(axisHeightIn);
+  const T1 = Number(tempOpF);
+  const T0 = Number(tempAmbF);
+  const coef = MATERIAL_COEFF[String(materialKey)] ?? NaN;
+
+  if(!Number.isFinite(H) || !Number.isFinite(T1) || !Number.isFinite(T0) || !Number.isFinite(coef)){
+    return NaN;
+  }
+
+  const dT = T1 - T0;                 // °F
+  const growth_in = H * coef * dT;    // pouces (in)
+  const growth_mils = growth_in * 1000;
+
+  return growth_mils;
+}
+
+function calcRelativeThermalShim(motor, pump, tempAmbF){
+  if(!motor || !pump) return null;
+
+  const motorGrowth = calcThermalGrowthMils(
+    motor.axisHeight,
+    motor.material,
+    motor.tempOp,
+    tempAmbF
+  );
+
+  const pumpGrowth = calcThermalGrowthMils(
+    pump.axisHeight,
+    pump.material,
+    pump.tempOp,
+    tempAmbF
+  );
+
+  if(!Number.isFinite(motorGrowth) || !Number.isFinite(pumpGrowth)){
+    return null;
+  }
+
+  // + = moteur grandit plus que la pompe
+  const relative = motorGrowth - pumpGrowth;
+
+  // Si le moteur grandit PLUS : à froid il doit être PLUS BAS => retirer des cales
+  // Si le moteur grandit MOINS : à froid il doit être PLUS HAUT => ajouter des cales
+  const action = (relative >= 0) ? "REMOVE" : "ADD";
+  const shim = Math.abs(relative);
+
+  return { motorGrowth, pumpGrowth, relative, action, shim };
 }
 
 
