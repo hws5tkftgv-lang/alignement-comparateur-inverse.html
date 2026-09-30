@@ -1,1246 +1,75 @@
- <!doctype html>
-<html lang="fr">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#132d46">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Alignement">
-<title>Alignement – Comparateur inversé (mils)</title>
-
+<meta name="description" content="Atelier pédagogique d’alignement : mesures, corrections, vues de la machine et entraînement aux comparateurs.">
+<title>Alignement — Atelier interactif</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='13' fill='%23132d46'/%3E%3Cg fill='none' stroke='%2387d1ea' stroke-width='3'%3E%3Crect x='9' y='19' width='15' height='26' rx='2'/%3E%3Crect x='40' y='19' width='15' height='26' rx='2'/%3E%3Cpath d='M24 32h16M29 22v20M35 22v20'/%3E%3C/g%3E%3C/svg%3E">
 <style>
-:root{
-  --bg:#0b1436;
-  --card:#121c4a;
-  --text:#eaf1ff;
-  --muted:rgba(234,241,255,.75);
-  --ok:#4caf50;
-  --bad:#ff5252;
-  --accent:#00a2ff;
-}
-*{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-html,body{
-  margin:0;
-  background:var(--bg);
-  color:var(--text);
-  font-family:Arial,system-ui,sans-serif;
-}
-
-/* ===== HEADER ===== */
-.headerBar{
-  position:sticky;
-  top:0;
-  z-index:50;
-  background:linear-gradient(to bottom, rgba(11,20,54,.98), rgba(11,20,54,.88));
-  border-bottom:1px solid rgba(255,255,255,.08);
-  padding:12px;
-  text-align:center;
-  font-weight:900;
-  font-size:16px;
-}
-
-/* ===== LAYOUT ===== */
-.wrap{
-  padding:12px;
-  max-width:1100px;
-  margin:0 auto;
-}
-.grid{
-  display:grid;
-  gap:12px;
-}
-@media (min-width:900px){
-  .grid{ grid-template-columns:1fr 1fr; }
-}
-
-/* ===== CARDS ===== */
-.card{
-  background:var(--card);
-  border-radius:14px;
-  padding:12px;
-  border:1px solid rgba(255,255,255,.06);
-}
-h2{
-  margin:0 0 8px;
-  font-size:15px;
-}
-p{
-  margin:6px 0;
-  font-size:13px;
-  color:var(--muted);
-}
-
-/* ===== ÉTAPES ===== */
-.step{
-  border:1px solid rgba(255,255,255,.10);
-  border-radius:14px;
-  padding:12px;
-  background:rgba(255,255,255,.03);
-}
-.stepHead{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:6px;
-}
-.stepTitle{
-  font-weight:900;
-  font-size:14px;
-}
-.badge{
-  font-size:12px;
-  font-weight:900;
-  padding:4px 10px;
-  border-radius:999px;
-  background:rgba(255,255,255,.10);
-}
-.badge.ok{ background:rgba(76,175,80,.15); }
-.badge.bad{ background:rgba(255,82,82,.15); }
-
-/* ===== INPUTS ===== */
-.row{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px;
-}
-@media(max-width:420px){
-  .row{ grid-template-columns:1fr; }
-}
-label{
-  font-size:12px;
-  color:var(--muted);
-}
-input{
-  width:100%;
-  padding:10px;
-  font-size:16px;
-  border-radius:12px;
-  border:none;
-}
-
-/* ===== NAV ===== */
-.navRow{
-  display:flex;
-  gap:10px;
-  margin-top:10px;
-}
-button{
-  flex:1;
-  padding:12px;
-  font-size:16px;
-  border:none;
-  border-radius:12px;
-  background:var(--accent);
-  color:#fff;
-  font-weight:900;
-}
-button.secondary{
-  background:rgba(255,255,255,.15);
-}
-
-/* ===== CANVAS ===== */
-.canvasGrid{
-  display:grid;
-  gap:12px;
-}
-@media(min-width:900px){
-  .canvasGrid{ grid-template-columns:1fr 1fr; }
-}
-.canvasCard{
-  background:#000;
-  border-radius:14px;
-  overflow:hidden;
-  border:1px solid rgba(255,255,255,.10);
-}
-.canvasHeader{
-  padding:8px 12px;
-  font-size:13px;
-  font-weight:900;
-  background:rgba(0,0,0,.35);
-}
-/* ===== CANVAS (dessins pédagogiques) ===== */
-canvas{
-  width:100%;
-  height:180px;   /* ⬅️ réduit proportionnellement */
-  display:block;
-}
-
-@media(min-width:900px){
-  canvas{
-    height:280px; /* ⬅️ réduit aussi sur PC */
-  }
-}
-
-/* ===== INFO ===== */
-.infoBox{
-  margin-top:10px;
-  padding:10px;
-  border-radius:12px;
-  background:rgba(0,0,0,.2);
-  font-size:12px;
-  white-space:pre-line;
-}
-/* ===== FORMULES (PC seulement) ===== */
-.formulaBox{
-  margin-top:10px;
-  padding:10px;
-  border-radius:12px;
-  background:rgba(0,0,0,.25);
-  font-size:13px;
-  font-family:Consolas, monospace;
-  line-height:1.45;
-  white-space:pre-line;
-  display:none; /* caché par défaut (mobile) */
-}
-@media (min-width:900px){
-  .formulaBox{ display:block; } /* visible PC */
-}
-
-.c-blue{ border:2px solid #00a2ff !important; }
-.c-green{ border:2px solid #4caf50 !important; }
-.c-orange{ border:2px solid #ff9800 !important; }
-
-.noteBox{
-  background:rgba(255,255,255,.10);
-  border-radius:12px;
-  padding:10px 12px;
-  font-size:13px;
-  color:rgba(234,241,255,.9);
-  line-height:1.4;
-}
-
-.btnActive{
-  background:#00a2ff !important;
-  color:white !important;
-}
-/* =========================
-   MODAL AIDE / FORMULES
-========================= */
-#helpModal{
-  position:fixed;
-  inset:0;
-  z-index:9999;
-}
-
-#helpBackdrop{
-  position:absolute;
-  inset:0;
-  background:rgba(0,0,0,.65);
-}
-
-#helpPanel{
-  position:relative;
-  width:min(920px, calc(100% - 24px));
-  max-height:calc(100% - 24px);
-  margin:12px auto;
-  background:#0b1436;
-  border:1px solid rgba(255,255,255,.12);
-  border-radius:14px;
-  overflow:hidden;
-  display:flex;
-  flex-direction:column;
-  box-shadow:0 10px 40px rgba(0,0,0,.35);
-}
-
-.helpHeader{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:10px;
-  padding:12px;
-  background:rgba(255,255,255,.06);
-  border-bottom:1px solid rgba(255,255,255,.10);
-}
-
-.helpTitle{
-  font-weight:900;
-  font-size:14px;
-}
-
-.helpActions{
-  display:flex;
-  gap:10px;
-}
-
-.helpBtn{
-  padding:10px 12px;
-  border:none;
-  border-radius:10px;
-  background:var(--accent);
-  color:#fff;
-  font-weight:900;
-  cursor:pointer;
-}
-
-.helpBtn.secondary{
-  background:rgba(255,255,255,.15);
-}
-
-.helpContent{
-  padding:20px;
-  overflow:auto;
-  font-size:14px;
-  line-height:1.6;
-  color:#000;
-  background:#fff;
-  text-align:left;
-  max-width:820px;
-  margin:auto;
-}
-
-/* Titres internes */
-.helpContent h3{
-  margin:20px 0 10px;
-  font-size:16px;
-  text-align:center;
-  font-weight:900;
-}
-.helpContent .box{
-  border:1px solid #ddd;
-  background:#f8f8f8;
-  border-radius:10px;
-  padding:14px 16px;
-  margin:10px 0;
-}
-.helpContent code{
-  font-family:Consolas, monospace;
-  background:#eee;
-  padding:2px 6px;
-  border-radius:4px;
-  font-size:13px;
-}
-  
-
-#trainingBackdrop{
-  position:absolute;
-  inset:0;
-  background:rgba(0,0,0,.65);
-}
-
-
-  
-/* ==========================
-   MODE IMPRESSION — PRO
-========================== */
-
-@media print {
-
-  body {
-    background:#fff !important;
-    color:#000 !important;
-  }
-
-  body > * {
-    display:none !important;
-  }
-
-  #helpModal {
-    display:block !important;
-    position:static !important;
-  }
-
-  #helpPanel {
-    display:block !important;
-    width:100% !important;
-    max-width:100% !important;
-    box-shadow:none !important;
-    background:#fff !important;
-    color:#000 !important;
-    border-radius:0 !important;
-    padding:20px !important;
-  }
-
-  #helpBackdrop {
-    display:none !important;
-  }
-
-  .helpActions {
-    display:none !important;
-  }
-
-  /* ===== TEXTE ULTRA LISIBLE ===== */
-
-  .helpContent {
-    font-size:13.5pt !important;
-    line-height:1.45 !important;
-    color:#000 !important;
-  }
-
-  .helpContent h3 {
-    font-size:16pt !important;
-    margin-top:20px !important;
-    color:#000 !important;
-    border-bottom:2px solid #000 !important;
-    padding-bottom:4px !important;
-  }
-
-  .helpContent .box {
-    border:1px solid #000 !important;
-    background:#fff !important;
-    color:#000 !important;
-  }
-
-  .helpContent code {
-    background:#eee !important;
-    color:#000 !important;
-    font-weight:bold !important;
-    padding:2px 5px !important;
-  }
-
-}
-
-/* ===== FORMULES PÉDAGOGIQUES ===== */
-.formula{
-  font-family: Consolas, monospace;
-  font-size: 14px;
-  background: rgba(255,255,255,.12);
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-weight: 600;
-  display: inline-block;
-}
-
-
-#trainingBackdrop{
-  position:absolute;
-  inset:0;
-  background:rgba(0,0,0,.65);
-}
-
-#trainingPanel{
-  position:relative;
-  width:min(900px, calc(100% - 24px));
-  margin:12px auto;
-  background:#0b1436;
-  border-radius:14px;
-  border:1px solid rgba(255,255,255,.15);
-  box-shadow:0 10px 40px rgba(0,0,0,.45);
-
-  display:flex;
-  flex-direction:column;
-
-  max-height:90vh;
-  overflow:hidden;
-}
-#trainingPanel{
-  padding-bottom: env(safe-area-inset-bottom);
-}
-
-#dialBlock{
-  margin-top:6px;
-  padding:8px;
-  background:#0b1436;
-  border-radius:10px;
-  border:1px solid rgba(255,255,255,.15);
-}
-@media (max-width:600px){
-  #dialBlock{
-    padding:8px;
-    margin-top:6px;
-  }
-}
-#dialBlock,
-#dialBlock *{
-  color: #ffffff !important;
-}
-
-
-body.modal-open{
-  overflow: hidden;
-  position: fixed;
-  width: 100%;
-}
-
-
-#trainDial{
-  width:100%;
-  height:100%;
-  background:#000;
-  border-radius:50%;
-  border:3px solid #666;
-}
-
-
-@media (min-width: 1200px){
-  #dialWrap{ max-width:220px; }
-}
-
-#dialWrap{
-  width:100%;
-  max-width:220px;
-  aspect-ratio:1 / 1;
-  margin:6px auto 4px auto;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-}
-
-#trainDial{
-  width:100%;
-  height:100%;
-  display:block;
-  background:#000;
-  border-radius:50%;
-  border:3px solid #666;
-}
-
-#dialValue{
-  margin-top:4px !important;
-  font-size:14px;
-}
-
-#trainingExplain{
-  margin-top:4px;
-  font-size:12px;
-  line-height:1.25;
-  max-height:60px;
-  overflow:hidden;
-}
-
-.canvasGrid{
-  margin-top:6px !important;
-}
-
-/* =====================================================
-   TRAINING — MOBILE COMPACT (SANS IMPACT GLOBAL)
-===================================================== */
-@media (max-width: 768px){
-
-  /* On cible UNIQUEMENT le training */
-  body.training-on #trainingPanel{
-    max-height:100vh;
-  }
-
-  /* ======================
-     1️⃣ CADRAN
-  ====================== */
-  body.training-on #dialBlock{
-    padding:10px;
-  }
-
-  
-
-  body.training-on #dialValue{
-    font-size:12px;
-  }
-
-  body.training-on #trainingExplain{
-    font-size:11px;
-    max-height:46px;
-  }
-
-  /* ======================
-     2️⃣ SLIDER
-  ====================== */
-  body.training-on input[type="range"]{
-    height:22px;
-    margin:4px 0;
-  }
-
-  body.training-on .rangeLabels{
-    font-size:11px;
-    margin-top:2px;
-  }
-
-  /* ======================
-     3️⃣ DESSINS (CANVAS)
-  ====================== */
-  body.training-on .canvasGrid{
-    gap:8px;
-  }
-
-  body.training-on .canvasCard{
-    padding:0;
-  }
-
-  body.training-on canvas{
-    height:190px; /* réduit mais lisible */
-  }
-
-  body.training-on .canvasHeader{
-    font-size:11px;
-    padding:5px 8px;
-  }
-}
-
-
-
-/* =====================================================
-   TRAINING — SUPPRESSION DU BLOC INTRO PÉDAGOGIQUE
-   (titre + but pédagogique)
-===================================================== */
-
-/* =====================================================
-   TRAINING — SUPPRESSION DU TITRE "COMPRÉHENSION DU CADRAN"
-===================================================== */
-
-
-
-
-/* =====================================================
-   TRAINING — SUPPRESSION DU TITRE INTERNE (SOUS LE BANDEAU)
-===================================================== */
-
-
-/* =====================================================
-   TRAINING — SUPPRESSION DU TITRE
-   "Mode entraînement — Compréhension du cadran"
-===================================================== */
-
-
-
-.trainingOptions{
-  display:flex;
-  gap:12px;
-  align-items:center;
-}
-
-.trainingOptions .opt{
-  display:flex;
-  flex-direction:column;
-  font-size:11px;
-}
-
-.trainingOptions label{
-  font-size:11px;
-  opacity:.85;
-  margin-bottom:2px;
-}
-
-.trainingOptions select{
-  font-size:13px;
-  padding:6px 8px;
-  border-radius:8px;
-}
-
-
-#trainingContent{
-  overflow-y:auto;
-  flex:1;
-  padding-bottom:16px;
-}
-
-#trainingControls{
-  position:sticky;
-  bottom:0;
-  background:#0b1436;
-  padding:12px 0 16px;
-  border-top:1px solid rgba(255,255,255,.15);
-}
-
-/* =====================================================
-   MODE TEST — SLIDERS ULTRA COMPACTS (MOBILE SAFARI)
-===================================================== */
-
-@media (max-width: 768px){
-
-  /* Zone complète des contrôles TEST */
-  #trainingControls{
-    padding: 6px 10px !important;
-  }
-
-  /* Met les 2 sliders sur UNE SEULE LIGNE */
-  #trainingControls .row{
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-  }
-
-  /* Labels plus petits */
-  #trainingControls label{
-    font-size: 11px;
-    margin-bottom: 2px;
-  }
-
-  /* Sliders beaucoup moins hauts */
-  #trainingControls input[type="range"]{
-    height: 22px;
-    margin: 2px 0;
-  }
-
-  /* Bouton reset compact */
-  #btnResetTraining{
-    margin-top: 6px;
-    padding: 8px;
-    font-size: 13px;
-    border-radius: 10px;
-  }
-}
-/* ===============================
-   TRAINING TEST — SLIDERS COMPACTS
-   =============================== */
-
-#trainingControls{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-  margin-top:8px;
-}
-
-#trainingControls label{
-  font-size:11px;
-  opacity:.85;
-}
-
-#trainingControls input[type="range"]{
-  margin:4px 0 0 0;
-}
-
-/* Bouton reset centré et compact */
-#btnResetTraining{
-  grid-column:1 / -1;
-  margin-top:8px;
-  padding:10px;
-  font-size:14px;
-}
-
-/* iPhone : encore plus compact */
-@media (max-width:600px){
-  #trainingControls{
-    gap:8px;
-  }
-
-  #trainingControls label{
-    font-size:10.5px;
-  }
-
-  #btnResetTraining{
-    padding:9px;
-    font-size:13px;
-  }
-}
-
-
-/* ===============================
-   MODE TEST — CADRAN COMPACT (iPhone)
-   =============================== */
-@media (max-width: 600px) {
-
-  #dialBlock{
-    transform: scale(0.78);     /* ~22 % plus petit */
-    transform-origin: top center;
-    margin-top: -20px;          /* remonte visuellement */
-    margin-bottom: -30px;       /* récupère de la hauteur */
-  }
-
-}
-/* ===============================
-   MODE TEST — DESSINS COMPACTS
-   =============================== */
-@media (max-width: 600px) {
-
-  .visualisation-pedagogique,
-  #visualisationPedagogique,
-  .pedagoBox{
-    transform: scale(0.80);     /* ~20 % plus petit */
-    transform-origin: top center;
-    margin-top: -15px;
-    margin-bottom: -25px;
-  }
-
-}
-
-/* ================================
-   RÉDUCTION PROPORTIONNELLE BLOCS
-   ================================ */
-
-
-
-
-/* ===== NOTE CLIGNOTANTE (parallélisme) ===== */
-@keyframes blinkNote {
-  0%   { opacity: 1; }
-  50%  { opacity: 0.50; }
-  100% { opacity: 1; }
-}
-
-.note-blink{
-  animation: blinkNote 3.1s infinite;
-  border-left: 4px solid #ff5252;
-  padding-left: 10px;
-}
-
-/* ============================
-   FIX MOBILE — SIDE VIEW TROP PETIT
-============================ */
-#sideView{
-  width: 100%;
-  min-height: 280px;   /* ← valeur testée, SAFE */
-  display: block;
-}
-
-/* ===============================
-   TRAINING — CADRAN (RÈGLE MAÎTRE)
-=============================== */
-
-#dialWrap{
-  width: 100%;
-  max-width: 420px;   /* ← AJUSTE ICI (420–480 recommandé) */
-  aspect-ratio: 1 / 1;
-  margin: 10px auto;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-#trainDial{
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-.toggleGroup{
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  margin-top: 8px;
-}
-
-.defectToggle{
-  padding: 8px;
-  background: #1c2b6a;
-  border: 1px solid #2f3f9e;
-  color: #eaf1ff;
-  border-radius: 6px;
-  font-size: 13px;
-}
-
-.defectToggle.active{
-  background: #00a2ff;
-  color: #000;
-  font-weight: 600;
-}
-
-#topViewTest,
-#sideViewTest{
-  width: 100%;
-  height: 220px;
-  display: block;
-}
-
-/* ===== TRAINING FULLSCREEN ===== */
-
-
-
-
-/* barre du haut */
-.trainingTopBar{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:12px 18px;
-  background:#121c4a;
-  border-bottom:2px solid rgba(255,255,255,.08);
-}
-
-.trainingTitle{
-  font-size:18px;
-  font-weight:700;
-}
-
-.trainingControls{
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
-
-.trainingControls select,
-.trainingControls button{
-  padding:6px 10px;
-  border-radius:8px;
-  border:none;
-}
-
-/* contenu */
-.trainingBody{
-  flex:1;
-  display:flex;
-  flex-direction:column;
-  overflow:hidden;
-}
-
-#trainingContent{
-  padding:15px;
-  overflow:auto;
-}
-
-/* zone dessins */
-.trainingCanvasZone{
-  flex:1;
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:14px;
-  padding:14px;
-}
-
-.trainingCanvasCard{
-  background:#000;
-  border-radius:12px;
-  overflow:hidden;
-  display:flex;
-  flex-direction:column;
-}
-
-.trainingCanvasCard canvas{
-  width:100%;
-  height:260px;
-  display:block;
-}
-@media (max-width:900px){
-  .trainingCanvasCard canvas{
-    height:220px;
-  }
-}
-
-/* mobile */
-@media(max-width:900px){
-  .trainingCanvasZone{
-    grid-template-columns:1fr;
-  }
-}
-
-/* ===== TRAINING FULLSCREEN ===== */
-
-
-/* empêche scroll arrière */
-body.trainingLock{
-  overflow:hidden;
-  touch-action:none;
-}
-
-/* ================= TRAINING FULLSCREEN ================= */
-
-
-
-
-
-/* empêche scroll derrière */
-body.trainingLock{
-  overflow:hidden;
-  touch-action:none;
-}
-
-/* ====== iOS CANVAS FIX ====== */
-.trainingCanvasCard canvas{
-  transform: translateZ(0);
-}
-.trainingCanvasCard{
-  transform: translateZ(0);
-  backface-visibility: hidden;
-}
-
-
-/* empêche Safari de garder une texture figée */
-.trainingCanvasCard canvas{
-  will-change: contents;
-}
-
-.trainingHidden{
-  display:none;
-}
-
-
-
-#trainingPage{
-  position:fixed;
-  inset:0;
-  width:100vw;
-  height:100dvh;
-  background:#0b1436;
-  z-index:9999;
-
-  display:none;
-  flex-direction:column;
-}
-
-#trainingPage.active{
-  display:flex;
-}
-
-body.trainingLock{
-  overflow:hidden;
-}
-
-/* empêche le canvas d’être sous la carte */
-.canvasCard{
-  position:relative;
-  overflow:hidden;
-}
-
-/* le canvas doit être dans le bon layer */
-.canvasCard canvas{
-  position:relative;
-  z-index:2;
-  display:block;
-  background:transparent !important;
-}
-
-/* le fond de la carte passe derrière */
-.canvasCard::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  background:#000;
-  z-index:1;
-  border-radius:14px;
-}
-canvas{
-  transform:translateZ(0);
-}
-
-
-/* ===== FIX TRAINING CANVAS (bloc noir) ===== */
-
-.trainingCanvasCard::before{
-  display:none !important;
-}
-
-.trainingCanvasCard canvas{
-  position:relative;
-  z-index:5;
-  background:#000;
-}
-
-
-#trainingContent{
-  padding:15px;
-  overflow:auto;
-  flex:1;
-}
-/* ================= TRAINING FULLSCREEN CANVAS ================= */
-
-
-
-
-
-.trainingNote{
-  margin:14px;
-}
-
-.trainingNote.center{
-  text-align:center;
-}
-
-
-/* ================= TRAINING CANVAS LAYOUT ================= */
-
-
-/* ================= TRAINING CANVAS LAYOUT (SCOPÉ) ================= */
-
-/* ✅ Ne s'applique QUE dans la page training */
-#trainingPage .trainingCanvasZone{
-  width:100%;
-  flex:1;
-  min-height:420px;
-
-  display:flex;
-  flex-direction:column;
-  gap:14px;
-
-  /* IMPORTANT: éviter la boucle "contenu -> hauteur -> contenu" */
-  height:auto;
-}
-
-/* cartes */
-#trainingPage .trainingCanvasCard{
-  background:#000;
-  border-radius:12px;
-  overflow:hidden;
-  display:flex;
-  flex-direction:column;
-  min-height:220px;
-}
-
-/* le canvas doit prendre l'espace restant */
-#trainingPage .trainingCanvasCard canvas{
-  width:100%;
-  flex:1;
-  height:auto;      /* ← le CSS contrôle, pas le JS */
-  display:block;
-}
-/* ============================
-   TRAINING = PAGE ROOT LAYER
-============================ */
-
-#trainingPage{
-  position:fixed;
-  inset:0;
-  z-index:999999;
-  background:#0b1436;
-  display:none;
-  overflow:auto;
-  -webkit-overflow-scrolling:touch;
-}
-
-/* quand actif */
-#trainingPage.active{
-  display:block;
-}
-
-/* LA PAGE PRINCIPALE DISPARAIT PHYSIQUEMENT */
-body.trainingActive > *:not(#trainingPage){
-  display:none !important;
-}
-
-
-.trainingHidden{
-  display:none;
-}
-
-.trainingVisible{
-  position:fixed;
-  inset:0;
-  z-index:9999;
-  background:#0b1436;
-  display:flex;
-  flex-direction:column;
-}
-
+:root{font-family:Arial,Helvetica,sans-serif;color:#18334a;background:#eef3f7;font-size:16px;--blue:#116f9a;--ink:#132d46;--line:#d8e1e9;--muted:#526b7e;--bad:#a62e38;--ok:#247447;--accent:#116f9a;--text:#18334a}
+*{box-sizing:border-box}body{margin:0}button,input,select,textarea{font:inherit}button,select,input,a{touch-action:manipulation}button{cursor:pointer;min-height:44px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);padding:9px 13px;font-weight:700}button:hover{background:#e7f2f8}button:disabled{opacity:.45;cursor:default}button.primary{background:var(--blue);color:#fff;border-color:var(--blue)}button.primary:hover{background:#0d5c81}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid #e6a82b;outline-offset:2px}button[aria-pressed=true]{background:#d8f0fa;border-color:#1479a2}input,select{max-width:100%;width:100%;border:1px solid #adbfcd;border-radius:7px;padding:10px;min-height:44px;background:white;color:var(--ink)}input[type=range]{padding:0;border:none;min-height:36px;accent-color:var(--blue)}label{display:block;font-size:.82rem;font-weight:700;line-height:1.45;margin:0 0 5px}h1,h2,h3,p{margin:0}h1{font-size:1.2rem}h2{font-size:1.08rem;margin-bottom:8px}h3{font-size:.95rem;margin-bottom:8px}p{line-height:1.5;margin-bottom:10px}small,.muted{color:var(--muted);font-size:.83rem;line-height:1.5}a{color:#126f98}.hidden,[hidden]{display:none!important}.actions{display:flex;gap:8px;flex-wrap:wrap}
+.top{background:var(--ink);color:white;padding:15px 22px;display:flex;gap:15px;align-items:center;justify-content:space-between}.brand{display:flex;gap:12px;align-items:center}.monogram{background:#287798;border:1px solid #72c0dc;border-radius:10px;padding:10px 8px;min-width:49px;text-align:center}.monogram svg{display:block;width:32px;height:30px}.top p{font-size:.85rem;color:#bdd7e6;margin:3px 0 0}.mode-badge{font-size:.75rem;text-transform:uppercase;letter-spacing:.07em;color:#afe3ee;display:block;margin-bottom:3px}.top button{background:#213e55;color:white;border-color:#507089;font-size:.87rem}.top button:hover{background:#2d506b}.tools{padding:10px 20px;background:#fff;border-bottom:1px solid var(--line);display:flex;gap:10px;align-items:center;flex-wrap:wrap}.tools label{margin:0}.tools select{width:auto;max-width:310px;font-size:.87rem}.tools .spacer{flex:1}.tools button{font-size:.85rem}.progress-label{font-size:.8rem;color:var(--muted)}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 380px;max-width:1700px;margin:auto;align-items:start}.work{padding:20px;min-width:0}.work-intro{display:flex;justify-content:space-between;gap:14px;align-items:start;margin-bottom:15px}.work-intro h2{font-size:1.03rem;margin:0 0 5px}.work-intro p{margin:0}.pill{display:inline-block;padding:5px 8px;background:#e4f0f7;color:#176082;border-radius:5px;font-size:.73rem;line-height:1.3;font-weight:700;white-space:nowrap}.stage-grid{display:grid;gap:14px}.stage{padding:12px;background:white;border:1px solid var(--line);border-radius:14px;min-width:0;overflow:hidden}.stage-title{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:.88rem;font-weight:700;margin:0 0 10px}.stage-title small{font-weight:400;font-size:.74rem}.machine-canvas{display:block;width:100%;height:240px;background:#080d15;border-radius:10px}.caption{display:flex;gap:10px;justify-content:space-between;margin-top:10px;font-size:.76rem;color:var(--muted);line-height:1.4}.caption .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px}.dot.blue{background:#00a2ff}.dot.orange{background:#ff9800}.dimensions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:14px}.dimensions button{text-align:left;font-size:.8rem;background:white;padding:12px}.dimensions strong{font-size:1.03rem;display:block;margin:5px 0}.dimensions small{font-size:.72rem;font-weight:400;display:block}.dimensions button.active{border-color:var(--blue);background:#e6f4fb}.dimensions span{color:var(--blue)}.dimensions button:nth-child(2) span{color:#247447}.dimensions button:nth-child(3) span{color:#9c5a00}.work-note{font-size:.76rem;color:var(--muted);margin-top:12px;line-height:1.5}
+.side{background:white;border-left:1px solid var(--line);padding:20px;min-width:0;min-height:calc(100dvh - 157px)}.tabbar{display:flex;gap:5px;margin-bottom:18px}.tabbar button{flex:1;padding:8px;font-size:.85rem}.tabbar button[aria-selected=true]{background:#d8f0fa;border-color:#1479a2}.stepHead{display:flex;gap:9px;align-items:start;justify-content:space-between;margin-bottom:14px}.stepTitle{font-size:.98rem;font-weight:700;line-height:1.45}.badge{font-size:.67rem;font-weight:700;border-radius:5px;padding:5px 7px;background:#e4f0f7;color:#176082;white-space:nowrap}.row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}.row>div{min-width:0}.card{padding:13px;border:1px solid var(--line);background:#f6f9fb;border-radius:10px;margin-bottom:12px}.card label{margin-top:7px}.card h3{font-size:.87rem}.navRow{display:flex;gap:8px;margin:15px 0}.navRow button{flex:1;font-size:.83rem}.noteBox{background:#edf5fa;color:#214f68;border:1px solid #d4e5ef;border-radius:9px;padding:11px 12px;margin-top:12px;font-size:.82rem;line-height:1.55;white-space:pre-line;overflow-wrap:anywhere}.noteBox:empty{display:none}.noteBox.note-blink{background:#fff4d4;border-color:#ead596;color:#6b5018}.infoBox{background:#f4f7f9;color:var(--ink);border:1px solid var(--line);padding:12px;border-radius:9px;margin-top:12px;font-size:.79rem;line-height:1.55;white-space:pre-line;overflow-wrap:anywhere}.formulaDetails{border-top:1px solid var(--line);margin-top:16px;padding-top:8px}summary{cursor:pointer;font-size:.81rem;font-weight:700;min-height:38px;line-height:38px}.formulaBox{font-family:Consolas,monospace;font-size:.76rem;line-height:1.55;white-space:pre-line;overflow-wrap:anywhere;background:#f4f7f9;border-radius:8px;padding:12px}.formulaBox:empty{display:none}.c-blue{border:2px solid #116f9a!important}.c-green{border:2px solid #247447!important}.c-orange{border:2px solid #a66511!important}#inputsArea label[style]{color:var(--ink)!important}#inputsArea label span[style]{color:var(--muted)!important;font-size:.68rem!important}.help-card{padding:13px;background:#f2f6f9;border-radius:10px;margin-bottom:12px}.help-card h3{font-size:.9rem}.help-card p{font-size:.82rem}.help-card p:last-child{margin:0}.help-list{padding-left:19px;font-size:.84rem;line-height:1.6;margin-bottom:0}.help-list li{margin-bottom:7px}.teacher-section{border-top:1px solid var(--line);margin-top:17px;padding-top:17px}.teacher-section h3{margin-top:10px}.teacher-section .actions{display:grid;grid-template-columns:1fr}.teacher-section button{font-size:.8rem;text-align:left}.teacher-section p{font-size:.81rem}.teacher-section #savedStatus{margin:10px 0 0;font-size:.76rem}.result-pair{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:12px 0}.result-pair div{background:#eaf5fb;border:1px solid #c9e3f0;border-radius:9px;padding:13px}.result-pair span{font-size:.76rem;color:var(--muted);display:block}.result-pair strong{display:block;font-size:1.23rem;margin-top:5px;color:#126b90}.verify-table{width:100%;border-collapse:collapse;font-size:.79rem}.verify-table th,.verify-table td{padding:10px 6px;text-align:left;border-bottom:1px solid var(--line)}.verify-table th{font-size:.73rem;color:var(--muted)}
+footer{padding:10px 20px;color:var(--muted);font-size:.74rem;border-top:1px solid var(--line);background:#f8fafc}dialog{width:min(520px,94vw);max-height:90dvh;border:none;border-radius:15px;padding:22px;color:var(--ink);background:white;box-shadow:0 10px 70px #0005}dialog::backdrop{background:#071d32b3}dialog:not([open]){display:none!important}dialog h2{margin-bottom:16px}dialog input{margin:7px 0 14px}#teacherLoginError{color:var(--bad);font-size:.85rem}.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#183c50;color:white;border-radius:10px;box-shadow:0 4px 30px #0003;padding:13px 18px;z-index:10005;max-width:min(92vw,700px);font-size:.88rem;line-height:1.4}
+#helpModal{width:min(920px,94vw);padding:0;max-height:92dvh}#helpPanel{display:flex;flex-direction:column;max-height:92dvh}.helpHeader{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 22px;border-bottom:1px solid var(--line)}.helpTitle{font-size:1.08rem;font-weight:700}.helpActions{display:flex;gap:8px}.helpActions button{font-size:.8rem}.helpContent{padding:20px 22px;overflow:auto;overscroll-behavior:contain;font-size:.88rem;line-height:1.6}.helpContent h3{margin:18px 0 10px}.helpContent h3:first-child{margin-top:0}.helpContent .box{background:#f2f6f9;border:1px solid var(--line);border-radius:10px;padding:14px;margin:10px 0}.helpContent ul{padding-left:22px}.teacherHelp{border-top:1px solid var(--line);margin-top:20px;padding-top:15px}
+#trainingPage{width:100%;max-width:100%;height:100dvh;max-height:100dvh;inset:0;margin:0;border-radius:0;padding:0;background:#eef3f7;overflow:auto}.trainingTopBar{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:14px 22px;background:var(--ink);color:white;position:sticky;top:0;z-index:5}.trainingTitle{font-size:1.06rem;font-weight:700}.trainingTitle small{display:block;color:#bdd7e6;font-weight:400;font-size:.75rem;margin-top:4px}.trainingControls{display:flex;align-items:center;gap:9px}.trainingControls label{margin:0;font-size:.76rem}.trainingControls select{width:auto;font-size:.82rem}.trainingControls button{font-size:.82rem}.trainingBody{display:grid;grid-template-columns:390px minmax(0,1fr);gap:20px;padding:20px;max-width:1700px;margin:auto}.trainingCanvasZone{display:grid;gap:14px;align-content:start;min-width:0}.trainingCanvasCard{background:white;border:1px solid var(--line);border-radius:14px;padding:12px;min-width:0;overflow:hidden}.canvasHeader{font-size:.88rem;font-weight:700;margin-bottom:10px}.trainingCanvasCard canvas{width:100%;height:260px;display:block;background:#080d15;border-radius:10px}#trainingContent{background:white;border:1px solid var(--line);border-radius:14px;padding:17px;min-width:0}#trainingContent>.box>b{font-size:.85rem;line-height:1.5}.toggleGroup{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:14px}.toggleGroup button{font-size:.77rem;padding:10px 8px}.defectToggle.active{background:#d8f0fa;border-color:#1479a2}#btnResetTraining{font-size:.78rem;width:100%}.dialCard{min-width:0;flex:1;padding:10px 5px;border:1px solid var(--line);border-radius:10px;background:#f4f7f9;text-align:center}.dialCard.active{border-color:#1479a2;background:#eaf6fb}.dialTitle{font-size:.79rem;font-weight:700;margin-bottom:8px}.dialCard canvas{display:block;width:100%;height:auto;aspect-ratio:1;max-width:220px;margin:auto}.dialValue{font-size:1rem;font-weight:700;margin:8px 0}.zeroDialBtn{font-size:.72rem;padding:8px;min-height:40px}.trainingNote{font-size:.8rem}#trainInfo:empty{display:none}.range-label{display:flex;justify-content:space-between;gap:8px;align-items:center;font-size:.8rem}.range-label output{font-size:.74rem;color:var(--muted)}body.trainingActive,body.modal-open{overflow:hidden}
+@media(min-width:1700px){.work{padding:24px}.machine-canvas{height:270px}}
+@media(max-width:1100px){.layout{grid-template-columns:minmax(0,1fr) 340px}.work,.side{padding:15px}.work-intro .pill{display:none}.machine-canvas{height:220px}.trainingBody{grid-template-columns:340px minmax(0,1fr);gap:14px;padding:15px}.trainingCanvasCard canvas{height:235px}.dimensions{gap:6px}.dimensions button{padding:10px}}
+@media(max-width:760px){.top{padding:12px;flex-wrap:wrap;gap:12px}.top h1{font-size:1.08rem}.top p{font-size:.76rem}.top .actions{width:100%}.top .actions>*{flex:1;white-space:nowrap}.monogram{padding:9px 7px}.mode-badge{font-size:.68rem}.tools{padding:10px 12px;gap:8px}.tools label,.tools .spacer{display:none}.tools select{flex:1;min-width:180px;max-width:none}.tools .progress-label{display:none}.tools button{font-size:.79rem;padding:8px 10px}#btnFullscreen{display:none}.layout{display:flex;flex-direction:column}.work,.side{width:100%;padding:12px}.side{border-left:0;border-top:1px solid var(--line);min-height:0}.work-intro h2{font-size:.96rem}.work-intro p{font-size:.77rem}.work-intro{margin-bottom:12px}.stage{padding:10px}.stage-grid{gap:12px}.machine-canvas{height:175px}.caption{font-size:.7rem}.dimensions{margin-top:12px;gap:6px}.dimensions button{padding:9px;font-size:.74rem}.dimensions strong{font-size:.92rem}.dimensions small{font-size:.68rem}.mobile-settings{display:inline-flex!important;font-size:.78rem;align-items:center}.stage-title small{font-size:.7rem}.side .row{gap:12px}.helpHeader{padding:13px;flex-wrap:wrap}.helpTitle{width:100%;font-size:1rem}.helpActions{width:100%}.helpActions button{flex:1}.helpContent{padding:15px}.trainingTopBar{padding:12px;flex-wrap:wrap;gap:12px}.trainingControls{width:100%;flex-wrap:wrap}.trainingControls select{flex:1}.trainingTitle{font-size:1rem}.trainingBody{display:flex;flex-direction:column;padding:12px;gap:12px}.trainingCanvasZone{width:100%}.trainingCanvasCard canvas{height:180px}.dialCard canvas{max-width:180px}.trainingTopBar{position:relative}#trainingContent{padding:14px}.trainingNote{font-size:.78rem}.trainingCanvasZone{gap:12px}footer{padding:12px}}
+@media(max-width:380px){.tools select{width:100%;flex-basis:100%}.monogram{display:none}.stage-title{font-size:.82rem}.stage-title small{font-size:.66rem}.dimensions strong{font-size:.88rem}.caption{flex-wrap:wrap}.helpActions button{font-size:.76rem}.trainingControls label{width:100%}}
+@media(prefers-reduced-motion:no-preference){button{transition:background .12s,border-color .12s}}
+@media print{body{background:#fff}.top,.tools,.side,footer,.toast,.work-note{display:none!important}.layout{display:block}.work{padding:0}.stage{break-inside:avoid}dialog:not([open]){display:none!important}body.modal-open>header,body.modal-open>nav,body.modal-open>main{display:none!important}#helpModal[open]{position:static;width:100%;max-height:none;box-shadow:none;margin:0}#helpPanel,.helpContent{max-height:none;overflow:visible}.helpHeader{display:none}.box{break-inside:avoid}}
 
 </style>
-</head>
-
-<body>
-
-<!-- ===================================================== -->
-<!-- HEADER -->
-<!-- ===================================================== -->
-<div class="headerBar">
-  <div style="display:flex; align-items:center; justify-content:center; gap:10px;">
-    <span>Alignement d’arbres — Comparateur inversé (mils)</span>
-
-    <button id="btnHelp"
-      type="button"
-      style="flex:0; padding:6px 10px; border-radius:10px; border:none; background:rgba(255,255,255,.15); color:#fff; font-weight:900; cursor:pointer;">
-      ℹ️
-    </button>
-
-    <button id="btnTraining"
-      type="button"
-      style="flex:0; padding:6px 12px; border-radius:10px; border:none; background:#4caf50; color:#fff; font-weight:900; cursor:pointer;">
-      🎓 Training
-    </button>
-  </div>
-</div>
-
-
-<!-- ===================================================== -->
-<!-- PAGE NORMALE -->
-<!-- ===================================================== -->
-<div class="wrap">
-  <div class="grid">
-
-    <!-- ===== ETAPES ===== -->
-    <div class="step" id="stepCard">
-      <div class="stepHead">
-        <div class="stepTitle" id="stepTitle">—</div>
-        <div class="badge" id="stepBadge">Info</div>
-      </div>
-
-      <div id="inputsArea"></div>
-      <div id="formulaBox" class="formulaBox"></div>
-
-      <div class="navRow">
-        <button class="secondary" id="btnPrev" type="button">◀ Précédent</button>
-        <button id="btnNext" type="button">Suivant ▶</button>
-      </div>
-
-      <div id="noteBox" class="noteBox" style="margin-top:10px;">—</div>
-      <div class="infoBox" id="infoBox">—</div>
+</head><body>
+<header class="top">
+  <div class="brand"><div class="monogram" aria-hidden="true"><svg viewBox="0 0 34 30" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="7" width="10" height="16" rx="2"/><rect x="23" y="7" width="10" height="16" rx="2"/><path d="M11 15h12M16 8v14M19 8v14M6 23v4m22-4v4"/></svg></div><div><span class="mode-badge" id="modeBadge">Consultation</span><h1>Atelier d’alignement</h1><p>Lire les mesures. Comprendre les corrections.</p></div></div>
+  <div class="actions"><button id="btnHelp" type="button">Aide</button><button id="modeBtn" type="button" aria-pressed="false">Mode enseignant</button></div>
+</header>
+<nav class="tools" aria-label="Parcours d’alignement">
+  <label for="stepSelect">Étape</label><select id="stepSelect" aria-label="Choisir une étape"></select><span class="progress-label" id="progressLabel"></span><span class="spacer"></span><button id="btnTraining" class="primary" type="button">Entraînement</button><button id="btnRestart" type="button">Réinitialiser</button><button id="btnFullscreen" type="button">Plein écran</button>
+</nav>
+<main class="layout">
+  <section class="work" aria-label="Vues de la machine">
+    <div class="work-intro"><div><h2>Moteur mobile et pompe fixe</h2><p class="muted">Compare les deux vues pendant ton alignement.</p></div><span class="pill">Comparateur inversé · mils</span><button id="jumpSettings" class="mobile-settings" style="display:none">Réglages</button></div>
+    <div class="stage-grid">
+      <section class="stage"><h3 class="stage-title">Vue de dessus <small>Plan horizontal · 3–9</small></h3><canvas id="topView" class="machine-canvas" aria-label="Moteur mobile et pompe fixe vus du dessus"></canvas><div class="caption"><span><i class="dot blue"></i>Moteur mobile</span><span><i class="dot orange"></i>Pompe fixe</span></div></section>
+      <section class="stage"><h3 class="stage-title">Vue de profil <small>Plan vertical · 12–6</small></h3><canvas id="sideView" class="machine-canvas" aria-label="Moteur mobile et pompe fixe vus de profil"></canvas><div class="caption"><span>Les lettres repèrent les pattes du moteur.</span><span>Déplacements amplifiés à l’écran</span></div></section>
     </div>
-
-
-    <!-- ===== DESSINS PRINCIPAUX ===== -->
-    <div class="card">
-      <h2>Dessins pédagogiques</h2>
-      <p>
-        Vue de dessus (horizontal) et vue de profil (vertical).
-        Les pattes A / B / C / D seront affichées ici.
-      </p>
-
-      <div class="trainingCanvasZone">
-
-        <div class="trainingView">
-          <div class="trainingViewTitle">Vue de dessus</div>
-          <canvas id="topView"></canvas>
-        </div>
-
-        <div class="trainingView">
-          <div class="trainingViewTitle">Vue de profil</div>
-          <canvas id="sideView"></canvas>
-        </div>
-
-      </div>
+    <div class="dimensions" aria-label="Dimensions géométriques en pouces">
+      <button data-measure="0" type="button"><span>D · Accouplement</span><strong id="dimD">3 po</strong><small>Diamètre</small></button>
+      <button data-measure="1" type="button"><span>A · Pattes avant</span><strong id="dimA">6 po</strong><small>Depuis le centre de l’accouplement</small></button>
+      <button data-measure="2" type="button"><span>B · Pattes arrière</span><strong id="dimB">16 po</strong><small>Depuis le centre de l’accouplement</small></button>
     </div>
-
-  </div>
-</div>
-
-
-<!-- ===================================================== -->
-<!-- AIDE -->
-<!-- ===================================================== -->
-<div id="helpModal" class="print-scope" style="display:none;">
-  <div id="helpBackdrop"></div>
-
-  <div id="helpPanel" role="dialog" aria-modal="true">
-    <div class="helpHeader">
-      <div class="helpTitle">ℹ️ Guide — Formules & Conventions (Alignement)</div>
-
-      <div class="helpActions">
-        <button id="btnHelpPrint" type="button" class="helpBtn">🖨️ Imprimer</button>
-        <button id="btnHelpClose" type="button" class="helpBtn secondary">Fermer ✕</button>
-      </div>
+    <p class="work-note">Choisis une dimension pour la modifier. L’entraînement permet de simuler les défauts et d’observer les cadrans.</p>
+  </section>
+  <aside class="side" id="settingsPanel" aria-label="Réglages et repères">
+    <div class="tabbar" role="tablist" aria-label="Panneau latéral"><button id="settingsTab" role="tab" aria-selected="true" aria-controls="settingsContent">Réglages</button><button id="referenceTab" role="tab" aria-selected="false" aria-controls="referenceContent" tabindex="-1">Repères</button></div>
+    <div id="settingsContent" role="tabpanel" aria-labelledby="settingsTab">
+      <section id="stepCard"><div class="stepHead"><h2 class="stepTitle" id="stepTitle">Pied boiteux</h2><span class="badge" id="stepBadge">Calcul</span></div><div id="inputsArea"></div><div class="navRow"><button class="secondary" id="btnPrev" type="button">Précédent</button><button class="primary" id="btnNext" type="button">Suivant</button></div><div id="noteBox" class="noteBox"></div><div class="infoBox" id="infoBox" aria-live="polite"></div><details class="formulaDetails" id="formulaDetails"><summary>Détail du calcul</summary><div id="formulaBox" class="formulaBox"></div></details></section>
     </div>
-
-    <div id="helpContent" class="helpContent"></div>
-  </div>
-</div>
-
-
-
-<!-- ===================================================== -->
-<!-- TRAINING FULLSCREEN -->
-<!-- ===================================================== -->
-<div id="trainingPage" class="trainingHidden">
-
-  <div class="trainingTopBar">
-    <div class="trainingTitle">🎓 Mode Training</div>
-
-    <div class="trainingControls">
-      <label>Montage cadran:</label>
-      <select id="trainMount">
-        <option value="motor">Moteur</option>
-        <option value="pump">Pompe</option>
-      </select>
-
-      <button id="btnTrainingClose">Fermer ✕</button>
+    <div id="referenceContent" role="tabpanel" aria-labelledby="referenceTab" hidden>
+      <div class="help-card"><h3>Les unités</h3><p><b>1 mil = 0,001 po</b></p><p>Les lectures au cadran et les corrections sont affichées en mils. Entre les dimensions D, A et B en pouces.</p></div>
+      <div class="help-card"><h3>Les deux plans</h3><p><b>Vertical · 12–6</b><br>Correction en hauteur sous les pattes.</p><p><b>Horizontal · 3–9</b><br>Déplacement latéral du moteur.</p></div>
+      <div class="help-card"><h3>Le parcours</h3><ol class="help-list"><li>Vérifier le pied boiteux.</li><li>Entrer les dimensions D, A et B.</li><li>Entrer les lectures et lire les corrections.</li><li>Vérifier la compensation thermique.</li><li>Reprendre les lectures après correction.</li></ol></div>
+      <button id="openGuide" type="button" style="width:100%">Ouvrir l’aide complète</button>
     </div>
-  </div>
+    <section class="teacher-section" id="teacherPanel" hidden><span class="pill">Préparation enseignant</span><h3>Configuration de départ</h3><p class="muted">Prépare les dimensions et les valeurs à retrouver au début de l’activité.</p><div class="actions"><button id="saveDefaults" type="button">Mémoriser ces réglages</button><button id="loadDefaults" type="button">Recharger les réglages mémorisés</button><button id="downloadStudentApp" type="button">Télécharger la version préparée</button></div><p id="savedStatus" class="muted" aria-live="polite"></p></section>
+  </aside>
+</main>
+<footer>Atelier d’alignement · Mécanique industrielle · Outil pédagogique</footer>
+<dialog id="helpModal" class="print-scope" aria-labelledby="helpTitle"><div id="helpPanel"><div class="helpHeader"><h2 class="helpTitle" id="helpTitle">Guide d’alignement</h2><div class="helpActions"><button id="btnHelpPrint" type="button">Imprimer</button><button id="btnHelpClose" type="button">Fermer</button></div></div><div id="helpContent" class="helpContent"></div></div></dialog>
+<dialog id="trainingPage" class="trainingHidden" aria-labelledby="trainingTitle"><div class="trainingTopBar"><div class="trainingTitle" id="trainingTitle">Entraînement à l’alignement<small>Simuler un défaut et observer la lecture des cadrans.</small></div><div class="trainingControls"><label for="trainMount">Montage du cadran</label><select id="trainMount"><option value="motor">Sur le moteur</option><option value="pump">Sur la pompe</option></select><button id="btnTrainingClose" type="button">Fermer</button></div></div><div class="trainingBody"><div id="trainingContent"></div><div class="trainingCanvasZone"><div class="trainingCanvasCard"><div class="canvasHeader">Vue de dessus · Plan horizontal</div><canvas id="topViewTest" aria-label="Simulation du déplacement horizontal"></canvas></div><div class="trainingCanvasCard"><div class="canvasHeader">Vue de profil · Plan vertical</div><canvas id="sideViewTest" aria-label="Simulation du déplacement vertical"></canvas></div></div></div></dialog>
+<dialog id="teacherLogin" aria-labelledby="teacherLoginTitle"><form id="teacherLoginForm"><h2 id="teacherLoginTitle">Mode enseignant</h2><label for="teacherPassword">Code d’accès</label><input id="teacherPassword" type="password" autocomplete="off" autocapitalize="none" required><p id="teacherLoginError" role="alert"></p><div class="actions"><button type="submit" class="primary">Déverrouiller</button><button type="button" id="cancelTeacherLogin">Annuler</button></div></form></dialog>
+<dialog id="resetDialog" aria-labelledby="resetTitle"><h2 id="resetTitle">Recommencer l’alignement ?</h2><p>Les lectures saisies seront remises à zéro. Les dimensions et les paramètres thermiques seront conservés.</p><div class="actions"><button id="confirmReset" class="primary" type="button">Remettre les lectures à zéro</button><button id="cancelReset" type="button">Annuler</button></div></dialog>
+<div id="appToast" class="toast" role="status" hidden></div>
 
-  <div class="trainingBody">
-
-    <!-- CONTENU PEDAGOGIQUE (texte, boutons etc) -->
-    <div id="trainingContent"></div>
-
-    <!-- CANVAS TRAINING (SEPARÉS DE LA PAGE PRINCIPALE) -->
-    <div class="trainingCanvasZone">
-
-      <div class="trainingCanvasCard">
-        <div class="canvasHeader">Vue de dessus</div>
-        <canvas id="topViewTest"></canvas>
-      </div>
-
-      <div class="trainingCanvasCard">
-        <div class="canvasHeader">Vue de profil</div>
-        <canvas id="sideViewTest"></canvas>
-      </div>
-
-    </div>
-
-  </div>
-
-</div>
-
+<script id="alignmentDefaults" type="application/json">null</script>
 <script>
+
 "use strict";
 
 let userIsTyping = false;
@@ -1248,7 +77,7 @@ let userIsTyping = false;
    GÉOMÉTRIE MÉCANIQUE MAÎTRE (UNE SEULE SOURCE)
 ===================================================== */
 
-const VIEW_OFFSET_X = 100; // ajuste à ton goût
+const VIEW_OFFSET_X = 30; // ajuste à ton goût
 const MACHINE_LAYOUT = {
   machineOffset: -145 // négatif = rapproche la pompe
 };
@@ -1979,6 +808,7 @@ if(tc && sc){
   
 
   if(slider) slider.value = 0;
+  lastSliderValue = 0;
 
   // ===============================
   // SÉLECTEURS DE DÉFAUT
@@ -2099,6 +929,7 @@ if (slider) {
 
       
       if(slider) slider.value = 0;
+  lastSliderValue = 0;
 
       updateTraining();
     });
@@ -2108,10 +939,10 @@ if (slider) {
   // MONTAGE (MOTEUR / POMPE)
   // ===============================
   if(mount){
-    mount.addEventListener("change",()=>{
+    mount.onchange=()=>{
       trainMount = mount.value;
       updateTraining();
-    });
+    };
   }
 
   initTrainingDials();
@@ -2231,8 +1062,9 @@ function updateTraining(){
   // ===============================
   // APPLICATION DES ZÉROS
   // ===============================
-  const parDisplay = parRaw - (dialState.parallel.zero || 0);
-  const angDisplay = angRaw - (dialState.angular.zero || 0);
+  const mountSign = trainMount === "pump" ? -1 : 1;
+  const parDisplay = (parRaw - (dialState.parallel.zero || 0)) * mountSign;
+  const angDisplay = (angRaw - (dialState.angular.zero || 0)) * mountSign;
 
   // ===============================
   // CADRANS
@@ -3140,9 +1972,9 @@ if(id === "shimV"){
     <div class="noteBox">
       Épaisseur de correction calculée :
       <br><br>
-      <b>Patte AVANT :</b> ${r.front.toFixed(2)} mil
+      <b>Patte AVANT :</b> ${(r.front*1000).toFixed(2)} mil
       <br>
-      <b>Patte ARRIÈRE :</b> ${r.rear.toFixed(2)} mil
+      <b>Patte ARRIÈRE :</b> ${(r.rear*1000).toFixed(2)} mil
       <br><br>
       Une seule correction corrige simultanément :
       <br>• l’angularité verticale
@@ -3184,7 +2016,7 @@ else if(id === "thermal"){
     <label>Température ambiante (°F)</label>
     <input type="number"
            value="${state.tempAmb}"
-         oninput="state.tempAmb = Number(this.value); thermalApply();">
+         onchange="state.tempAmb = Number(this.value); thermalApply();">
   </div>
 
   <!-- MOTEUR -->
@@ -3196,14 +2028,14 @@ else if(id === "thermal"){
         <label>Température d’opération (°F)</label>
         <input type="number"
                value="${state.motor.tempOp}"
-             oninput="state.motor.tempOp = Number(this.value); thermalApply();" >
+             onchange="state.motor.tempOp = Number(this.value); thermalApply();" >
       </div>
 
       <div>
         <label>Hauteur d’axe (po)</label>
         <input type="number"
                value="${state.motor.axisHeight}"
-            oninput="state.motor.axisHeight = Number(this.value); thermalApply();" >
+            onchange="state.motor.axisHeight = Number(this.value); thermalApply();" >
       </div>
     </div>
 
@@ -3231,14 +2063,14 @@ else if(id === "thermal"){
         <label>Température d’opération (°F)</label>
         <input type="number"
                value="${state.pump.tempOp}"
-            oninput="state.pump.tempOp = Number(this.value); thermalApply();" >
+            onchange="state.pump.tempOp = Number(this.value); thermalApply();" >
       </div>
 
       <div>
         <label>Hauteur d’axe (po)</label>
         <input type="number"
                value="${state.pump.axisHeight}"
-            oninput="state.pump.axisHeight = Number(this.value); thermalApply();" >
+            onchange="state.pump.axisHeight = Number(this.value); thermalApply();" >
       </div>
     </div>
 
@@ -3427,25 +2259,16 @@ const sideCtx = sideCanvas.getContext("2d");
 
 
 function resizeCanvas(canvas, ctx){
-
-  const rect = canvas.getBoundingClientRect();
-
-  // 🛑 Si Safari n’a pas encore calculé la hauteur
-  let w = Math.floor(rect.width);
-  let h = Math.floor(rect.height);
-
-  if(h < 40){
-    h = canvas.parentElement.clientHeight || 280;
-  }
-
-  if(w < 40){
-    w = canvas.parentElement.clientWidth || 400;
-  }
-
-  if(canvas.width !== w)  canvas.width  = w;
-  if(canvas.height !== h) canvas.height = h;
-
-  return { w, h };
+  const rect=canvas.getBoundingClientRect();
+  const cssW=Math.max(1,rect.width||640),cssH=Math.max(1,rect.height||240);
+  const w=Math.max(640,cssW),scale=cssW/w,h=cssH/scale;
+  const dpr=Math.min(2.5,window.devicePixelRatio||1);
+  const pxW=Math.round(cssW*dpr),pxH=Math.round(cssH*dpr);
+  if(canvas.width!==pxW)canvas.width=pxW;
+  if(canvas.height!==pxH)canvas.height=pxH;
+  ctx.setTransform(dpr*scale,0,0,dpr*scale,0,0);
+  canvas.layoutScale=scale;
+  return {w,h};
 }
 /* =====================================================
    UTILITAIRES DESSIN
@@ -3481,7 +2304,7 @@ function forceResizeTrainingCanvases(){
 
 function clear(ctx,w,h){
   ctx.clearRect(0,0,w,h);
-  ctx.fillStyle="#000";
+  ctx.fillStyle="#080d15";
   ctx.fillRect(0,0,w,h);
 }
 
@@ -3589,7 +2412,7 @@ function drawFoot(ctx, x, y, label){
 
   // texte
   ctx.fillStyle = "#fff";
-  ctx.font = "12px Arial";
+  ctx.font = `${12/(ctx.canvas.layoutScale||1)}px Arial`;
   ctx.textAlign = "center";
 
   // position selon la patte
@@ -3734,7 +2557,7 @@ function drawCouplingDiameter(ctx, cx, cy, diam){
   ctx.stroke();
 
   ctx.fillStyle = "rgba(255,255,255,.90)";
-  ctx.font = "12px Arial";
+  ctx.font = `${12/(ctx.canvas.layoutScale||1)}px Arial`;
   ctx.textAlign = "left";
   ctx.textBaseline = "middle";
   ctx.fillText(`Ø = ${diam} po`, cx + 24, cy);
@@ -3874,9 +2697,9 @@ ctx.fillRect(
   // ================= TITRES =================
   ctx.fillStyle="#fff";
   ctx.textAlign="center";
-  ctx.font="14px Arial";
-  ctx.fillText("MOTEUR (mobile)", motorX, motorY - motorH/2 - 15);
-  ctx.fillText("POMPE (fixe)", pumpX + pumpW/2, baseY - pumpH/2 - 15);
+  ctx.font=`${14/(ctx.canvas.layoutScale||1)}px Arial`;
+  ctx.fillText("MOTEUR (mobile)", motorX, motorY - motorH/2 - 34/(ctx.canvas.layoutScale||1));
+  ctx.fillText("POMPE (fixe)", pumpX + pumpW/2, baseY - pumpH/2 - 34/(ctx.canvas.layoutScale||1));
 }
 
 
@@ -3993,9 +2816,9 @@ ctx.fillRect(
   // ================= TITRES =================
   ctx.fillStyle="#fff";
   ctx.textAlign="center";
-  ctx.font="14px Arial";
-  ctx.fillText("MOTEUR (mobile)", motorX, motorY - motorH/2 - 15);
-  ctx.fillText("POMPE (fixe)", pumpX + pumpW/2, baseY - pumpH/2 - 15);
+  ctx.font=`${14/(ctx.canvas.layoutScale||1)}px Arial`;
+  ctx.fillText("MOTEUR (mobile)", motorX, motorY - motorH/2 - 34/(ctx.canvas.layoutScale||1));
+  ctx.fillText("POMPE (fixe)", pumpX + pumpW/2, baseY - pumpH/2 - 34/(ctx.canvas.layoutScale||1));
 }
 
 
@@ -4144,6 +2967,218 @@ window.addEventListener("resize", () => {
   }
 });
 
+
 </script>
-</body>
-</html>
+<script>
+/* Interface commune aux ateliers Compresseur, Vibration et Alignement. */
+const alignmentTemplate = '<!doctype html>\n' + document.documentElement.outerHTML;
+const alignmentDefaultsKey = 'atelier_alignement_defaults_v2';
+const byId = id => document.getElementById(id);
+let teacherMode = false;
+let toastTimer;
+const cloneData = value => JSON.parse(JSON.stringify(value));
+const factoryConfig = {state:cloneData(state),geometry:cloneData(geometry)};
+
+function notifyUI(message){
+  byId('appToast').textContent=message;byId('appToast').hidden=false;
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>byId('appToast').hidden=true,4500);
+}
+function getConfig(){
+  const data={state:cloneData(state),geometry:cloneData(geometry)};
+  data.state.step=0;data.state.measureStep=0;
+  return data;
+}
+function safeConfig(input){
+  if(!input||typeof input!=='object')return null;
+  const data=cloneData(factoryConfig);
+  function mergeNumbers(target, source){
+    if(!source||typeof source!=='object')return;
+    for(const key of Object.keys(target)){
+      if(target[key]&&typeof target[key]==='object')mergeNumbers(target[key],source[key]);
+      else if(typeof target[key]==='number'&&typeof source[key]==='number'&&Number.isFinite(source[key]))target[key]=source[key];
+      else if(key==='material'&&Object.hasOwn(MATERIAL_COEFF,source[key]))target[key]=source[key];
+    }
+  }
+  mergeNumbers(data.state,input.state);mergeNumbers(data.geometry,input.geometry);
+  for(const key of Object.keys(data.geometry))data.geometry[key]=Math.max(.1,data.geometry[key]);
+  for(const key of Object.keys(data.state.softFoot))data.state.softFoot[key]=Math.max(0,data.state.softFoot[key]);
+  for(const key of ['softFootTol','angVTol','parVTol','angHTol','parHTol','runoutTol'])data.state[key]=Math.max(0,data.state[key]);
+  data.state.motor.axisHeight=Math.max(0,data.state.motor.axisHeight);data.state.pump.axisHeight=Math.max(0,data.state.pump.axisHeight);
+  data.state.step=0;data.state.measureStep=0;return data;
+}
+function applyConfig(data){
+  const valid=safeConfig(data);if(!valid)return false;
+  Object.assign(state,valid.state);Object.assign(geometry,valid.geometry);userIsTyping=false;
+  return true;
+}
+function rememberedConfig(){
+  try{return safeConfig(JSON.parse(localStorage.getItem(alignmentDefaultsKey)));}catch{return null;}
+}
+let embeddedConfig=null;
+try{embeddedConfig=safeConfig(JSON.parse(byId('alignmentDefaults').textContent));}catch{}
+applyConfig(rememberedConfig()||embeddedConfig||factoryConfig);
+
+function setTab(reference){
+  byId('settingsContent').hidden=reference;byId('referenceContent').hidden=!reference;
+  byId('settingsTab').setAttribute('aria-selected',String(!reference));
+  byId('referenceTab').setAttribute('aria-selected',String(reference));
+  byId('settingsTab').tabIndex=reference?-1:0;byId('referenceTab').tabIndex=reference?0:-1;
+}
+function jumpToSettings(){
+  setTab(false);
+  if(matchMedia('(max-width:760px)').matches)byId('settingsPanel').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function setTeacherMode(value){
+  teacherMode=!!value;
+  byId('modeBadge').textContent=teacherMode?'Préparation':'Consultation';
+  byId('modeBtn').textContent=teacherMode?'Terminer la préparation':'Mode enseignant';
+  byId('modeBtn').setAttribute('aria-pressed',String(teacherMode));
+  byId('teacherPanel').hidden=!teacherMode;
+  if(!teacherMode)byId('savedStatus').textContent='';
+  if(byId('helpModal').open)byId('helpContent').innerHTML=buildHelpHTML();
+}
+
+const originalHelpHTML=buildHelpHTML;
+buildHelpHTML=function(){
+  const intro='<h3>Utiliser l’atelier</h3><div class="box">Choisis une étape dans le menu du haut, puis entre les valeurs dans <b>Réglages</b>. Les boutons <b>Précédent</b> et <b>Suivant</b> parcourent toutes les étapes, y compris les trois dimensions D, A et B.<br><br>Le bouton <b>Entraînement</b> ouvre les cadrans et les défauts simulés. Les valeurs d’entraînement sont indépendantes des lectures du parcours d’alignement.<br><br><b>Réinitialiser</b> remet les lectures à zéro et retourne à la première étape. Les dimensions et les paramètres thermiques restent disponibles.</div>';
+  const teacher=teacherMode?'<section class="teacherHelp" id="teacherHelp"><h3>Préparer l’application pour la classe</h3><div class="box"><p><b>Mémoriser ces réglages</b> conserve les dimensions, les lectures de départ, les tolérances et les paramètres thermiques sur cet appareil, dans ce navigateur.</p><p><b>Recharger les réglages mémorisés</b> retrouve cette configuration.</p><p><b>Télécharger la version préparée</b> crée un fichier <b>index.html</b> contenant les valeurs actuelles. Il démarre en consultation à la première étape et peut remplacer la page de l’application sur GitHub Pages. Un navigateur qui possède déjà des réglages mémorisés continue à les utiliser.</p><p>Les élèves peuvent utiliser les réglages, le parcours et l’entraînement. Les outils de préparation et cette section d’aide apparaissent en mode enseignant.</p></div></section>':'';
+  return intro+originalHelpHTML()+teacher;
+};
+openHelp=function(){
+  byId('helpContent').innerHTML=buildHelpHTML();
+  if(!byId('helpModal').open)byId('helpModal').showModal();
+  document.body.classList.add('modal-open');byId('btnHelpClose').focus();
+};
+closeHelp=function(){
+  if(byId('helpModal').open){byId('helpModal').close();byId('btnHelp').focus();}
+  document.body.classList.remove('modal-open');
+};
+printHelp=function(){
+  const popup=window.open('','','width=900,height=700');
+  if(!popup){notifyUI('Autorise l’ouverture de la fenêtre pour imprimer le guide.');return;}
+  const contents=byId('helpContent').innerHTML;
+  popup.document.open();
+  popup.document.write('<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Guide d’alignement</title><style>body{font:14px/1.6 Arial,sans-serif;color:#18334a;margin:30px}h1{font-size:22px}h3{font-size:16px;margin-top:24px}.box{padding:14px;border:1px solid #ccd9e2;border-radius:8px;margin:10px 0;break-inside:avoid}p{margin:8px 0}button{display:none}@page{margin:15mm}</style></head><body><h1>Atelier d’alignement — Guide</h1>'+contents+'</body></html>');
+  popup.document.close();popup.focus();setTimeout(()=>popup.print(),250);
+};
+
+const originalTrainingHTML=buildTrainingHTML;
+buildTrainingHTML=function(){
+  return originalTrainingHTML()
+    .replace('Training = comprendre • Alignement = corriger','Choisis un défaut, puis déplace le curseur.')
+    .replace('Reset alignement','Réinitialiser l’entraînement')
+    .replace('<input id="trainSlider"','<label class="range-label" for="trainSlider">Déplacer le moteur <output id="trainDisplacement">0,00 mil</output></label><input id="trainSlider"')
+    .replace('id="trainInfo" class="noteBox trainingNote center">\n—','id="trainInfo" class="noteBox trainingNote center">');
+};
+openTraining=function(){
+  if(!byId('trainingPage').open)byId('trainingPage').showModal();
+  byId('trainingPage').classList.add('active');lastSliderValue=0;
+  startTraining();byId('btnTrainingClose').focus();
+};
+closeTraining=function(){
+  if(!trainingMode&&!byId('trainingPage').open)return;
+  trainingMode=false;byId('trainingPage').classList.remove('active');
+  byId('trainingPage').classList.add('trainingHidden');byId('trainingPage').close();
+  document.body.classList.remove('trainingActive','training-on');
+  byId('btnTraining').focus();renderAll();
+};
+const originalUpdateTraining=updateTraining;
+updateTraining=function(){
+  originalUpdateTraining();if(!trainingMode)return;
+  const names={parH:'Parallélisme horizontal',angH:'Angularité horizontale',parV:'Parallélisme vertical',angV:'Angularité verticale'};
+  byId('trainingExplain').textContent=names[activeDefect]+' · Montage sur '+(trainMount==='motor'?'le moteur':'la pompe')+'.';
+  byId('trainInfo').hidden=true;
+  const output=byId('trainDisplacement');if(output)output.textContent=Number(trainState[activeDefect]||0).toLocaleString('fr-CA',{minimumFractionDigits:2,maximumFractionDigits:2})+' mil';
+  document.querySelectorAll('.defectToggle').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.defect===activeDefect)));
+};
+
+function syncShell(){
+  const step=STEPS[state.step];
+  byId('stepSelect').value=String(state.step);
+  byId('progressLabel').textContent=`Étape ${state.step+1} / ${STEPS.length}`;
+  byId('stepTitle').textContent=(state.step+1)+'. '+step.label;
+  byId('stepBadge').textContent=step.id==='measures'?['D','A','B'][state.measureStep]:'Étape '+(state.step+1);
+  byId('btnPrev').disabled=state.step===0;
+  byId('btnNext').disabled=state.step===STEPS.length-1;
+  byId('formulaDetails').hidden=step.id!=='softfoot';
+  byId('dimD').textContent=geometry.couplingDiameter.toLocaleString('fr-CA')+' po';
+  byId('dimA').textContent=geometry.A.toLocaleString('fr-CA')+' po';
+  byId('dimB').textContent=geometry.B.toLocaleString('fr-CA')+' po';
+  document.querySelectorAll('[data-measure]').forEach(b=>b.classList.toggle('active',step.id==='measures'&&Number(b.dataset.measure)===state.measureStep));
+  if(step.id==='shimV'||step.id==='shimH'){
+    const result=step.id==='shimV'?computeCemeqVertical():computeCemeqHorizontal();
+    // Le moteur de calcul existant renvoie des pouces; la fiche affiche des mils.
+    const fmt=v=>(v*1000).toLocaleString('fr-CA',{minimumFractionDigits:2,maximumFractionDigits:2});
+    byId('inputsArea').innerHTML=`<p class="muted">${step.id==='shimV'?'Correction en hauteur':'Déplacement latéral'} du moteur</p><div class="result-pair"><div><span>Pattes avant</span><strong>${fmt(result.front)} mil</strong></div><div><span>Pattes arrière</span><strong>${fmt(result.rear)} mil</strong></div></div>`;
+  }
+  if(step.id==='verify'){
+    const fmt=v=>(v*1000).toLocaleString('fr-CA',{minimumFractionDigits:2,maximumFractionDigits:2});
+    byId('inputsArea').innerHTML=`<p class="muted">Après les corrections, reprends les mesures et remplace les lectures dans les étapes 3 et 5.</p><table class="verify-table"><thead><tr><th>Lectures saisies</th><th>Vertical</th><th>Horizontal</th></tr></thead><tbody><tr><td>Angularité C</td><td>${fmt(state.angV)} mil</td><td>${fmt(state.angH)} mil</td></tr><tr><td>Parallélisme E</td><td>${fmt(state.parV)} mil</td><td>${fmt(state.parH)} mil</td></tr></tbody></table>`;
+  }
+  byId('inputsArea').querySelectorAll('input').forEach((input,i)=>{
+    if(!input.id)input.id='field_'+step.id+'_'+i;
+    const label=input.parentElement.querySelector('label');if(label)label.htmlFor=input.id;
+    input.setAttribute('inputmode','decimal');input.setAttribute('enterkeyhint','done');
+  });
+  byId('inputsArea').querySelectorAll('select').forEach((select,i)=>{
+    if(!select.id)select.id='select_'+step.id+'_'+i;
+    const label=select.previousElementSibling;if(label?.tagName==='LABEL')label.htmlFor=select.id;
+  });
+}
+const originalRefreshUI=refreshUI;
+refreshUI=function(){originalRefreshUI();syncShell();};
+
+byId('stepSelect').innerHTML=STEPS.map((step,index)=>`<option value="${index}">${index+1}. ${step.label}</option>`).join('');
+byId('stepSelect').addEventListener('change',()=>{state.step=Number(byId('stepSelect').value);state.measureStep=0;userIsTyping=false;renderAll();jumpToSettings();});
+document.querySelectorAll('[data-measure]').forEach(button=>button.addEventListener('click',()=>{state.step=1;state.measureStep=Number(button.dataset.measure);userIsTyping=false;renderAll();jumpToSettings();}));
+byId('settingsTab').onclick=()=>setTab(false);byId('referenceTab').onclick=()=>setTab(true);
+document.querySelector('.tabbar').addEventListener('keydown',event=>{if(['ArrowLeft','ArrowRight','Home','End'].includes(event.key)){event.preventDefault();const reference=event.key==='End'||(event.key!=='Home'&&byId('referenceTab').getAttribute('aria-selected')!=='true');setTab(reference);byId(reference?'referenceTab':'settingsTab').focus();}});
+byId('openGuide').onclick=openHelp;byId('jumpSettings').onclick=jumpToSettings;
+byId('modeBtn').onclick=()=>{
+  if(teacherMode){setTeacherMode(false);return;}
+  byId('teacherLoginError').textContent='';byId('teacherPassword').value='';byId('teacherLogin').showModal();byId('teacherPassword').focus();
+};
+byId('teacherLoginForm').onsubmit=event=>{
+  event.preventDefault();
+  if(byId('teacherPassword').value!=='PROF'){byId('teacherLoginError').textContent='Code incorrect.';byId('teacherPassword').value='';byId('teacherPassword').focus();return;}
+  byId('teacherPassword').value='';byId('teacherLogin').close();setTeacherMode(true);byId('modeBtn').focus();
+};
+byId('cancelTeacherLogin').onclick=()=>byId('teacherLogin').close();
+byId('teacherLogin').addEventListener('close',()=>{byId('teacherPassword').value='';byId('modeBtn').focus();});
+byId('helpModal').addEventListener('cancel',event=>{event.preventDefault();closeHelp();});
+byId('trainingPage').addEventListener('cancel',event=>{event.preventDefault();closeTraining();});
+byId('saveDefaults').onclick=()=>{
+  if(!teacherMode)return;
+  try{localStorage.setItem(alignmentDefaultsKey,JSON.stringify(getConfig()));byId('savedStatus').textContent='Configuration de départ mémorisée sur cet appareil.';notifyUI('Réglages mémorisés.');}
+  catch{byId('savedStatus').textContent='Enregistrement local indisponible. Télécharge la version préparée pour conserver tes réglages.';}
+};
+byId('loadDefaults').onclick=()=>{
+  if(!teacherMode)return;
+  const data=rememberedConfig();if(!data){notifyUI('Aucun réglage mémorisé sur cet appareil.');return;}
+  applyConfig(data);renderAll();setTab(false);notifyUI('Réglages mémorisés rechargés.');
+};
+byId('downloadStudentApp').onclick=()=>{
+  if(!teacherMode)return;
+  const prepared=new DOMParser().parseFromString(alignmentTemplate,'text/html');
+  prepared.getElementById('alignmentDefaults').textContent=JSON.stringify(getConfig()).replace(/</g,'\\u003c');
+  const blob=new Blob(['<!doctype html>\n'+prepared.documentElement.outerHTML],{type:'text/html;charset=utf-8'});
+  const url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download='index.html';document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),10000);
+  notifyUI('Version préparée téléchargée. Elle démarrera en consultation.');
+};
+byId('btnRestart').onclick=()=>byId('resetDialog').showModal();
+byId('cancelReset').onclick=()=>byId('resetDialog').close();
+byId('confirmReset').onclick=()=>{
+  for(const key of Object.keys(state.softFoot))state.softFoot[key]=0;
+  state.angV=0;state.parV=0;state.angH=0;state.parH=0;state.runout=0;state.step=0;state.measureStep=0;userIsTyping=false;
+  byId('resetDialog').close();setTab(false);renderAll();notifyUI('Lectures remises à zéro.');
+};
+byId('btnFullscreen').onclick=async()=>{
+  try{if(document.fullscreenElement)await document.exitFullscreen();else await document.documentElement.requestFullscreen();}
+  catch{notifyUI('Le plein écran n’est pas disponible dans ce navigateur.');}
+};
+document.addEventListener('fullscreenchange',()=>byId('btnFullscreen').textContent=document.fullscreenElement?'Quitter le plein écran':'Plein écran');
+window.addEventListener('resize',()=>{if(!trainingMode){drawTopView();drawSideView();}});
+window.addEventListener('load',()=>{setTeacherMode(false);syncShell();});
+
+</script>
+</body></html>
